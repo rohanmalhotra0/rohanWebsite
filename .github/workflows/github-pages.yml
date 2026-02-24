@@ -34,6 +34,16 @@ jobs:
 
       - name: Build
         working-directory: Ashif
+        env:
+          # Recommended: point the frontend at a serverless endpoint so no API key
+          # is ever bundled client-side.
+          VITE_ROHANGPT_API_URL: ${{ secrets.VITE_ROHANGPT_API_URL }}
+          VITE_OPENAI_MODEL: ${{ vars.VITE_OPENAI_MODEL }}
+
+          # Optional fallback: if you *really* want direct OpenAI from the client,
+          # you can set OPENAI_API_KEY as a GitHub Secret. This will be mapped
+          # to VITE_OPENAI_API_KEY by `Ashif/vite.config.js` and bundled.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run build
 
       - name: Configure Pages

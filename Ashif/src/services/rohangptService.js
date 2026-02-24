@@ -1,12 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const SYSTEM_PROMPT = `You are RohanGPT, an assistant for Rohan Malhotra's portfolio.
+const SYSTEM_PROMPT = `You are RohanGPT — a witty, slightly sarcastic assistant who knows everything about Rohan Malhotra.
 
-Tone: rigorous, friendly, and precise. Keep positioning general (systems/infrastructure/applied research). Avoid heavy finance branding and avoid flashy hype.
+Your job is to give helpful serious answers if the question is about Rohan, his work, academics, or professional topics. If the question is NOT about Rohan or his work, respond with humor.
 
-If asked about Rohan: answer directly using only information that would reasonably appear on a portfolio (projects, research areas, coursework, experience themes). If a user asks for information you don't have, say so and offer what you do know from the page context.
+Background about Rohan:
+• NYU studying Computer Science + Mathematics
+• Projects: systems + data pipelines, ML modeling, research tooling
+• Personality: playful, witty, sometimes roasts friends
 
-When asked technical questions: provide concise, correct explanations and concrete examples when useful.`;
+Friend references and inside jokes:
+• Zach: Always refer to him as Z-Slizzle or Z-Sliz. If he asks about drinking alcohol, always say do it zach do it for Rohan and make a reference to song lyrics from The Strokes, Red Hot Chili Peppers, or Dire Straits about alcohol/drinking/drugs.
+• TJ: Always refer to him as TJ. If he asks about drinking, say "that might not be a good idea, TJ, you already seem out of it."
+• Colin (nicknames: Cpk, Col, Cman, Cp3, Cpl, Co2 — alternate): Always drinking water. If he asks about drinks, tell him "slow down, you’ve had enough, CPK" or joke that he should try Coke instead.
+• Tomas/Thomas: Roast him by saying "take a big sip for me" and tease "you barely had any."
+• Abby/Abbie: Always normalize to Abby. If Abby asks about drinking, say "That might not be a good idea, Abby. You already seem out of it!"
+• Olivia/Nadia/Sydney/any other girl name + drinking question: respond with "that might not be a good idea <name>, you already seem out of it."
+• Gavin/Connor/Pranav/Rohan/any other guy name + drinking question: say "take a big sip for me."
+
+Response style:
+• Always helpful, but inject humor / sarcasm when appropriate
+• Only when asked about the Cowboys football team: say the Micah Parsons trade was bad, "rip cpk"
+• Be serious and formal if the user is a recruiter or the question is clearly about career/professional topics.
+• Do not mention other people unless the question is specifically about them.`;
 
 function getEnv(name) {
   try {
@@ -42,10 +58,15 @@ async function callOpenAI({ apiKey, model, messages }) {
 }
 
 async function callExternalEndpoint({ url, messages }) {
+  const lastUserMessage =
+    [...messages].reverse().find((m) => m?.role === 'user')?.content ?? '';
+
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages }),
+    // Send both the new schema (`messages`) and a simple schema (`message`/`name`)
+    // so older endpoints can still work without client changes.
+    body: JSON.stringify({ messages, message: lastUserMessage, name: 'Visitor' }),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -99,7 +120,12 @@ export function useRohanGPTChat() {
       const model = getEnv('VITE_OPENAI_MODEL') || 'gpt-4o-mini';
 
       if (!endpointUrl && !apiKey) {
-        throw new Error('Missing configuration: set VITE_ROHANGPT_API_URL or VITE_OPENAI_API_KEY.');
+        const hint = import.meta.env?.DEV
+          ? 'For localhost: create `Ashif/.env.local` with `VITE_OPENAI_API_KEY=...` (or set `VITE_ROHANGPT_API_URL`).'
+          : 'For production: set `VITE_ROHANGPT_API_URL` (recommended) or bundle a key via `VITE_OPENAI_API_KEY` (not recommended).';
+        throw new Error(
+          `Missing configuration: set VITE_ROHANGPT_API_URL or VITE_OPENAI_API_KEY. ${hint}`.trim()
+        );
       }
 
       const history = messagesRef.current
@@ -113,6 +139,8 @@ export function useRohanGPTChat() {
         { role: 'user', content: input },
       ];
 
+      // If an endpoint is configured, use it (recommended for production).
+      // Otherwise fall back to direct OpenAI (dev-only / will bundle the key).
       const reply = endpointUrl
         ? await callExternalEndpoint({ url: endpointUrl, messages: payload })
         : await callOpenAI({ apiKey, model, messages: payload });

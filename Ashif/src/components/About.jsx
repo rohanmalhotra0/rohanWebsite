@@ -1,6 +1,7 @@
 import React from 'react';
 import ScrollReveal from './ScrollReveal';
 import { Highlighter } from "@/components/ui/highlighter";
+import HeadshotCarousel from './HeadshotCarousel';
 
 export default function About({ scrollContainerRef }) {
   return (
@@ -19,13 +20,7 @@ export default function About({ scrollContainerRef }) {
 
         <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:gap-12">
           <div className="w-full max-w-[220px] sm:max-w-[240px] md:max-w-[280px] flex-shrink-0">
-            <img
-              src="/website-photos/headshot.png"
-              alt="Rohan Malhotra headshot"
-              loading="lazy"
-              decoding="async"
-              className="w-full aspect-square object-cover rounded-2xl shadow-lg border border-gray-200"
-            />
+            <HeadshotCarousel />
           </div>
 
           <div className="flex-1">

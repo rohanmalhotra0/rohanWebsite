@@ -181,10 +181,30 @@
   background: #ffffff;
 }
 
+#rohangpt .cs-message-input__content-editor-container,
+#rohangpt .cs-message-input__content-editor-wrapper {
+  background: #ffffff;
+}
+
 #rohangpt .cs-message-input__content-editor {
   border-radius: 999px;
   background: #f3f4f6;
   padding: 10px 14px;
+}
+
+#rohangpt .cs-message-input__content-editor-wrapper:focus-within {
+  background: #ffffff;
+  box-shadow: none;
+}
+
+#rohangpt .cs-message-input--focused .cs-message-input__content-editor {
+  background: #f3f4f6;
+}
+
+#rohangpt .cs-message-input__content-editor:focus {
+  background: #f3f4f6;
+  box-shadow: none;
+  outline: none;
 }
 
 #rohangpt .cs-message-input__content-editor:focus {
