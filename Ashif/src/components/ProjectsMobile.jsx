@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Highlighter } from "@/components/ui/highlighter";
 import { projects, research, workExperience } from '../data/portfolioData';
-import { Rocket } from 'lucide-react';
 
 export default function ProjectsMobile() {
     const [showAllProjects, setShowAllProjects] = useState(false);
@@ -94,10 +93,7 @@ export default function ProjectsMobile() {
             <div className="text-center mt-16 mb-8">
                 <h2 className="text-3xl font-bold font-pixel underline-wavy-yellow inline-block">
                     <Highlighter action="underline" color="#FFD700">
-                        <span className="inline-flex items-center gap-2">
-                            Projects
-                            <Rocket size={18} aria-hidden="true" />
-                        </span>
+                        Projects
                     </Highlighter>
                 </h2>
             </div>

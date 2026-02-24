@@ -6,7 +6,6 @@ import { Highlighter } from "@/components/ui/highlighter";
 import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
 import { cn } from "@/lib/utils";
 import { projects, research, workExperience } from '../data/portfolioData';
-import { Rocket } from 'lucide-react';
 
 function clampStyles(lines) {
     return {
@@ -174,10 +173,7 @@ export default function Projects() {
                 <div className="text-center mt-20 mb-12">
                     <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
                         <Highlighter action="underline" color="#FFD700">
-                            <span className="inline-flex items-center gap-2">
-                                Projects
-                                <Rocket size={22} aria-hidden="true" />
-                            </span>
+                            Projects
                         </Highlighter>
                     </h2>
                 </div>
