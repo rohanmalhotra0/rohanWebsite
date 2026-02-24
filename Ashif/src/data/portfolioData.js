@@ -45,7 +45,7 @@ export const projects = [
     title: 'RSI Predictor',
     description:
       'Engineered SMA, MACD, RSI features with a Random Forest baseline and cross-validation evaluation.',
-    imageUrl: '/website-photos/projectsPhotos/refrax2.png',
+    imageUrl: '/website-photos/projectsPhotos/rsi.jpeg',
     tags: ['Random Forest', 'Feature Engineering', 'Cross-validation'],
   },
   {
@@ -98,7 +98,7 @@ export const research = [
     description:
       'NLP + time-series modeling with volatility analysis and regression-based evaluation pipelines.',
     imageUrl: '/website-photos/Research/RedditSetiment.png',
-    liveUrl: '/website-photos/research/reddit-paper.pdf',
+    liveUrl: '/website-photos/Research/Reddit%20Data%20in%20Quantitative%20Financial%20Models%20copy.pdf',
     tags: ['NLP', 'Time Series', 'Regression'],
   },
   {
@@ -106,7 +106,7 @@ export const research = [
     description:
       'Monte Carlo backtesting comparing fractional vs full Kelly and analyzing risk-adjusted growth.',
     imageUrl: '/website-photos/Research/economic.png',
-    liveUrl: '/website-photos/research/kelly-paper.pdf',
+    liveUrl: '/website-photos/Research/AnEconomic%20Approachto%20OptimizeCapital%20Allocation.pdf',
     tags: ['Monte Carlo', 'Optimization', 'Risk'],
   },
   {

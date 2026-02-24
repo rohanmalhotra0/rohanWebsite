@@ -37,7 +37,7 @@ export default function Education() {
                     <File value="Course-Numerical"><p>Numerical Methods</p></File>
                   </Folder>
                   <Folder element="Graduate Coursework" value="Graduate Coursework">
-                    <File value="Grad-MathTech"><p>Mathematical Techniques for Computer Science Applications</p></File>
+                    <File value="Grad-MathTech"><p>Mathematical Techniques for CS Applications</p></File>
                   </Folder>
                 </Folder>
               </Folder>

@@ -2,12 +2,29 @@ import React from 'react';
 import Spline from '@splinetool/react-spline';
 import { ArrowRight } from 'lucide-react';
 import RotatingText from './RotatingText';
+import { WordRotate } from "@/components/ui/word-rotate";
 
 /**
  * A modern, minimal hero section component.
  */
 export default function Hero() {
-  const focusAreas = ['Systems', 'Infrastructure', 'Applied Research'];
+  const focusAreas = [
+    'Systems',
+    'Infrastructure',
+    'Applied Research',
+    'Concurrency',
+    'Distributed Systems',
+    'Numerical Computing',
+  ];
+  const greetings = [
+    "Hello, I'm",
+    "Hola, soy",
+    "Hallo, ich bin",
+    "Olá, eu sou",
+    "Привет, я",
+    "こんにちは、私は",
+    "مرحباً، أنا",
+  ];
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
@@ -16,21 +33,43 @@ export default function Hero() {
         <Spline
           scene="https://prod.spline.design/9xuF1oRA5poA131s/scene.splinecode"
           aria-label="Interactive 3D animation"
+          onLoad={(spline) => {
+            const candidates = [
+              'ROBOT',
+              'Robot',
+              'robot',
+              'Text',
+              'text',
+              'BackgroundText',
+              'backgroundText',
+              'Title',
+              'title',
+            ];
+            candidates.forEach((name) => {
+              try {
+                const obj = spline?.findObjectByName?.(name);
+                if (obj) obj.visible = false;
+              } catch {
+                // ignore
+              }
+            });
+          }}
         />
       </div>
 
       {/* 2. Overlay Content */}
       {/* Content is aligned to the center */}
       <div className="relative z-20 flex items-center justify-center w-full h-full p-8 text-center bg-black/20 pointer-events-none sm:p-16 md:p-24">
-        <div className="max-w-md pointer-events-auto">
-          <h1 className="font-pixel text-5xl font-bold text-white md:text-7xl lg:text-8xl [text-shadow:_0_3px_5px_rgb(0_0_0_/_40%)]">
-            Rohan Malhotra
+        <div className="max-w-3xl pointer-events-auto">
+          <h1 className="font-pixel inline-flex items-baseline justify-center gap-x-3 font-bold text-white whitespace-nowrap leading-none text-[clamp(1.6rem,6vw,4.75rem)] [text-shadow:_0_3px_5px_rgb(0_0_0_/_40%)]">
+            <WordRotate words={greetings} className="leading-none" />
+            <span className="leading-none">Rohan</span>
           </h1>
           
           <div className="mt-4 space-y-3">
             <div className="flex justify-center">
               <div className="text-lg text-white/90 md:text-xl lg:text-2xl [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]">
-                Mathematics &amp; Computer Science
+                Mathematics &amp; Computer Science @ NYU Courant
               </div>
             </div>
             <div className="flex justify-center">

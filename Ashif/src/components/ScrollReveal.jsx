@@ -12,6 +12,7 @@ const ScrollReveal = ({
   baseRotation = 3,
   blurStrength = 4,
   containerClassName = '',
+  textSizeClassName = 'text-[clamp(1.6rem,4vw,3rem)]',
   textClassName = '',
   rotationEnd = 'bottom bottom',
   wordAnimationEnd = 'bottom bottom'
@@ -97,7 +98,7 @@ const ScrollReveal = ({
 
   return (
     <h2 ref={containerRef} className={`my-5 ${containerClassName}`}>
-      <p className={`text-[clamp(1.6rem,4vw,3rem)] leading-[1.5] font-semibold ${textClassName}`}>{splitText}</p>
+      <p className={`${textSizeClassName} leading-[1.5] font-semibold ${textClassName}`}>{splitText}</p>
     </h2>
   );
 };

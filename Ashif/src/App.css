@@ -131,23 +131,62 @@
 /* Minimal, scoped overrides for ChatScope (RohanGPT section) */
 #rohangpt .cs-main-container,
 #rohangpt .cs-chat-container,
-#rohangpt .cs-message-list,
 #rohangpt .cs-message-input {
   background: #ffffff;
   color: #111827;
 }
 
+#rohangpt .cs-message-list {
+  background: #f9fafb;
+  color: #111827;
+}
+
+#rohangpt .cs-message-list__scroll-wrapper {
+  padding: 14px 12px;
+}
+
+#rohangpt .cs-message {
+  max-width: 78%;
+}
+
+#rohangpt .cs-message__content {
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px 12px;
+  border: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
 #rohangpt .cs-message--incoming .cs-message__content {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border-radius: 16px 16px 16px 6px;
 }
 
 #rohangpt .cs-message--outgoing .cs-message__content {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: #e5e7eb;
+  border-radius: 16px 16px 6px 16px;
+}
+
+#rohangpt .cs-message__sender-name {
+  display: none;
 }
 
 #rohangpt .cs-message-input__content-editor-wrapper {
   background: #ffffff;
   border-top: 1px solid #e5e7eb;
+}
+
+#rohangpt .cs-message-input {
+  padding: 10px 10px;
+  background: #ffffff;
+}
+
+#rohangpt .cs-message-input__content-editor {
+  border-radius: 999px;
+  background: #f3f4f6;
+  padding: 10px 14px;
+}
+
+#rohangpt .cs-message-input__content-editor:focus {
+  outline: none;
 }

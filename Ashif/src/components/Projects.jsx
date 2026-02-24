@@ -23,16 +23,28 @@ const Card = ({ item }) => (
         style={{ border: '1px solid #e5e7eb' }}
     >
         <div className="flex flex-col h-full bg-white rounded-[16px] overflow-hidden">
-            <img
-                src={item.imageUrl}
-                alt={item.title}
-                loading="lazy"
-                decoding="async"
-                className={[
-                    "w-full h-1/2",
-                    item.imageFit === 'contain' ? "object-contain p-6 bg-white" : "object-cover",
-                ].join(' ')}
-            />
+            {item.videoUrl ? (
+                <video
+                    src={item.videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-1/2 object-cover"
+                    poster={item.imageUrl}
+                />
+            ) : (
+                <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    loading="lazy"
+                    decoding="async"
+                    className={[
+                        "w-full h-1/2",
+                        item.imageFit === 'contain' ? "object-contain p-6 bg-white" : "object-cover",
+                    ].join(' ')}
+                />
+            )}
             <div className="p-4 flex-grow flex flex-col">
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
                     {item.title}
@@ -58,7 +70,7 @@ const Card = ({ item }) => (
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 font-semibold text-xs transition-colors duration-300"
                         >
-                            View
+                            {item.primaryCtaLabel || 'View'}
                         </a>
                     )}
                     {item.repoUrl && item.repoUrl !== '#' && (
@@ -80,7 +92,7 @@ const Card = ({ item }) => (
 // --- Main Projects Section Component ---
 export default function Projects() {
     const [showAll, setShowAll] = useState(false);
-    const displayedProjects = showAll ? projects : projects.slice(0, 8);
+    const displayedProjects = showAll ? projects : projects.slice(0, 3);
 
     return (
         <section
@@ -109,7 +121,7 @@ export default function Projects() {
                         </Highlighter>
                     </h2>
                 </div>
-                <div className="grid grid-cols-4 gap-6 max-w-screen-lg mx-auto">
+                <div className="grid grid-cols-3 gap-6 max-w-screen-lg mx-auto">
                     {workExperience.map((item) => (
                         <div key={item.title} className="aspect-square">
                             <Card item={item} />
@@ -124,7 +136,7 @@ export default function Projects() {
                         </Highlighter>
                     </h2>
                 </div>
-                <div className="grid grid-cols-4 gap-6 max-w-screen-lg mx-auto">
+                <div className="grid grid-cols-3 gap-6 max-w-screen-lg mx-auto">
                     {research.map((item) => (
                         <div key={item.title} className="aspect-square">
                             <Card item={item} />
@@ -135,11 +147,11 @@ export default function Projects() {
                 <div className="text-center mt-20 mb-12">
                     <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
                         <Highlighter action="underline" color="#FFD700">
-                            Projects
+                            Projects 🚀
                         </Highlighter>
                     </h2>
                 </div>
-                <div className="grid grid-cols-4 gap-6 max-w-screen-lg mx-auto">
+                <div className="grid grid-cols-3 gap-6 max-w-screen-lg mx-auto">
                     {displayedProjects.map((item) => (
                         <div key={item.title} className="aspect-square">
                             <Card item={item} />
@@ -148,7 +160,7 @@ export default function Projects() {
                 </div>
 
                 <div className="text-center mt-12">
-                    {!showAll && projects.length > 8 && (
+                    {!showAll && projects.length > 3 && (
                         <button onClick={() => setShowAll(true)} className="btn">
                             View More
                         </button>
