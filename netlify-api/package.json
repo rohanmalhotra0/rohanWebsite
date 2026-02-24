@@ -1,0 +1,12 @@
+{
+  "name": "rohanm-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo \"netlify-api: no build step\""
+  },
+  "dependencies": {
+    "openai": "^5.15.0"
+  }
+}
+
