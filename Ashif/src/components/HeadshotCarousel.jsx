@@ -1,20 +1,25 @@
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 
+function assetUrl(path) {
+  const base = import.meta.env.BASE_URL || '/';
+  return `${base}${String(path || '').replace(/^\/+/, '')}`;
+}
+
 function HeadshotCarousel({
   intervalMs = 3500,
   className = '',
 }) {
   const images = useMemo(
     () => [
-      { src: '/website-photos/me/01.png', alt: 'Rohan Malhotra photo 1' },
-      { src: '/website-photos/me/02.jpg', alt: 'Rohan Malhotra photo 2' },
-      { src: '/website-photos/me/03.jpg', alt: 'Rohan Malhotra photo 3' },
-      { src: '/website-photos/me/04.jpg', alt: 'Rohan Malhotra photo 4' },
-      { src: '/website-photos/me/05.jpg', alt: 'Rohan Malhotra photo 5' },
-      { src: '/website-photos/me/06.png', alt: 'Rohan Malhotra photo 6' },
-      { src: '/website-photos/me/07.png', alt: 'Rohan Malhotra photo 7' },
-      { src: '/website-photos/me/09.png', alt: 'Rohan Malhotra photo 9' },
+      { src: assetUrl('website-photos/me/01.png'), alt: 'Rohan Malhotra photo 1' },
+      { src: assetUrl('website-photos/me/02.jpg'), alt: 'Rohan Malhotra photo 2' },
+      { src: assetUrl('website-photos/me/03.jpg'), alt: 'Rohan Malhotra photo 3' },
+      { src: assetUrl('website-photos/me/04.jpg'), alt: 'Rohan Malhotra photo 4' },
+      { src: assetUrl('website-photos/me/05.jpg'), alt: 'Rohan Malhotra photo 5' },
+      { src: assetUrl('website-photos/me/06.png'), alt: 'Rohan Malhotra photo 6' },
+      { src: assetUrl('website-photos/me/07.png'), alt: 'Rohan Malhotra photo 7' },
+      { src: assetUrl('website-photos/me/09.png'), alt: 'Rohan Malhotra photo 9' },
     ],
     []
   );

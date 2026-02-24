@@ -4,6 +4,9 @@ import { ArrowRight } from 'lucide-react';
 import RotatingText from './RotatingText';
 import { WordRotate } from "@/components/ui/word-rotate";
 
+const assetUrl = (path) =>
+  `${import.meta.env.BASE_URL || '/'}${String(path || '').replace(/^\/+/, '')}`;
+
 /**
  * A modern, minimal hero section component.
  */
@@ -109,7 +112,7 @@ export default function Hero() {
               <ArrowRight size={20} />
             </a>
             <a
-              href="/website-photos/misc/resume.pdf"
+              href={assetUrl('website-photos/misc/resume.pdf')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold text-white transition-all duration-300 bg-transparent border border-white rounded-lg shadow-lg pointer-events-auto hover:bg-white hover:text-black hover:scale-105"

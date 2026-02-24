@@ -1,58 +1,61 @@
+const BASE = import.meta.env.BASE_URL || '/';
+const assetUrl = (path) => `${BASE}${String(path || '').replace(/^\/+/, '')}`;
+
 export const projects = [
   {
     title: 'Refrax',
     description:
       'Quantitative modeling and 2D/3D visualization platform with low-latency REST + WebSocket pipelines and a PostgreSQL-backed research engine.',
-    imageUrl: '/website-photos/projectsPhotos/refrax1.png',
+    imageUrl: assetUrl('website-photos/projectsPhotos/refrax1.png'),
     tags: ['C++', 'PostgreSQL', 'REST', 'WebSocket', 'Visualization'],
   },
   {
     title: 'GreenSticker',
     description:
       'Computer vision accessibility tool enabling hands-free cursor control using color tracking with low-latency, on-device processing.',
-    imageUrl: '/website-photos/projectsPhotos/greensticker.png',
+    imageUrl: assetUrl('website-photos/projectsPhotos/greensticker.png'),
     tags: ['Python', 'Computer Vision', 'Accessibility'],
   },
   {
     title: 'Autism Research Tool',
     description:
       'Screening experiments and structured data collection workflow with an accessible UX designed for research reliability.',
-    imageUrl: '/website-photos/projectsPhotos/autism.png',
+    imageUrl: assetUrl('website-photos/projectsPhotos/autism.png'),
     tags: ['Research Tooling', 'Data Collection', 'UX'],
   },
   {
     title: 'PIVOT Platform',
     description:
       'Student-led STEM research platform supporting multi-university collaboration infrastructure and scalable project coordination.',
-    imageUrl: '/website-photos/projectsPhotos/pivot.png',
+    imageUrl: assetUrl('website-photos/projectsPhotos/pivot.png'),
     tags: ['Platform', 'Collaboration', 'Infrastructure'],
   },
   {
     title: 'Automated Raspberry Pi Binomial Options System',
     description:
       'Raspberry Pi pipeline for live data ingestion, binomial tree pricing, and automated execution with guardrails.',
-    imageUrl: '/website-photos/projectsPhotos/discreteOptions.jpeg',
+    imageUrl: assetUrl('website-photos/projectsPhotos/discreteOptions.jpeg'),
     tags: ['Raspberry Pi', 'Python', 'Live Data', 'Automation'],
   },
   {
     title: 'Quantum Oscillating Stock Model',
     description:
       'Wave-based cyclical signal construction with regime detection logic and automated reporting.',
-    imageUrl: '/website-photos/projectsPhotos/refrax2.png',
+    imageUrl: assetUrl('website-photos/projectsPhotos/refrax2.png'),
     tags: ['Time Series', 'Signals', 'Regime Detection', 'Reporting'],
   },
   {
     title: 'RSI Predictor',
     description:
       'Engineered SMA, MACD, RSI features with a Random Forest baseline and cross-validation evaluation.',
-    imageUrl: '/website-photos/projectsPhotos/rsi.jpeg',
+    imageUrl: assetUrl('website-photos/projectsPhotos/rsi.jpeg'),
     tags: ['Random Forest', 'Feature Engineering', 'Cross-validation'],
   },
   {
     title: 'Linear Generator',
     description:
       'Wearable Faraday-law-based energy system for harvesting power from motion with an embedded systems prototype.',
-    imageUrl: '/website-photos/projectsPhotos/linear-generator-1.webp',
+    imageUrl: assetUrl('website-photos/projectsPhotos/linear-generator-1.webp'),
     tags: ['Embedded', 'Energy Harvesting', 'Prototype'],
   },
 ];
@@ -62,7 +65,7 @@ export const workExperience = [
     title: 'Kalshi — Quantitative Developer Intern',
     description:
       'Built a C++ prediction-market hedging engine, converted price representations (cents ↔ probability ↔ basis points), implemented Kelly-based sizing logic, and architected a real-time WebSocket data pipeline.',
-    imageUrl: '/website-photos/work/kalshi_logo.jpeg',
+    imageUrl: assetUrl('website-photos/work/kalshi_logo.jpeg'),
     imageFit: 'contain',
     tags: ['C++', 'WebSocket', 'Real-time', 'Risk'],
   },
@@ -70,7 +73,7 @@ export const workExperience = [
     title: 'Aress Software — Machine Learning Intern',
     description:
       'Trained PyTorch models on 500k+ multimodal records, unified 10+ data sources into an analytics layer, and designed operational dashboards.',
-    imageUrl: '/website-photos/work/aress_software_logo.jpeg',
+    imageUrl: assetUrl('website-photos/work/aress_software_logo.jpeg'),
     imageFit: 'contain',
     tags: ['PyTorch', 'Data Engineering', 'Analytics'],
   },
@@ -78,7 +81,7 @@ export const workExperience = [
     title: 'Hume Center — Systems Engineering Intern',
     description:
       'Built concurrent C++ imaging modules, resolved race conditions and memory safety issues, and contributed to CubeSat systems deployed to orbit.',
-    imageUrl: '/website-photos/work/humecenter_logo.jpeg',
+    imageUrl: assetUrl('website-photos/work/humecenter_logo.jpeg'),
     imageFit: 'contain',
     tags: ['C++', 'Concurrency', 'Systems'],
   },
@@ -86,7 +89,7 @@ export const workExperience = [
     title: 'Y-Axis — Data Engineering Intern',
     description:
       'Cleaned and standardized SQL datasets, engineered predictive features, and built automated Excel dashboards.',
-    imageUrl: '/website-photos/work/y_axis_logo.jpeg',
+    imageUrl: assetUrl('website-photos/work/y_axis_logo.jpeg'),
     imageFit: 'contain',
     tags: ['SQL', 'Feature Engineering', 'Automation'],
   },
@@ -97,23 +100,23 @@ export const research = [
     title: 'Reddit Sentiment in Financial Markets',
     description:
       'NLP + time-series modeling with volatility analysis and regression-based evaluation pipelines.',
-    imageUrl: '/website-photos/Research/RedditSetiment.png',
-    liveUrl: '/website-photos/Research/Reddit%20Data%20in%20Quantitative%20Financial%20Models%20copy.pdf',
+    imageUrl: assetUrl('website-photos/Research/RedditSetiment.png'),
+    liveUrl: assetUrl('website-photos/Research/Reddit%20Data%20in%20Quantitative%20Financial%20Models%20copy.pdf'),
     tags: ['NLP', 'Time Series', 'Regression'],
   },
   {
     title: 'Capital Allocation with the Kelly Criterion',
     description:
       'Monte Carlo backtesting comparing fractional vs full Kelly and analyzing risk-adjusted growth.',
-    imageUrl: '/website-photos/Research/economic.png',
-    liveUrl: '/website-photos/Research/AnEconomic%20Approachto%20OptimizeCapital%20Allocation.pdf',
+    imageUrl: assetUrl('website-photos/Research/economic.png'),
+    liveUrl: assetUrl('website-photos/Research/AnEconomic%20Approachto%20OptimizeCapital%20Allocation.pdf'),
     tags: ['Monte Carlo', 'Optimization', 'Risk'],
   },
   {
     title: 'Aerospace Systems Research',
     description:
       'CubeSat subsystem development and concurrent embedded systems work with an emphasis on reliability.',
-    imageUrl: '/website-photos/Research/cubesats.jpeg',
+    imageUrl: assetUrl('website-photos/Research/cubesats.jpeg'),
     tags: ['Embedded', 'Concurrency', 'Aerospace'],
   },
 ];
