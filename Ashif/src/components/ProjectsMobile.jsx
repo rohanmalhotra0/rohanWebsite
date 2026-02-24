@@ -18,13 +18,13 @@ export default function ProjectsMobile() {
             <div className="flex flex-col gap-6 max-w-md mx-auto">
                 {displayedProjects.map((project) => (
                     <div key={project.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
-                        <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
+                        <div className="w-full h-32 rounded-lg overflow-hidden mb-3 bg-gray-100">
                             <img
                                 src={project.imageUrl}
                                 alt={project.title}
                                 loading="lazy"
                                 decoding="async"
-                                className="w-full h-full object-cover"
+                                className="w-[88%] h-full mx-auto object-contain p-3 bg-white"
                             />
                         </div>
                         <h3 className="text-lg font-bold mb-1">{project.title}</h3>
@@ -100,7 +100,7 @@ export default function ProjectsMobile() {
                                 alt={item.title}
                                 loading="lazy"
                                 decoding="async"
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain p-4 bg-white"
                             />
                         </div>
                         <h3 className="text-base font-bold mb-1">{item.title}</h3>
@@ -129,7 +129,7 @@ export default function ProjectsMobile() {
             <div className="flex flex-col gap-6 max-w-md mx-auto">
                 {research.map((item) => (
                     <div key={item.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
-                        <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
+                        <div className="w-full h-32 rounded-lg overflow-hidden mb-3 bg-gray-100">
                             <img
                                 src={item.imageUrl}
                                 alt={item.title}

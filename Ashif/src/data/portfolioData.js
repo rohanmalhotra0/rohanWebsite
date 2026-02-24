@@ -63,6 +63,7 @@ export const workExperience = [
     description:
       'Built a C++ prediction-market hedging engine, converted price representations (cents ↔ probability ↔ basis points), implemented Kelly-based sizing logic, and architected a real-time WebSocket data pipeline.',
     imageUrl: '/website-photos/work/kalshi_logo.jpeg',
+    imageFit: 'contain',
     tags: ['C++', 'WebSocket', 'Real-time', 'Risk'],
   },
   {
@@ -70,6 +71,7 @@ export const workExperience = [
     description:
       'Trained PyTorch models on 500k+ multimodal records, unified 10+ data sources into an analytics layer, and designed operational dashboards.',
     imageUrl: '/website-photos/work/aress_software_logo.jpeg',
+    imageFit: 'contain',
     tags: ['PyTorch', 'Data Engineering', 'Analytics'],
   },
   {
@@ -77,6 +79,7 @@ export const workExperience = [
     description:
       'Built concurrent C++ imaging modules, resolved race conditions and memory safety issues, and contributed to CubeSat systems deployed to orbit.',
     imageUrl: '/website-photos/work/humecenter_logo.jpeg',
+    imageFit: 'contain',
     tags: ['C++', 'Concurrency', 'Systems'],
   },
   {
@@ -84,6 +87,7 @@ export const workExperience = [
     description:
       'Cleaned and standardized SQL datasets, engineered predictive features, and built automated Excel dashboards.',
     imageUrl: '/website-photos/work/y_axis_logo.jpeg',
+    imageFit: 'contain',
     tags: ['SQL', 'Feature Engineering', 'Automation'],
   },
 ];
@@ -93,7 +97,7 @@ export const research = [
     title: 'Reddit Sentiment in Financial Markets',
     description:
       'NLP + time-series modeling with volatility analysis and regression-based evaluation pipelines.',
-    imageUrl: '/website-photos/research/reddit.png',
+    imageUrl: '/website-photos/Research/RedditSetiment.png',
     liveUrl: '/website-photos/research/reddit-paper.pdf',
     tags: ['NLP', 'Time Series', 'Regression'],
   },
@@ -101,7 +105,7 @@ export const research = [
     title: 'Capital Allocation with the Kelly Criterion',
     description:
       'Monte Carlo backtesting comparing fractional vs full Kelly and analyzing risk-adjusted growth.',
-    imageUrl: '/website-photos/research/economic.png',
+    imageUrl: '/website-photos/Research/economic.png',
     liveUrl: '/website-photos/research/kelly-paper.pdf',
     tags: ['Monte Carlo', 'Optimization', 'Risk'],
   },
@@ -109,7 +113,7 @@ export const research = [
     title: 'Aerospace Systems Research',
     description:
       'CubeSat subsystem development and concurrent embedded systems work with an emphasis on reliability.',
-    imageUrl: '/website-photos/research/cubesats.jpeg',
+    imageUrl: '/website-photos/Research/cubesats.jpeg',
     tags: ['Embedded', 'Concurrency', 'Aerospace'],
   },
 ];

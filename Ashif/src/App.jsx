@@ -7,7 +7,6 @@ import Navbar from './components/Navbar';
 import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
-import ProjectsMobile from './components/ProjectsMobile';
 import Education from './components/Education';
 import SocialMagnet from './components/SocialMagnet';
 import ContactForm from './components/ContactForm';
@@ -62,7 +61,7 @@ function App() {
         <About />
         <Skills />
         <Education />
-        {isMobile ? <ProjectsMobile /> : <Projects />}
+        <Projects />
         <Suspense fallback={null}>
           <RohanGPT />
         </Suspense>

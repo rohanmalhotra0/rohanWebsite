@@ -22,7 +22,7 @@ export default function Education() {
               <Folder element="My Education" value="Education">
                 <Folder element="New York University, Courant Institute" value="NYU">
                   <File value="NYU-Degree">
-                    <p>B.S. in Mathematics and Computer Science (Aug 2024 – May 2027)</p>
+                    <p>B.S. in Mathematics and Computer Science (May 2027)</p>
                   </File>
                   <File value="NYU-GPA">
                     <p>GPA: 3.75 / 4.00 (Accelerated 3-Year Program)</p>

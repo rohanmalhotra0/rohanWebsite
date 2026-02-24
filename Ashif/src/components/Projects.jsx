@@ -28,7 +28,10 @@ const Card = ({ item }) => (
                 alt={item.title}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-1/2 object-cover"
+                className={[
+                    "w-full h-1/2",
+                    item.imageFit === 'contain' ? "object-contain p-6 bg-white" : "object-cover",
+                ].join(' ')}
             />
             <div className="p-4 flex-grow flex flex-col">
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
@@ -77,7 +80,7 @@ const Card = ({ item }) => (
 // --- Main Projects Section Component ---
 export default function Projects() {
     const [showAll, setShowAll] = useState(false);
-    const displayedProjects = showAll ? projects : projects.slice(0, 6);
+    const displayedProjects = showAll ? projects : projects.slice(0, 8);
 
     return (
         <section
@@ -102,11 +105,41 @@ export default function Projects() {
                 <div className="text-center mb-12">
                     <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
                         <Highlighter action="underline" color="#FFD700">
+                            Work Experience
+                        </Highlighter>
+                    </h2>
+                </div>
+                <div className="grid grid-cols-4 gap-6 max-w-screen-lg mx-auto">
+                    {workExperience.map((item) => (
+                        <div key={item.title} className="aspect-square">
+                            <Card item={item} />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="text-center mt-20 mb-10">
+                    <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
+                        <Highlighter action="underline" color="#FFD700">
+                            Research
+                        </Highlighter>
+                    </h2>
+                </div>
+                <div className="grid grid-cols-4 gap-6 max-w-screen-lg mx-auto">
+                    {research.map((item) => (
+                        <div key={item.title} className="aspect-square">
+                            <Card item={item} />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="text-center mt-20 mb-12">
+                    <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
+                        <Highlighter action="underline" color="#FFD700">
                             Projects
                         </Highlighter>
                     </h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-screen-lg mx-auto">
+                <div className="grid grid-cols-4 gap-6 max-w-screen-lg mx-auto">
                     {displayedProjects.map((item) => (
                         <div key={item.title} className="aspect-square">
                             <Card item={item} />
@@ -115,7 +148,7 @@ export default function Projects() {
                 </div>
 
                 <div className="text-center mt-12">
-                    {!showAll && projects.length > 6 && (
+                    {!showAll && projects.length > 8 && (
                         <button onClick={() => setShowAll(true)} className="btn">
                             View More
                         </button>
@@ -125,36 +158,6 @@ export default function Projects() {
                             View Less
                         </button>
                     )}
-                </div>
-
-                <div className="text-center mt-20 mb-10">
-                    <h3 className="text-4xl font-bold font-pixel inline-block">
-                        <Highlighter action="underline" color="#FFD700">
-                            Work Experience
-                        </Highlighter>
-                    </h3>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-screen-lg mx-auto">
-                    {workExperience.map((item) => (
-                        <div key={item.title} className="aspect-square">
-                            <Card item={item} />
-                        </div>
-                    ))}
-                </div>
-
-                <div className="text-center mt-20 mb-10">
-                    <h3 className="text-4xl font-bold font-pixel inline-block">
-                        <Highlighter action="underline" color="#FFD700">
-                            Research
-                        </Highlighter>
-                    </h3>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-screen-lg mx-auto">
-                    {research.map((item) => (
-                        <div key={item.title} className="aspect-square">
-                            <Card item={item} />
-                        </div>
-                    ))}
                 </div>
             </div>
         </section>

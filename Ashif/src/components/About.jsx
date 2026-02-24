@@ -9,13 +9,13 @@ export default function About({ scrollContainerRef }) {
         <div className="mb-12 flex justify-center text-center">
           <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
             <Highlighter action="underline" color="#FFD700">
-              About
+              About Me
             </Highlighter>
           </h2>
         </div>
 
         <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:gap-12">
-          <div className="w-full max-w-[260px] md:max-w-[300px] flex-shrink-0">
+          <div className="w-full max-w-[220px] sm:max-w-[240px] md:max-w-[280px] flex-shrink-0">
             <img
               src="/website-photos/headshot.png"
               alt="Rohan Malhotra headshot"
@@ -33,10 +33,13 @@ export default function About({ scrollContainerRef }) {
               baseRotation={1.2}
               blurStrength={10}
               containerClassName="my-0"
-              textClassName="font-sans text-base sm:text-lg md:text-xl text-center md:text-left"
+              textClassName="font-sans text-sm sm:text-base md:text-lg text-center md:text-left"
             >
-              Rohan Malhotra is a Mathematics and Computer Science student at NYU Courant. His work spans algorithms and systems engineering, concurrency and multithreaded programming, statistical modeling and applied mathematics, real-time data pipelines, and research-driven software design. He builds structured systems grounded in mathematical reasoning and practical implementation.
-            </ScrollReveal>
+I’m Rohan Malhotra, a Mathematics and Computer Science student at NYU Courant.
+
+My work spans algorithms and systems engineering, concurrency and multithreaded programming, statistical modeling and applied mathematics, real-time data pipelines, and research-driven software design.
+
+I focus on building structured systems grounded in mathematical reasoning and practical implementation.            </ScrollReveal>
           </div>
         </div>
       </div>

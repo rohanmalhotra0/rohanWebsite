@@ -30,7 +30,7 @@ export default function Hero() {
           <div className="mt-4 space-y-3">
             <div className="flex justify-center">
               <div className="text-lg text-white/90 md:text-xl lg:text-2xl [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]">
-                Mathematics × Computer Science
+                Mathematics &amp; Computer Science
               </div>
             </div>
             <div className="flex justify-center">
@@ -70,7 +70,7 @@ export default function Hero() {
               <ArrowRight size={20} />
             </a>
             <a
-              href="/website-photos/misc/R_Malhotra_Resume.pdf"
+              href="/website-photos/misc/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold text-white transition-all duration-300 bg-transparent border border-white rounded-lg shadow-lg pointer-events-auto hover:bg-white hover:text-black hover:scale-105"
