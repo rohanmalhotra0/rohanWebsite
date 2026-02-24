@@ -28,7 +28,11 @@ export default function Navbar() {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="font-pixel text-white text-base sm:text-lg tracking-wide"
+          className="text-white text-base sm:text-lg tracking-wide"
+          style={{
+            fontFamily:
+              '"Silkscreen", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+          }}
           aria-label="Scroll to top"
         >
           Rohan Malhotra
@@ -41,7 +45,7 @@ export default function Navbar() {
             onClick={e => handleNavClick(e, 'about')}
             className="transition hover:text-white"
           >
-            About
+            About Me
           </a>
           <a
             href="#projects"

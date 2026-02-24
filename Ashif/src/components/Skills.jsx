@@ -1,21 +1,23 @@
 import React from 'react';
 import { VelocityText } from './ScrollVelocity';
-import { Docker, Git, Javascript, Node, PostgreSQL, Postman, ReactLogo, Typescript, Mysql } from './SkillLogos';
+import { Cpp, Docker, Git, Javascript, Node, Postman, PyTorch, Python, ReactLogo, Sql, Typescript } from './SkillLogos';
 import { Highlighter } from "@/components/ui/highlighter";
 
 const skillsRow1 = [
+  <Cpp key="cpp" />,
+  <Python key="python" />,
   <Git key="git" />,
-  <PostgreSQL key="postgresql" />,
   <Docker key="docker" />,
-  <Node key="node" />,
 ];
 
 const skillsRow2 = [
+  <PyTorch key="pytorch" />,
+  <Sql key="sql" />,
+  <ReactLogo key="react" />,
+  <Node key="node" />,
   <Javascript key="js" />,
   <Typescript key="ts" />,
-  <Mysql key="mysql" />,
   <Postman key="postman" />,
-  <ReactLogo key="react" />,
 ];
 
 export default function Skills() {
@@ -25,7 +27,7 @@ export default function Skills() {
         <div className="inline-block mb-12">
           <h2 className="text-5xl font-bold font-pixel inline-block">
             <Highlighter action="underline" color="#FFD700">
-              Tech Stack
+              My Tech Stack
             </Highlighter>
           </h2>
         </div>
@@ -45,14 +47,14 @@ export default function Skills() {
                filter: 'blur(6px)'
              }}
         />
-        <VelocityText baseVelocity={-5} numCopies={4}>
+        <VelocityText baseVelocity={-45} numCopies={4}>
           {skillsRow1.map((logo, index) => (
             <div key={index} className="w-20 h-20 text-gray-600 mx-4">
               {logo}
             </div>
           ))}
         </VelocityText>
-        <VelocityText baseVelocity={5} numCopies={4}>
+        <VelocityText baseVelocity={45} numCopies={4}>
           {skillsRow2.map((logo, index) => (
             <div key={index} className="w-20 h-20 text-gray-600 mx-4">
               {logo}

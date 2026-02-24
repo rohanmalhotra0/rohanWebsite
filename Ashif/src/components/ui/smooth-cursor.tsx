@@ -8,6 +8,10 @@ interface Position {
 
 export interface SmoothCursorProps {
   cursor?: React.ReactNode
+  /** When true, cursor rotates to follow movement direction. */
+  rotateToVelocity?: boolean
+  /** Rotation (degrees) when not rotating to velocity. */
+  idleRotationDeg?: number
   springConfig?: {
     damping: number
     stiffness: number
@@ -80,6 +84,8 @@ const DefaultCursorSVG: FC = () => {
 
 export function SmoothCursor({
   cursor = <DefaultCursorSVG />,
+  rotateToVelocity = false,
+  idleRotationDeg = 37,
   springConfig = {
     damping: 45,
     stiffness: 400,
@@ -96,7 +102,7 @@ export function SmoothCursor({
 
   const cursorX = useSpring(0, springConfig)
   const cursorY = useSpring(0, springConfig)
-  const rotation = useSpring(0, {
+  const rotation = useSpring(idleRotationDeg, {
     ...springConfig,
     damping: 60,
     stiffness: 300,
@@ -135,16 +141,21 @@ export function SmoothCursor({
       cursorY.set(currentPos.y)
 
       if (speed > 0.1) {
-        const currentAngle =
-          Math.atan2(velocity.current.y, velocity.current.x) * (180 / Math.PI) +
-          90
+        if (rotateToVelocity) {
+          const currentAngle =
+            Math.atan2(velocity.current.y, velocity.current.x) *
+              (180 / Math.PI) +
+            90
 
-        let angleDiff = currentAngle - previousAngle.current
-        if (angleDiff > 180) angleDiff -= 360
-        if (angleDiff < -180) angleDiff += 360
-        accumulatedRotation.current += angleDiff
-        rotation.set(accumulatedRotation.current)
-        previousAngle.current = currentAngle
+          let angleDiff = currentAngle - previousAngle.current
+          if (angleDiff > 180) angleDiff -= 360
+          if (angleDiff < -180) angleDiff += 360
+          accumulatedRotation.current += angleDiff
+          rotation.set(accumulatedRotation.current)
+          previousAngle.current = currentAngle
+        } else {
+          rotation.set(idleRotationDeg)
+        }
 
         scale.set(0.95)
         setIsMoving(true)
@@ -176,7 +187,7 @@ export function SmoothCursor({
       document.body.style.cursor = "auto"
       if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [cursorX, cursorY, rotation, scale])
+  }, [cursorX, cursorY, idleRotationDeg, rotateToVelocity, rotation, scale])
 
   return (
     <motion.div

@@ -6,8 +6,23 @@ import { Highlighter } from "@/components/ui/highlighter";
 import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
 import { cn } from "@/lib/utils";
 import { projects, research, workExperience } from '../data/portfolioData';
+import { Rocket } from 'lucide-react';
 
-const Card = ({ item }) => (
+function clampStyles(lines) {
+    return {
+        display: '-webkit-box',
+        WebkitLineClamp: lines,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+    };
+}
+
+const Card = ({ item }) => {
+    const tags = item.tags || [];
+    const visibleTags = tags.slice(0, 4);
+    const extraCount = Math.max(0, tags.length - visibleTags.length);
+
+    return (
     <GlareHover
         glareColor="#ffffff"
         glareOpacity={0.3}
@@ -30,7 +45,7 @@ const Card = ({ item }) => (
                     loop
                     muted
                     playsInline
-                    className="w-full h-1/2 object-cover"
+                    className="w-full h-36 object-cover"
                     poster={item.imageUrl}
                 />
             ) : (
@@ -40,20 +55,20 @@ const Card = ({ item }) => (
                     loading="lazy"
                     decoding="async"
                     className={[
-                        "w-full h-1/2",
+                        "w-full h-36",
                         item.imageFit === 'contain' ? "object-contain p-6 bg-white" : "object-cover",
                     ].join(' ')}
                 />
             )}
             <div className="p-4 flex-grow flex flex-col">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                <h3
+                    className="text-lg font-bold text-gray-900 mb-1"
+                    style={clampStyles(2)}
+                >
                     {item.title}
                 </h3>
-                <p className="text-gray-600 text-xs mb-2 flex-grow">
-                    {item.description}
-                </p>
                 <div className="flex flex-wrap gap-1 mb-2">
-                    {item.tags.map((tag) => (
+                    {visibleTags.map((tag) => (
                         <span
                             key={tag}
                             className="bg-gray-200 text-gray-800 text-[10px] font-semibold px-2 py-0.5 rounded-full"
@@ -61,7 +76,18 @@ const Card = ({ item }) => (
                             {tag}
                         </span>
                     ))}
+                    {extraCount > 0 && (
+                        <span className="bg-gray-200 text-gray-800 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                            +{extraCount}
+                        </span>
+                    )}
                 </div>
+                <p
+                    className="text-gray-600 text-xs mb-2"
+                    style={clampStyles(3)}
+                >
+                    {item.description}
+                </p>
                 <div className="flex items-center justify-start space-x-3 mt-auto pt-1">
                     {item.liveUrl && (
                         <a
@@ -87,7 +113,8 @@ const Card = ({ item }) => (
             </div>
         </div>
     </GlareHover>
-);
+    );
+};
 
 // --- Main Projects Section Component ---
 export default function Projects() {
@@ -147,7 +174,10 @@ export default function Projects() {
                 <div className="text-center mt-20 mb-12">
                     <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
                         <Highlighter action="underline" color="#FFD700">
-                            Projects 🚀
+                            <span className="inline-flex items-center gap-2">
+                                Projects
+                                <Rocket size={22} aria-hidden="true" />
+                            </span>
                         </Highlighter>
                     </h2>
                 </div>

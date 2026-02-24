@@ -11,7 +11,7 @@ export const projects = [
     description:
       'Computer vision accessibility tool enabling hands-free cursor control using color tracking with low-latency, on-device processing.',
     imageUrl: '/website-photos/projectsPhotos/greensticker.png',
-    tags: ['Python', 'Computer Vision', 'Accessibility', 'On-device'],
+    tags: ['Python', 'Computer Vision', 'Accessibility'],
   },
   {
     title: 'Autism Research Tool',

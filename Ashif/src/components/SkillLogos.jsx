@@ -17,6 +17,10 @@ import mongologo from '../assets/logos/mongo.png';
 import postgrelogo from '../assets/logos/postgreSQL.png';
 import postmanlogo from '../assets/logos/postman.png';
 import dockerlogo from '../assets/logos/docker.png';
+import cplusplusLogo from '../assets/logos/cplusplus.svg';
+import pythonLogo from '../assets/logos/python.svg';
+import pytorchLogo from '../assets/logos/pytorch.svg';
+import sqlLogo from '../assets/logos/sql.svg';
 
 
 // A generic wrapper for all logos
@@ -45,3 +49,7 @@ export const MongoDB = () => <Logo src={mongologo} alt="MongoDB" />;
 export const PostgreSQL = () => <Logo src={postgrelogo} alt="PostgreSQL" />;
 export const Postman = () => <Logo src={postmanlogo} alt="Postman" />;
 export const Docker = () => <Logo src={dockerlogo} alt="Docker" />;
+export const Cpp = () => <Logo src={cplusplusLogo} alt="C++" />;
+export const Python = () => <Logo src={pythonLogo} alt="Python" />;
+export const PyTorch = () => <Logo src={pytorchLogo} alt="PyTorch" />;
+export const Sql = () => <Logo src={sqlLogo} alt="SQL" />;
