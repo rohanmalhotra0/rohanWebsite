@@ -127,3 +127,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Minimal, scoped overrides for ChatScope (RohanGPT section) */
+#rohangpt .cs-main-container,
+#rohangpt .cs-chat-container,
+#rohangpt .cs-message-list,
+#rohangpt .cs-message-input {
+  background: #ffffff;
+  color: #111827;
+}
+
+#rohangpt .cs-message--incoming .cs-message__content {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+#rohangpt .cs-message--outgoing .cs-message__content {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+#rohangpt .cs-message-input__content-editor-wrapper {
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}

@@ -10,57 +10,37 @@ export default function Education() {
           <div className="inline-block mb-12">
             <h2 className="text-4xl md:text-5xl font-bold font-pixel">
               <Highlighter action="underline" color="#FFD700">
-                Qualifications
+                Education
               </Highlighter>
             </h2>
           </div>
           <div className="relative flex max-w-lg mx-auto flex-col items-center justify-center overflow-hidden rounded-lg border bg-background p-4">
             <Tree
               className="w-full bg-background overflow-hidden rounded-md"
-              initialExpandedItems={["Education", "KU", "MC", "BA", "BHS", "Certifications"]}
+              initialExpandedItems={["Education", "NYU", "Coursework", "Graduate Coursework"]}
             >
               <Folder element="My Education" value="Education">
-                <Folder element="Kaziranga University" value="KU">
-                  <File value="KU-MCA">
-                    <p>Masters of Computer Application (2023 – 2025)</p>
+                <Folder element="New York University, Courant Institute" value="NYU">
+                  <File value="NYU-Degree">
+                    <p>B.S. in Mathematics and Computer Science (Aug 2024 – May 2027)</p>
                   </File>
-                </Folder>
-                <Folder element="M.C College, Barpeta" value="MC">
-                  <File value="MC-BCA">
-                    <p>Bachelor of Computer Application (2019 – 2022)</p>
+                  <File value="NYU-GPA">
+                    <p>GPA: 3.75 / 4.00 (Accelerated 3-Year Program)</p>
                   </File>
-                </Folder>
-                <Folder element="Bidyasagar Academy, Howly" value="BA">
-                  <File value="BA-HS">
-                    <p>Higher Secondary (2019)</p>
-                  </File>
-                </Folder>
-                 <Folder element="Barpeta Govt. HS School" value="BHS">
-                   <File value="BHS-Matric">
-                    <p>Matriculation (2016)</p>
-                  </File>                   
+                  <Folder element="Relevant Coursework" value="Coursework">
+                    <File value="Course-Algorithms"><p>Algorithms</p></File>
+                    <File value="Course-OS"><p>Operating Systems</p></File>
+                    <File value="Course-MVC"><p>Multivariable Calculus</p></File>
+                    <File value="Course-LA"><p>Linear Algebra</p></File>
+                    <File value="Course-Probability"><p>Probability</p></File>
+                    <File value="Course-Statistics"><p>Statistics</p></File>
+                    <File value="Course-Numerical"><p>Numerical Methods</p></File>
+                  </Folder>
+                  <Folder element="Graduate Coursework" value="Graduate Coursework">
+                    <File value="Grad-MathTech"><p>Mathematical Techniques for Computer Science Applications</p></File>
+                  </Folder>
                 </Folder>
               </Folder>
-                <Folder element="My Certifications" value="Certifications">
-                  <Folder element="Cisco" value="Cisco">
-                    <File value="Cisco-Intro">
-                      <p>Introduction to Cybersecurity</p>
-                    </File>
-                    <File value="Cisco-Jr">
-                      <p>Jr. Cybersecurity Analyst</p>
-                    </File>
-                  </Folder>
-                  <Folder element="IBM" value="IBM">
-                    <File value="IBM-Python">
-                      <p>Python 101 for Data Science</p>
-                    </File>
-                  </Folder>
-                  <Folder element="AWS" value="AWS">
-                    <File value="AWS-Cloud">
-                      <p>Cloud Foundations (AWS Academy Graduate)</p>
-                    </File>
-                  </Folder>
-                </Folder>
             </Tree>
           </div>
         </div>

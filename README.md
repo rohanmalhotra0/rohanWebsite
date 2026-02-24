@@ -1,38 +1,40 @@
-![App Screenshot](https://github.com/Deadcoder001/AshifPf/blob/main/screen.gif)
+# Rohan Malhotra — Portfolio
 
-# AshifPf - Personal Portfolio 
+Personal portfolio for **Rohan Malhotra** (New York, NY) at [`rohanm.org`](https://rohanm.org).
 
-![Repo Views](https://komarev.com/ghpvc/?username=Deadcoder001-AshifPf&label=Repo%20Views&style=flat-square&color=blue)
+- **Theme**: Mathematics × Computer Science — Systems. Infrastructure. Applied Research.
+- **App location**: the Vite + React app lives in `Ashif/`.
 
-This is a personal portfolio website built with React, Vite, and other modern web technologies.
+## Local development
 
-## Live Demo
+```bash
+cd Ashif
+npm install
+npm run dev
+```
 
-Live Demo: https://ashifelahi.netlify.app/
+## RohanGPT configuration
 
+RohanGPT can run in one of two modes:
 
-## 🚀 About 
-A modern, responsive portfolio layout.
-* Interactive animations using **Framer Motion** and **GSAP**.
-* 3D elements rendered with **Spline**.
-* Smooth scrolling experience provided by **Lenis**.
+- **Recommended (no client key exposure)**: set `VITE_ROHANGPT_API_URL` to your serverless endpoint that returns `{ "response": "..." }`.
+- **Direct OpenAI (exposes key in client bundle)**: set `VITE_OPENAI_API_KEY` (and optionally `VITE_OPENAI_MODEL`).
 
-## Tech Used
+Create `Ashif/.env.local`:
 
-**Client:** React, Vite, TailwindCSS, Framer Motion, GSAP, Spline, Lenis
+```bash
+VITE_ROHANGPT_API_URL=
+VITE_OPENAI_API_KEY=
+VITE_OPENAI_MODEL=gpt-4o-mini
+```
 
-## Feedback
+## Deployment (GitHub Pages)
 
-If you have any feedback, please reach out to us at asifelahi6@gmail.com
+This repo includes a GitHub Actions workflow that:
 
-## Deployment
+- Installs dependencies in `Ashif/`
+- Builds the static site to `Ashif/dist`
+- Deploys to GitHub Pages
 
-To deploy this project run:
+Custom domain is configured via `Ashif/public/CNAME` (currently `rohanm.org`).
 
-In the project directory, you can run the following commands:
-
-* `npm install`
-
-* `npm run dev`
-    Runs the app in development mode. Open [http://localhost:5173](http://localhost:5173) (or the port specified in your console) to view it in the browser.
-# rohanWebsite

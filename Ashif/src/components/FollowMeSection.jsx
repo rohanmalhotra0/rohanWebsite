@@ -6,7 +6,7 @@ export default function FollowMeSection() {
   const [showCrosshair, setShowCrosshair] = useState(false);
 
   // Replace with your actual Instagram URL
-  const instagramUrl = "https://www.instagram.com/ashif.zip/";
+  const instagramUrl = "https://www.instagram.com/rohanmalhotra0/";
 
   const handleShootClick = () => {
     window.open(instagramUrl, "_blank");

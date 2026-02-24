@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -8,13 +8,14 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import ProjectsMobile from './components/ProjectsMobile';
-import Certifications from './components/Certifications';
 import Education from './components/Education';
 import SocialMagnet from './components/SocialMagnet';
 import ContactForm from './components/ContactForm';
 import { SmoothCursor } from './components/ui/smooth-cursor';
 
 import './App.css'
+
+const RohanGPT = lazy(() => import('./components/RohanGPT'));
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -62,7 +63,9 @@ function App() {
         <Skills />
         <Education />
         {isMobile ? <ProjectsMobile /> : <Projects />}
-        {/* <Certifications /> */}
+        <Suspense fallback={null}>
+          <RohanGPT />
+        </Suspense>
         <ContactForm />
         <SocialMagnet />
       </main>

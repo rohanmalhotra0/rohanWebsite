@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from '../assets/logo3.png'; // Make sure this path is correct
 
 function handleNavClick(e, id) {
   e.preventDefault();
@@ -23,8 +22,16 @@ export default function Navbar() {
     <header className="absolute top-0 left-0 right-0 z-30 p-4 sm:p-6">
       <nav className="container flex items-center justify-between mx-auto">
         {/* Logo */}
-        <a href="#">
-          <img src={logo} alt="Logo" className="w-28 h-6" /> {/* Adjust size as needed */}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="font-pixel text-white text-base sm:text-lg tracking-wide"
+          aria-label="Scroll to top"
+        >
+          Rohan Malhotra
         </a>
         
         {/* Navigation Links */}
@@ -42,6 +49,13 @@ export default function Navbar() {
             className="transition hover:text-white"
           >
             Projects
+          </a>
+          <a
+            href="#rohangpt"
+            onClick={e => handleNavClick(e, 'rohangpt')}
+            className="transition hover:text-white"
+          >
+            RohanGPT
           </a>
           <a
             href="#contact"

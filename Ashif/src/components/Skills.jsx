@@ -1,28 +1,21 @@
 import React from 'react';
 import { VelocityText } from './ScrollVelocity';
-import { Figma, Git, Javascript, Mysql, Nextjs, Node, Php, PostgreSQL, ReactLogo, Typescript, Bootstrap, Css, Django, Html, MongoDB, Postman } from './SkillLogos';
+import { Docker, Git, Javascript, Node, PostgreSQL, Postman, ReactLogo, Typescript, Mysql } from './SkillLogos';
 import { Highlighter } from "@/components/ui/highlighter";
 
 const skillsRow1 = [
-  <ReactLogo key="react" />,
-  <Nextjs key="nextjs" />,
-  <Javascript key="js" />,
-  <Typescript key="ts" />,
-  <Bootstrap key="bootstrap" />,
-  <Css key="css" />,
-  <Django key="django" />,
-  <Figma key="figma" />,
+  <Git key="git" />,
+  <PostgreSQL key="postgresql" />,
+  <Docker key="docker" />,
+  <Node key="node" />,
 ];
 
 const skillsRow2 = [
-  <Html key="html" />,
-  <MongoDB key="mongodb" />,
-  <PostgreSQL key="postgresql" />,
-  <Postman key="postman" />,
+  <Javascript key="js" />,
+  <Typescript key="ts" />,
   <Mysql key="mysql" />,
-  <Node key="node" />,
-  <Git key="git" />,
-  <Php key="php" />,
+  <Postman key="postman" />,
+  <ReactLogo key="react" />,
 ];
 
 export default function Skills() {

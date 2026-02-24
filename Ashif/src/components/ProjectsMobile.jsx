@@ -1,144 +1,31 @@
 import React, { useState } from 'react';
 import { Highlighter } from "@/components/ui/highlighter";
-// --- 1. Import your project images ---
-
-import project1Img from '../assets/projects/project1.png';
-import project2Img from '../assets/projects/project2.png';
-import project3Img from '../assets/projects/Project3.png';
-import project4Img from '../assets/projects/Project4.png';
-import project5Img from '../assets/projects/project5.png';
-import project6Img from '../assets/projects/project6.png';
-import project7Img from '../assets/projects/project7.png';
-import project8Img from '../assets/projects/project8.png';
-import project9Img from '../assets/projects/project9.png';
-import { Truck } from 'lucide-react';
-
-// --- Data for the projects ---
-const projectData = [
-    {
-        title: 'Sahityaa Sangamm',
-        description: 'A modern e-commerce platform built with Blade and Laravel.',
-        // Use your Cloudinary video URL here:
-        videoUrl: 'https://res.cloudinary.com/dktapziq9/video/upload/v1764394626/1764393871242766_dqfnqn.mp4',
-        imageUrl: project1Img, // optional fallback
-        liveUrl: 'https://sahityaasangamm.in',
-        repoUrl: '#',
-        tags: ['Blade', 'Laravel', 'MySQL'],
-    },
-    {
-        title: 'Portfolio Website',
-        description: 'My personal portfolio website built with React and Tailwind CSS.',
-        videoUrl: 'https://res.cloudinary.com/dktapziq9/video/upload/v1764395075/1764395026924189_ij9257.mov',
-        imageUrl: project7Img,
-        liveUrl: 'https://ashifelahi.netlify.app',
-        repoUrl: 'https://github.com/Deadcoder001/React-Personal-Portfolio.git',
-        tags: ['React', 'Tailwind CSS', 'GSAP', 'Spline', 'Framer Motion', 'Lenis'],
-    },
-    {
-        title: 'ONS Trading Application',
-        description: 'A real-time trading application using Django and Bootstrap 5.',
-        videoUrl: 'https://res.cloudinary.com/dktapziq9/video/upload/v1764395357/1764395325884939_lrg7f4.mp4',
-        imageUrl: project5Img,
-        liveUrl: 'https://ons-trading.onrender.com',
-        repoUrl: 'https://github.com/Deadcoder001/ons_trading.git',
-        tags: ['Django', 'yfinance', 'Bootstrap 5'],
-    },
-    {
-        title: 'Creatorhub',
-        description: 'An Influencer Marketing platform for Creators and brands built with React.',
-        videoUrl: 'https://res.cloudinary.com/dktapziq9/video/upload/v1764396382/1764396334647746_qruqaf.mp4',
-
-        liveUrl: 'https://creatorhub.in',
-        repoUrl: '#',
-        tags: ['React', 'Node.js', 'MongoDB'],
-    },
-    {
-        title: 'Tea Country',
-        description: 'A Tourist website created with React.',
-        // --- 2. Use the imported variable here ---
-        imageUrl: project2Img,
-        liveUrl: 'https://teacountry.in',
-        repoUrl: '#',
-        tags: ['React', 'Vue', 'Tailwind CSS'],
-    },
-    // {
-    //     title: 'MeghaRise Products',
-    //     description: 'A modern e-commerce platform using React (Its Frontend Only For Now).',
-    //     // --- 2. Use the imported variable here ---
-    //     imageUrl: project3Img,
-    //     liveUrl: 'https://meghariseproducts.com',
-    //     repoUrl: '#',
-    //     tags: ['React', 'Vue', 'Tailwind CSS'],
-    // },
-    {
-        title: 'Scabbard Tech',
-        description: 'A Digital Marketing website built with React, Vue and Tailwind CSS.',
-        videoUrl: 'https://res.cloudinary.com/dktapziq9/video/upload/v1764397211/1764397136159111_zlcckk.mp4',
-        liveUrl: 'https://scabbardtech.com',
-        repoUrl: '#',
-        tags: ['React', 'Vue', 'Tailwind CSS'],
-    },
-
-        {
-        title: 'Jana Kalyan Swastha sewa',
-        description: 'A Healthcare website built with HTML and php.',
-        imageUrl: project6Img,
-        liveUrl: 'https://jkssewa.org',
-        repoUrl: '#',
-        tags: ['HTML', 'CSS', 'JavaScript','PHP', 'MySQL'],
-    },
-    {
-        title: 'Janaewa',
-        description: 'A NGO website built with HTML, CSS and JavaScript.',
-        imageUrl: project8Img,
-        liveUrl: 'https://janasewa.org',
-        repoUrl: '#',
-        tags: ['HTML', 'CSS', 'JavaScript'],
-    },
-        {
-        title: 'Earmacs',
-        description: 'A Hotel Management website built with Wordpress and PHP.',
-        imageUrl: project9Img,
-        liveUrl: 'https://earmacs.com',
-        repoUrl: '#',
-        tags: ['Wordpress', 'PHP'],
-    },
-];
+import { projects, research, workExperience } from '../data/portfolioData';
 
 export default function ProjectsMobile() {
     const [showAll, setShowAll] = useState(false);
-    const displayedProjects = showAll ? projectData : projectData.slice(0, 3);
+    const displayedProjects = showAll ? projects : projects.slice(0, 6);
 
     return (
-        <section id="projects-mobile" className="w-full bg-white text-black py-12 px-2">
+        <section id="projects" className="w-full bg-white text-black py-12 px-2">
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold font-pixel underline-wavy-yellow inline-block">
                     <Highlighter action="underline" color="#FFD700">
-                        Projects 🚀
+                        Projects
                     </Highlighter>
                 </h2>
             </div>
             <div className="flex flex-col gap-6 max-w-md mx-auto">
-                {displayedProjects.map((project, idx) => (
-                    <div key={idx} className="bg-white rounded-xl shadow p-4 flex flex-col">
+                {displayedProjects.map((project) => (
+                    <div key={project.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
                         <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
-                            {project.videoUrl ? (
-                                <video
-                                    src={project.videoUrl}
-                                    autoPlay
-                                    loop
-                                    muted
-                                    playsInline
-                                    className="w-full h-full object-cover"
-                                    poster={project.imageUrl}
-                                />
-                            ) : (
-                                <img
-                                    src={project.imageUrl}
-                                    alt={project.title}
-                                    className="w-full h-full object-cover"
-                                />
-                            )}
+                            <img
+                                src={project.imageUrl}
+                                alt={project.title}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-full h-full object-cover"
+                            />
                         </div>
                         <h3 className="text-lg font-bold mb-1">{project.title}</h3>
                         <p className="text-xs text-gray-600 mb-2">{project.description}</p>
@@ -153,14 +40,16 @@ export default function ProjectsMobile() {
                             ))}
                         </div>
                         <div className="flex gap-3 mt-auto">
-                            <a
-                                href={project.liveUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn !w-auto !h-auto !px-4 !py-2 !text-xs !rounded-lg"
-                            >
-                                Visit Site
-                            </a>
+                            {project.liveUrl && (
+                                <a
+                                    href={project.liveUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn !w-auto !h-auto !px-4 !py-2 !text-xs !rounded-lg"
+                                >
+                                    View
+                                </a>
+                            )}
                             {project.repoUrl && project.repoUrl !== '#' && (
                                 <a
                                     href={project.repoUrl}
@@ -177,7 +66,7 @@ export default function ProjectsMobile() {
             </div>
             {/* View More / View Less Button */}
             <div className="text-center mt-8">
-                {!showAll && projectData.length > 3 && (
+                {!showAll && projects.length > 6 && (
                     <button
                         onClick={() => setShowAll(true)}
                         className="btn"
@@ -193,6 +82,86 @@ export default function ProjectsMobile() {
                         View Less
                     </button>
                 )}
+            </div>
+
+            <div className="text-center mt-16 mb-8">
+                <h3 className="text-3xl font-bold font-pixel underline-wavy-yellow inline-block">
+                    <Highlighter action="underline" color="#FFD700">
+                        Work Experience
+                    </Highlighter>
+                </h3>
+            </div>
+            <div className="flex flex-col gap-6 max-w-md mx-auto">
+                {workExperience.map((item) => (
+                    <div key={item.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
+                        <div className="w-full h-32 rounded-lg overflow-hidden mb-3 bg-gray-100 flex items-center justify-center">
+                            <img
+                                src={item.imageUrl}
+                                alt={item.title}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <h3 className="text-base font-bold mb-1">{item.title}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{item.description}</p>
+                        <div className="flex flex-wrap gap-1">
+                            {item.tags.map((tag) => (
+                                <span
+                                    key={tag}
+                                    className="bg-gray-200 text-gray-800 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="text-center mt-16 mb-8">
+                <h3 className="text-3xl font-bold font-pixel underline-wavy-yellow inline-block">
+                    <Highlighter action="underline" color="#FFD700">
+                        Research
+                    </Highlighter>
+                </h3>
+            </div>
+            <div className="flex flex-col gap-6 max-w-md mx-auto">
+                {research.map((item) => (
+                    <div key={item.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
+                        <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
+                            <img
+                                src={item.imageUrl}
+                                alt={item.title}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <h3 className="text-base font-bold mb-1">{item.title}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{item.description}</p>
+                        <div className="flex flex-wrap gap-1 mb-2">
+                            {item.tags.map((tag) => (
+                                <span
+                                    key={tag}
+                                    className="bg-gray-200 text-gray-800 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                        {item.liveUrl && (
+                            <a
+                                href={item.liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn !w-auto !h-auto !px-4 !py-2 !text-xs !rounded-lg self-start"
+                            >
+                                View
+                            </a>
+                        )}
+                    </div>
+                ))}
             </div>
         </section>
     );

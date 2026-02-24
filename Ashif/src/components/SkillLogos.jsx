@@ -16,6 +16,7 @@ import htmllogo from '../assets/logos/html.png';
 import mongologo from '../assets/logos/mongo.png';
 import postgrelogo from '../assets/logos/postgreSQL.png';
 import postmanlogo from '../assets/logos/postman.png';
+import dockerlogo from '../assets/logos/docker.png';
 
 
 // A generic wrapper for all logos
@@ -33,7 +34,6 @@ export const Javascript = () => <Logo src={javascriptLogo} alt="JavaScript" />;
 export const Typescript = () => <Logo src={typescriptLogo} alt="TypeScript" />;
 export const Node = () => <Logo src={nodeLogo} alt="Node.js" />;
 export const Git = () => <Logo src={gitLogo} alt="Git" />;
-export const Tailwind = () => <Logo src={tailwindLogo} alt="Tailwind CSS" />;
 export const Figma = () => <Logo src={figmalogo} alt="Figma" />;
 export const Php = () => <Logo src={phpLogo} alt="PHP" />;
 export const Mysql = () => <Logo src={mysqlLogo} alt="MySQL" />;
@@ -44,3 +44,4 @@ export const Html = () => <Logo src={htmllogo} alt="HTML" />;
 export const MongoDB = () => <Logo src={mongologo} alt="MongoDB" />;
 export const PostgreSQL = () => <Logo src={postgrelogo} alt="PostgreSQL" />;
 export const Postman = () => <Logo src={postmanlogo} alt="Postman" />;
+export const Docker = () => <Logo src={dockerlogo} alt="Docker" />;

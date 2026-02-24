@@ -9,6 +9,8 @@ import {
   useAnimationFrame
 } from 'framer-motion';
 
+const MotionDiv = motion.div;
+
 function useElementWidth(ref) {
   const [width, setWidth] = useState(0);
 
@@ -94,12 +96,12 @@ export function VelocityText({
 
   return (
     <div className={`${parallaxClassName} relative overflow-hidden`} style={parallaxStyle}>
-      <motion.div
+      <MotionDiv
         className={`${scrollerClassName} flex whitespace-nowrap`}
         style={{ x, ...scrollerStyle }}
       >
         {spans}
-      </motion.div>
+      </MotionDiv>
     </div>
   );
 }

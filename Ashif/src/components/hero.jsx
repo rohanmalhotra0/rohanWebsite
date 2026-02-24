@@ -2,14 +2,12 @@ import React from 'react';
 import Spline from '@splinetool/react-spline';
 import { ArrowRight } from 'lucide-react';
 import RotatingText from './RotatingText';
-import { WordRotate } from "@/components/ui/word-rotate";
 
 /**
  * A modern, minimal hero section component.
  */
 export default function Hero() {
-  const skills = ['UI/UX Designer', 'Frontend Developer', 'Backend Developer', 'Creative Coder'];
-  const greetings = ["Hello", "Hola", "Ciao", "مرحبا"];
+  const focusAreas = ['Systems', 'Infrastructure', 'Applied Research'];
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
@@ -25,20 +23,28 @@ export default function Hero() {
       {/* Content is aligned to the center */}
       <div className="relative z-20 flex items-center justify-center w-full h-full p-8 text-center bg-black/20 pointer-events-none sm:p-16 md:p-24">
         <div className="max-w-md pointer-events-auto">
-          <h1 className="font-pixel flex items-center justify-center gap-x-2 text-5xl font-bold text-white md:text-7xl lg:text-8xl [text-shadow:_0_3px_5px_rgb(0_0_0_/_40%)]">
-            <WordRotate words={greetings} />
-            {", I'm"}
+          <h1 className="font-pixel text-5xl font-bold text-white md:text-7xl lg:text-8xl [text-shadow:_0_3px_5px_rgb(0_0_0_/_40%)]">
+            Rohan Malhotra
           </h1>
           
-          {/* Rotating Text for Skills */}
-          <div className="flex justify-center mt-4">
-            <RotatingText
-              texts={skills}
-              mainClassName="text-lg text-white/90 md:text-xl lg:text-2xl [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]"
-              splitLevelClassName="overflow-hidden"
-              staggerDuration={0.08}
-              staggerFrom="last"
-            />
+          <div className="mt-4 space-y-3">
+            <div className="flex justify-center">
+              <div className="text-lg text-white/90 md:text-xl lg:text-2xl [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]">
+                Mathematics × Computer Science
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <RotatingText
+                texts={focusAreas}
+                mainClassName="text-base text-white/85 md:text-lg [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]"
+                splitLevelClassName="overflow-hidden"
+                staggerDuration={0.08}
+                staggerFrom="last"
+              />
+            </div>
+            <p className="text-sm leading-relaxed text-white/85 md:text-base">
+              Engineer focused on mathematical systems, concurrency, and real-time computation. I build tools that translate theory into reliable infrastructure.
+            </p>
           </div>
         
           {/* Call-to-action buttons */}
@@ -64,10 +70,10 @@ export default function Hero() {
               <ArrowRight size={20} />
             </a>
             <a
-              href="https://drive.google.com/file/d/1vuvWLNdXU6Mh2FTUlzscJUAOXo-Uc_D9/view?usp=share_link"
+              href="/website-photos/misc/R_Malhotra_Resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold text-white transition-all duration-300 bg-transparent border border-white rounded-lg shadow-lg pointer-events-auto hover:bg-white hover:text-white hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold text-white transition-all duration-300 bg-transparent border border-white rounded-lg shadow-lg pointer-events-auto hover:bg-white hover:text-black hover:scale-105"
             >
               View Resume
             </a>
