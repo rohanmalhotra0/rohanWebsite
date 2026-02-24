@@ -57,7 +57,7 @@ async function callOpenAI({ apiKey, model, messages }) {
   return content;
 }
 
-async function callExternalEndpoint({ url, messages }) {
+async function callExternalEndpoint({ url, messages, name }) {
   const lastUserMessage =
     [...messages].reverse().find((m) => m?.role === 'user')?.content ?? '';
 
@@ -66,7 +66,7 @@ async function callExternalEndpoint({ url, messages }) {
     headers: { 'Content-Type': 'application/json' },
     // Send both the new schema (`messages`) and a simple schema (`message`/`name`)
     // so older endpoints can still work without client changes.
-    body: JSON.stringify({ messages, message: lastUserMessage, name: 'Visitor' }),
+    body: JSON.stringify({ messages, message: lastUserMessage, name: name || 'Visitor' }),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -78,7 +78,7 @@ async function callExternalEndpoint({ url, messages }) {
   return content;
 }
 
-export function useRohanGPTChat() {
+export function useRohanGPTChat({ visitorName } = {}) {
   const [messages, setMessages] = useState(() => [
     {
       id: 'rgpt-welcome',
@@ -92,9 +92,15 @@ export function useRohanGPTChat() {
 
   const messageListRef = useRef(null);
   const messagesRef = useRef(messages);
+  const visitorNameRef = useRef(visitorName || '');
+
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  useEffect(() => {
+    visitorNameRef.current = visitorName || '';
+  }, [visitorName]);
 
   const scrollToBottom = useCallback(() => {
     const api = messageListRef.current;
@@ -108,6 +114,11 @@ export function useRohanGPTChat() {
   const sendMessage = useCallback(async (text) => {
     const input = (text || '').trim();
     if (!input || loading) return;
+
+    const safeName = (visitorNameRef.current || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .slice(0, 64);
 
     setError(null);
     const userMsg = { id: `${Date.now()}-u`, role: 'user', content: input };
@@ -135,6 +146,7 @@ export function useRohanGPTChat() {
 
       const payload = [
         { role: 'system', content: SYSTEM_PROMPT },
+        ...(safeName ? [{ role: 'system', content: `The user's name is ${safeName}.` }] : []),
         ...history,
         { role: 'user', content: input },
       ];
@@ -142,7 +154,7 @@ export function useRohanGPTChat() {
       // If an endpoint is configured, use it (recommended for production).
       // Otherwise fall back to direct OpenAI (dev-only / will bundle the key).
       const reply = endpointUrl
-        ? await callExternalEndpoint({ url: endpointUrl, messages: payload })
+        ? await callExternalEndpoint({ url: endpointUrl, messages: payload, name: safeName || 'Visitor' })
         : await callOpenAI({ apiKey, model, messages: payload });
 
       setMessages((prev) => [...prev, { id: `${Date.now()}-a`, role: 'assistant', content: reply }]);

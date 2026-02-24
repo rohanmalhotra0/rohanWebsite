@@ -210,3 +210,27 @@
 #rohangpt .cs-message-input__content-editor:focus {
   outline: none;
 }
+
+/* Mobile usability fixes (iOS keyboard + readability) */
+@media (max-width: 767px) {
+  /* Prevent iOS Safari input-zoom and improve readability */
+  #rohangpt .cs-message__content {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  #rohangpt .cs-message-input__content-editor {
+    font-size: 16px;
+  }
+
+  /* Avoid iPhone safe-area clipping */
+  #rohangpt .cs-message-input {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+
+  /* Hide floating socials while typing in RohanGPT */
+  .rgpt-focused .social-magnet {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

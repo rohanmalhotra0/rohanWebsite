@@ -31,10 +31,10 @@ export default function About({ scrollContainerRef }) {
               baseRotation={1.2}
               blurStrength={10}
               containerClassName="my-0"
-              textSizeClassName="text-xs sm:text-sm md:text-base"
+              textSizeClassName="text-[18px] sm:text-[21px] md:text-[24px]"
               textClassName="font-sans leading-relaxed text-center md:text-left font-normal"
             >
-              Rohan Malhotra is a Mathematics and Computer Science student at NYU Courant. His work spans algorithms and systems engineering, concurrency and multithreaded programming, statistical modeling and applied mathematics, real-time data pipelines, and research-driven software design. He builds structured systems grounded in mathematical reasoning and practical implementation.
+              I am a Mathematics and Computer Science student at NYU Courant. My work spans algorithms and systems engineering, concurrency and multithreaded programming, statistical modeling and applied mathematics, real-time data pipelines, and research-driven software design. I builds structured systems grounded in mathematical reasoning and practical implementation.
             </ScrollReveal>
           </div>
         </div>
