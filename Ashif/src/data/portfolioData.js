@@ -41,7 +41,7 @@ export const projects = [
     title: 'Quantum Oscillating Stock Model',
     description:
       'Wave-based cyclical signal construction with regime detection logic and automated reporting.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/refrax2.png'),
+    imageUrl: assetUrl('website-photos/projectsPhotos/download.png'),
     tags: ['Time Series', 'Signals', 'Regime Detection', 'Reporting'],
   },
   {
