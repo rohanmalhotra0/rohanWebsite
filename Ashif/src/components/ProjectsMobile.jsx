@@ -23,7 +23,10 @@ export default function ProjectsMobile() {
                 </h2>
             </div>
 
-            <div className="relative z-10 flex flex-col gap-6 max-w-md mx-auto">
+            <div
+                className="relative z-10 grid grid-cols-2 gap-4 max-w-md mx-auto"
+                style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}
+            >
                 {workExperience.map((item) => (
                     <div key={item.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
                         <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">

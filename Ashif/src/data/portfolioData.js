@@ -1,5 +1,5 @@
 const BASE = import.meta.env.BASE_URL || '/';
-const assetUrl = (path) => `${BASE}${String(path || '').replace(/^\/+/, '')}`;
+export const assetUrl = (path) => `${BASE}${String(path || '').replace(/^\/+/, '')}`;
 
 export const projects = [
   {

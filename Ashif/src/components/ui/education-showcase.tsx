@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GridPattern } from "@/components/ui/grid-pattern"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { assetUrl } from "@/data/portfolioData"
+
+const NYU_LOGO = assetUrl('website-photos/Work%20Logos/new_york_university_logo.jpeg')
 
 export type EducationShowcaseProps = {
   school: string
@@ -51,6 +54,11 @@ export function EducationShowcase({
       <CardHeader className="relative">
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <img
+              src={NYU_LOGO}
+              alt="New York University"
+              className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-lg object-contain"
+            />
             <CardTitle className="text-xl sm:text-2xl text-gray-900">
               {school}
             </CardTitle>
@@ -160,4 +168,3 @@ export function EducationShowcase({
     </Card>
   )
 }
-

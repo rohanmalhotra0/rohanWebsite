@@ -14,7 +14,6 @@ function HeadshotCarousel({
     () => [
       { src: assetUrl('website-photos/me/01.png'), alt: 'Rohan Malhotra photo 1' },
       { src: assetUrl('website-photos/me/02.jpg'), alt: 'Rohan Malhotra photo 2' },
-      { src: assetUrl('website-photos/me/03.jpg'), alt: 'Rohan Malhotra photo 3' },
       { src: assetUrl('website-photos/me/04.jpg'), alt: 'Rohan Malhotra photo 4' },
       { src: assetUrl('website-photos/me/05.jpg'), alt: 'Rohan Malhotra photo 5' },
       { src: assetUrl('website-photos/me/06.png'), alt: 'Rohan Malhotra photo 6' },
