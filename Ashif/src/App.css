@@ -299,6 +299,21 @@
   outline: none;
 }
 
+/* Hide social dock when on RohanGPT so it doesn't block the input */
+.rgpt-inview .social-magnet,
+.rgpt-focused .social-magnet {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* When typing in RohanGPT on mobile, hide floating footer/social dock */
+@media (max-width: 767px) {
+  html.rgpt-focused .floating-social-dock,
+  html.rgpt-focused .site-footer-dock {
+    display: none !important;
+  }
+}
+
 /* Mobile usability fixes (iOS keyboard + readability) */
 @media (max-width: 767px) {
   /* Prevent iOS Safari input-zoom and improve readability */
@@ -311,26 +326,27 @@
     font-size: 16px;
   }
 
+  /* iOS tap comfort (44px minimum tap targets) */
+  #rohangpt .cs-message-input__content-editor-wrapper {
+    min-height: 44px !important;
+  }
+  #rohangpt .cs-message-input__content-editor {
+    font-size: 16px !important;
+    line-height: 1.3 !important;
+  }
+  #rohangpt .cs-message-input__send-button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
   /* Avoid iPhone safe-area clipping */
   #rohangpt .cs-message-input {
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
 
-  /* On iOS/mobile: keep dock usable while on RohanGPT */
+  /* On iOS/mobile: position dock above safe area */
   .social-magnet {
     bottom: calc(12px + env(safe-area-inset-bottom));
-  }
-
-  .rgpt-inview .social-magnet,
-  .rgpt-focused .social-magnet {
-    left: 12px;
-    transform: translateX(0) scale(0.92);
-    transform-origin: left bottom;
-  }
-
-  /* When typing, lift it so it doesn't crowd the input */
-  .rgpt-focused .social-magnet {
-    bottom: calc(84px + env(safe-area-inset-bottom));
   }
 
   /* Ensure last messages remain visible above the input/keyboard */

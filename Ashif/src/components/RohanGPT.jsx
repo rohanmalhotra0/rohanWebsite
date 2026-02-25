@@ -23,6 +23,7 @@ function RohanGPT() {
   });
 
   const [chatHeight, setChatHeight] = useState(560);
+  const [kbOffset, setKbOffset] = useState(0);
 
   const [visitorName, setVisitorName] = useState(() => {
     try {
@@ -37,6 +38,8 @@ function RohanGPT() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+
+  const { messages, loading, error, sendMessage, messageListRef, scrollMessagesToBottom } = useRohanGPTChat({ visitorName });
 
   useEffect(() => {
     try {
@@ -83,6 +86,33 @@ function RohanGPT() {
   }, [isMobile, recomputeChatHeight]);
 
   useEffect(() => {
+    if (!isMobile) return;
+
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    let raf = 0;
+
+    const update = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        setKbOffset(offset);
+      });
+    };
+
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    update();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, [isMobile]);
+
+  useEffect(() => {
     const node = sectionRef.current;
     if (!node) return;
 
@@ -90,10 +120,9 @@ function RohanGPT() {
 
     const onFocusIn = () => {
       if (window.innerWidth < 768) document.documentElement.classList.add('rgpt-focused');
-      // Give iOS a moment to open the keyboard, then recompute + scroll.
       setTimeout(() => {
         recomputeChatHeight();
-        chatFrameRef.current?.scrollIntoView({ block: 'end', behavior: 'auto' });
+        scrollMessagesToBottom?.();
       }, 50);
     };
 
@@ -115,15 +144,14 @@ function RohanGPT() {
       node.removeEventListener('focusout', onFocusOut);
       document.documentElement.classList.remove('rgpt-focused');
     };
-  }, [recomputeChatHeight]);
+  }, [recomputeChatHeight, scrollMessagesToBottom]);
 
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return;
 
-    const isSmall = () => window.innerWidth < 768;
     const setInView = (inView) => {
-      document.documentElement.classList.toggle('rgpt-inview', Boolean(inView) && isSmall());
+      document.documentElement.classList.toggle('rgpt-inview', Boolean(inView));
     };
 
     const io = new IntersectionObserver(
@@ -132,19 +160,11 @@ function RohanGPT() {
     );
     io.observe(node);
 
-    const onResize = () => {
-      if (!isSmall()) document.documentElement.classList.remove('rgpt-inview');
-    };
-    window.addEventListener('resize', onResize);
-
     return () => {
       io.disconnect();
-      window.removeEventListener('resize', onResize);
       document.documentElement.classList.remove('rgpt-inview');
     };
   }, []);
-
-  const { messages, loading, error, sendMessage, messageListRef } = useRohanGPTChat({ visitorName });
 
   const senderLabel = useMemo(() => (visitorName || '').trim() || 'You', [visitorName]);
 
@@ -199,25 +219,30 @@ function RohanGPT() {
           <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden bg-white">
             <div className="px-4 py-3 border-b border-gray-200 bg-white">
               <div className="flex items-center justify-between gap-3">
-                <label htmlFor="rgpt-name" className="text-sm font-medium text-gray-700">
-                  Your name
-                </label>
-                <input
-                  id="rgpt-name"
-                  type="text"
-                  value={visitorName}
-                  onChange={(e) => setVisitorName(e.target.value)}
-                  placeholder="Enter your name"
-                  autoComplete="name"
-                  inputMode="text"
-                  className="w-[220px] max-w-[60vw] rounded-xl border border-gray-300 bg-white px-4 py-2 text-[16px] text-gray-900 shadow-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                />
+                <div className="text-sm font-medium text-gray-800">RohanGPT</div>
+                <button
+                  type="button"
+                  className="text-sm rounded-full border border-gray-300 px-3 py-1.5 bg-white"
+                  onClick={() => {
+                    const next = prompt('What should I call you?', visitorName || '');
+                    if (next !== null) setVisitorName(next);
+                  }}
+                >
+                  {visitorName?.trim() ? `Name: ${visitorName}` : 'Set name'}
+                </button>
               </div>
             </div>
             <div
               ref={chatFrameRef}
               className="h-[560px]"
-              style={isMobile ? { height: `${chatHeight}px` } : undefined}
+              style={
+                isMobile
+                  ? {
+                      height: `${chatHeight}px`,
+                      paddingBottom: `${kbOffset}px`,
+                    }
+                  : undefined
+              }
             >
               <MainContainer>
                 <ChatContainer>

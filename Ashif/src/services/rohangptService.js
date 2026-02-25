@@ -242,12 +242,25 @@ export function useRohanGPTChat({ visitorName } = {}) {
     }
   }, [loading]);
 
+  /* Scroll only the message list to bottom (avoids jumpy iOS scrollIntoView) */
+  const scrollMessagesToBottom = useCallback(() => {
+    const api = messageListRef.current;
+    if (api && typeof api.scrollToBottom === 'function') {
+      api.scrollToBottom();
+    } else {
+      const node = messageListRef?.current;
+      const el = node?.containerRef?.current ?? node?.parentElement ?? node;
+      if (el && el.scrollHeight != null) el.scrollTop = el.scrollHeight;
+    }
+  }, []);
+
   return {
     messages,
     loading,
     error,
     sendMessage,
     messageListRef,
+    scrollMessagesToBottom,
   };
 }
 
