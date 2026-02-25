@@ -7,6 +7,7 @@ export const projects = [
     description:
       'Quantitative modeling and 2D/3D visualization platform with low-latency REST + WebSocket pipelines and a PostgreSQL-backed research engine.',
     imageUrl: assetUrl('website-photos/projectsPhotos/refrax1.png'),
+    liveUrl: 'https://refrax.io',
     tags: ['C++', 'PostgreSQL', 'REST', 'WebSocket', 'Visualization'],
   },
   {
@@ -14,6 +15,7 @@ export const projects = [
     description:
       'Computer vision accessibility tool enabling hands-free cursor control using color tracking with low-latency, on-device processing.',
     imageUrl: assetUrl('website-photos/projectsPhotos/greensticker.png'),
+    liveUrl: 'https://greensticker.us',
     tags: ['Python', 'Computer Vision', 'Accessibility'],
   },
   {
@@ -21,6 +23,7 @@ export const projects = [
     description:
       'Screening experiments and structured data collection workflow with an accessible UX designed for research reliability.',
     imageUrl: assetUrl('website-photos/projectsPhotos/autism.png'),
+    liveUrl: 'https://autismtester.com',
     tags: ['Research Tooling', 'Data Collection', 'UX'],
   },
   {
@@ -28,6 +31,7 @@ export const projects = [
     description:
       'Student-led STEM research platform supporting multi-university collaboration infrastructure and scalable project coordination.',
     imageUrl: assetUrl('website-photos/projectsPhotos/pivot.png'),
+    liveUrl: 'https://vtpivot.org',
     tags: ['Platform', 'Collaboration', 'Infrastructure'],
   },
   {
