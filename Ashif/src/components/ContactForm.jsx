@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
+import { Highlighter } from "@/components/ui/highlighter";
 import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function ContactForm() {
@@ -23,7 +24,11 @@ export default function ContactForm() {
       <div className="relative z-10 container px-4 mx-auto">
         {/* Centered Form */}
         <div className="max-w-md mx-auto px-8 py-6 bg-gray-50 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-1 text-center">Contact</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-1 text-center">
+            <Highlighter action="underline" color="#FFD700">
+              Contact
+            </Highlighter>
+          </h2>
           <p className="text-center text-sm text-gray-600 mb-5">
             New York, NY · <a className="underline hover:text-gray-900" href="https://rohanm.org" target="_blank" rel="noopener noreferrer">rohanm.org</a>
           </p>

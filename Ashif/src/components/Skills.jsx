@@ -1,4 +1,5 @@
 import React from 'react';
+import { Highlighter } from "@/components/ui/highlighter";
 import { VelocityText } from './ScrollVelocity';
 import { Cpp, Docker, Git, Javascript, Node, Postman, PyTorch, Python, ReactLogo, Sql, Typescript } from './SkillLogos';
 import { Highlighter } from "@/components/ui/highlighter";

@@ -128,6 +128,40 @@
   }
 }
 
+/* Work Experience: force 2x2 grid */
+#work-experience-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1.5rem;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 767px) {
+  #work-experience-grid {
+    gap: 1rem;
+    max-width: 100%;
+  }
+}
+
+/* Research: same 2x2 grid as Work Experience */
+#research-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1.5rem;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 767px) {
+  #research-grid {
+    gap: 1rem;
+    max-width: 100%;
+  }
+}
+
 /* Particles.js canvas sizing (About section) */
 #about #about-particles .particles-js-canvas-el {
   position: absolute;

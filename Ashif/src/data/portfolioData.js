@@ -112,12 +112,5 @@ export const research = [
     liveUrl: assetUrl('website-photos/Research/AnEconomic%20Approachto%20OptimizeCapital%20Allocation.pdf'),
     tags: ['Monte Carlo', 'Optimization', 'Risk'],
   },
-  {
-    title: 'Aerospace Systems Research',
-    description:
-      'CubeSat subsystem development and concurrent embedded systems work with an emphasis on reliability.',
-    imageUrl: assetUrl('website-photos/Research/cubesats.jpeg'),
-    tags: ['Embedded', 'Concurrency', 'Aerospace'],
-  },
 ];
 

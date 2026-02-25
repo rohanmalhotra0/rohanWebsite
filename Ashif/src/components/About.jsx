@@ -1,4 +1,5 @@
 import React from 'react';
+import { Highlighter } from "@/components/ui/highlighter";
 import ScrollReveal from './ScrollReveal';
 import { Highlighter } from "@/components/ui/highlighter";
 import HeadshotCarousel from './HeadshotCarousel';

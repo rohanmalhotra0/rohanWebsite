@@ -205,7 +205,7 @@ function RohanGPT() {
 
       <div className="relative z-10 container mx-auto px-4">
         <div className="text-center mb-10">
-          <h2 className="text-5xl font-bold font-pixel inline-block">
+          <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
             <Highlighter action="underline" color="#FFD700">
               RohanGPT
             </Highlighter>

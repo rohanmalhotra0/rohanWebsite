@@ -8,7 +8,7 @@ export default function Education() {
       <div className="container mx-auto px-4">
         <div className="text-center">
           <div className="inline-block mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold font-pixel">
+            <h2 className="text-4xl md:text-5xl font-bold font-pixel underline-wavy-yellow">
               <Highlighter action="underline" color="#FFD700">
                 Education
               </Highlighter>

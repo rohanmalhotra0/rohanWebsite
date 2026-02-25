@@ -147,7 +147,10 @@ export default function Projects() {
                         </Highlighter>
                     </h2>
                 </div>
-                <div className="grid grid-cols-3 gap-6 max-w-screen-lg mx-auto">
+                <div
+                    id="work-experience-grid"
+                    className="grid gap-6 max-w-screen-lg mx-auto"
+                >
                     {workExperience.map((item) => (
                         <div key={item.title} className="aspect-square">
                             <Card item={item} />
@@ -162,7 +165,10 @@ export default function Projects() {
                         </Highlighter>
                     </h2>
                 </div>
-                <div className="grid grid-cols-3 gap-6 max-w-screen-lg mx-auto">
+                <div
+                    id="research-grid"
+                    className="grid gap-6 max-w-screen-lg mx-auto"
+                >
                     {research.map((item) => (
                         <div key={item.title} className="aspect-square">
                             <Card item={item} />
