@@ -2,7 +2,6 @@ import React from 'react';
 import { Highlighter } from "@/components/ui/highlighter";
 import { VelocityText } from './ScrollVelocity';
 import { Cpp, Docker, Git, Javascript, Node, Postman, PyTorch, Python, ReactLogo, Sql, Typescript } from './SkillLogos';
-import { Highlighter } from "@/components/ui/highlighter";
 import { GridPattern } from "@/components/ui/grid-pattern";
 
 const skillsRow1 = [
@@ -33,7 +32,7 @@ export default function Skills() {
 
       <div className="relative z-10 container mx-auto text-center">
         <div className="inline-block mb-12">
-          <h2 className="text-5xl font-bold font-pixel inline-block">
+          <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
             <Highlighter action="underline" color="#FFD700">
               My Tech Stack
             </Highlighter>
