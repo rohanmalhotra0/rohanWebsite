@@ -17,7 +17,7 @@ export default function ContactForm() {
         x={-1}
         y={-1}
         className={cn(
-          "[mask-image:linear-gradient(to_bottom_right,white,transparent,transparent)]"
+          "fill-gray-300/25 stroke-gray-300/60 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
         )}
       />
       <div className="relative z-10 container px-4 mx-auto">

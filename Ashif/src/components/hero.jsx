@@ -2,7 +2,6 @@ import React from 'react';
 import Spline from '@splinetool/react-spline';
 import { ArrowRight } from 'lucide-react';
 import RotatingText from './RotatingText';
-import { WordRotate } from "@/components/ui/word-rotate";
 
 const assetUrl = (path) =>
   `${import.meta.env.BASE_URL || '/'}${String(path || '').replace(/^\/+/, '')}`;
@@ -65,7 +64,19 @@ export default function Hero() {
       <div className="relative z-20 flex items-center justify-center w-full h-full p-8 text-center bg-black/20 pointer-events-none sm:p-16 md:p-24">
         <div className="max-w-3xl pointer-events-auto">
           <h1 className="font-pixel inline-flex items-baseline justify-center gap-x-3 font-bold text-white whitespace-nowrap leading-none text-[clamp(1.6rem,6vw,4.75rem)] [text-shadow:_0_3px_5px_rgb(0_0_0_/_40%)]">
-            <WordRotate words={greetings} className="leading-none" />
+            <RotatingText
+              texts={greetings}
+              rotationInterval={3200}
+              splitBy="characters"
+              staggerDuration={0.06}
+              staggerFrom="first"
+              mainClassName="inline-flex items-baseline leading-none"
+              splitLevelClassName="overflow-hidden"
+              elementLevelClassName="leading-none"
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "-140%", opacity: 0 }}
+            />
             <span className="leading-none">Rohan</span>
           </h1>
           

@@ -129,14 +129,14 @@ export default function Projects() {
             <InteractiveGridPattern
                 className={cn(
                     "absolute inset-0 h-full w-full",
-                    "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]"
+                    "[mask-image:radial-gradient(1400px_circle_at_center,white,transparent)]"
                 )}
                 // --- 2. Added the missing props from your demo ---
                 width={20}
                 height={20}
                 squares={[80, 80]}
                 // You can set a static color for the squares
-                squaresClassName="fill-gray-100"
+                squaresClassName="fill-transparent stroke-gray-300/40"
             />
 
             <div className="relative z-10 px-2">

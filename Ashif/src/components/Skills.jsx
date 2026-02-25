@@ -2,6 +2,7 @@ import React from 'react';
 import { VelocityText } from './ScrollVelocity';
 import { Cpp, Docker, Git, Javascript, Node, Postman, PyTorch, Python, ReactLogo, Sql, Typescript } from './SkillLogos';
 import { Highlighter } from "@/components/ui/highlighter";
+import { GridPattern } from "@/components/ui/grid-pattern";
 
 const skillsRow1 = [
   <Cpp key="cpp" />,
@@ -22,8 +23,14 @@ const skillsRow2 = [
 
 export default function Skills() {
   return (
-    <section id="skills" className="w-full bg-white text-black py-24">
-      <div className="container mx-auto text-center">
+    <section id="skills" className="relative w-full bg-white text-black py-24 overflow-hidden">
+      <GridPattern
+        width={48}
+        height={48}
+        className="fill-gray-300/20 stroke-gray-300/55 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
+      />
+
+      <div className="relative z-10 container mx-auto text-center">
         <div className="inline-block mb-12">
           <h2 className="text-5xl font-bold font-pixel inline-block">
             <Highlighter action="underline" color="#FFD700">
@@ -32,7 +39,7 @@ export default function Skills() {
           </h2>
         </div>
       </div>
-      <div className="relative max-w-screen-lg mx-auto flex flex-col gap-4">
+      <div className="relative z-10 max-w-screen-lg mx-auto flex flex-col gap-4">
         {/* Left Blur */}
         <div className="pointer-events-none absolute left-0 top-0 h-full w-16 z-10"
              style={{

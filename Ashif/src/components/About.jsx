@@ -2,14 +2,21 @@ import React from 'react';
 import ScrollReveal from './ScrollReveal';
 import { Highlighter } from "@/components/ui/highlighter";
 import HeadshotCarousel from './HeadshotCarousel';
+import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function About({ scrollContainerRef }) {
   return (
     <section
       id="about"
-      className="w-full min-h-screen bg-white text-black p-8 sm:p-16 md:p-24 flex items-center justify-center"
+      className="relative w-full min-h-screen bg-white text-black p-8 sm:p-16 md:p-24 flex items-center justify-center overflow-hidden"
     >
-      <div className="max-w-4xl w-full">
+      <GridPattern
+        width={44}
+        height={44}
+        className="fill-gray-300/25 stroke-gray-300/60 [mask-image:radial-gradient(520px_circle_at_center,white,transparent)]"
+      />
+
+      <div className="relative z-10 max-w-4xl w-full">
         <div className="mb-12 flex justify-center text-center">
           <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
             <Highlighter action="underline" color="#FFD700">

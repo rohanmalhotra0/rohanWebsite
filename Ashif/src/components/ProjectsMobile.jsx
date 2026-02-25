@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { Highlighter } from "@/components/ui/highlighter";
 import { projects, research, workExperience } from '../data/portfolioData';
+import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function ProjectsMobile() {
     const [showAllProjects, setShowAllProjects] = useState(false);
     const displayedProjects = showAllProjects ? projects : projects.slice(0, 3);
 
     return (
-        <section id="projects" className="w-full bg-white text-black py-12 px-2">
-            <div className="text-center mb-8">
+        <section id="projects" className="relative w-full bg-white text-black py-12 px-2 overflow-hidden">
+            <GridPattern
+                width={44}
+                height={44}
+                className="fill-gray-300/20 stroke-gray-300/55 [mask-image:radial-gradient(520px_circle_at_center,white,transparent)]"
+            />
+
+            <div className="relative z-10 text-center mb-8">
                 <h2 className="text-3xl font-bold font-pixel underline-wavy-yellow inline-block">
                     <Highlighter action="underline" color="#FFD700">
                         Work Experience
@@ -16,7 +23,7 @@ export default function ProjectsMobile() {
                 </h2>
             </div>
 
-            <div className="flex flex-col gap-6 max-w-md mx-auto">
+            <div className="relative z-10 flex flex-col gap-6 max-w-md mx-auto">
                 {workExperience.map((item) => (
                     <div key={item.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
                         <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
@@ -44,7 +51,7 @@ export default function ProjectsMobile() {
                 ))}
             </div>
 
-            <div className="text-center mt-16 mb-8">
+            <div className="relative z-10 text-center mt-16 mb-8">
                 <h2 className="text-3xl font-bold font-pixel underline-wavy-yellow inline-block">
                     <Highlighter action="underline" color="#FFD700">
                         Research
@@ -52,7 +59,7 @@ export default function ProjectsMobile() {
                 </h2>
             </div>
 
-            <div className="flex flex-col gap-6 max-w-md mx-auto">
+            <div className="relative z-10 flex flex-col gap-6 max-w-md mx-auto">
                 {research.map((item) => (
                     <div key={item.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
                         <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
@@ -90,7 +97,7 @@ export default function ProjectsMobile() {
                 ))}
             </div>
 
-            <div className="text-center mt-16 mb-8">
+            <div className="relative z-10 text-center mt-16 mb-8">
                 <h2 className="text-3xl font-bold font-pixel underline-wavy-yellow inline-block">
                     <Highlighter action="underline" color="#FFD700">
                         Projects
@@ -98,7 +105,7 @@ export default function ProjectsMobile() {
                 </h2>
             </div>
 
-            <div className="flex flex-col gap-6 max-w-md mx-auto">
+            <div className="relative z-10 flex flex-col gap-6 max-w-md mx-auto">
                 {displayedProjects.map((project) => (
                     <div key={project.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
                         <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">

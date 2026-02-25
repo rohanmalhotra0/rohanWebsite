@@ -7,6 +7,7 @@ import {
   MessageInput,
 } from '@chatscope/chat-ui-kit-react';
 import { Highlighter } from '@/components/ui/highlighter';
+import { GridPattern } from "@/components/ui/grid-pattern";
 import { useRohanGPTChat } from '../services/rohangptService';
 
 function RohanGPT() {
@@ -171,8 +172,18 @@ function RohanGPT() {
   );
 
   return (
-    <section ref={sectionRef} id="rohangpt" className="w-full bg-white text-black py-14 sm:py-20">
-      <div className="container mx-auto px-4">
+    <section
+      ref={sectionRef}
+      id="rohangpt"
+      className="relative w-full bg-white text-black py-14 sm:py-20 overflow-hidden"
+    >
+      <GridPattern
+        width={44}
+        height={44}
+        className="fill-gray-300/20 stroke-gray-300/55 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
+      />
+
+      <div className="relative z-10 container mx-auto px-4">
         <div className="text-center mb-10">
           <h2 className="text-5xl font-bold font-pixel inline-block">
             <Highlighter action="underline" color="#FFD700">
