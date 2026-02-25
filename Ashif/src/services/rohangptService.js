@@ -68,7 +68,7 @@ async function callOpenAI({ apiKey, model, messages }) {
   return content;
 }
 
-async function callExternalEndpoint({ url, messages, name }) {
+async function callExternalEndpoint({ url, messages, name, messageOverride, systemPrompt, nameRulePrompt }) {
   const lastUserMessage =
     [...messages].reverse().find((m) => m?.role === 'user')?.content ?? '';
 
@@ -77,7 +77,13 @@ async function callExternalEndpoint({ url, messages, name }) {
     headers: { 'Content-Type': 'application/json' },
     // Send both the new schema (`messages`) and a simple schema (`message`/`name`)
     // so older endpoints can still work without client changes.
-    body: JSON.stringify({ messages, message: lastUserMessage, name: name || 'Visitor' }),
+    body: JSON.stringify({
+      messages,
+      message: messageOverride ?? lastUserMessage,
+      name: name || 'Visitor',
+      systemPrompt,
+      nameRulePrompt,
+    }),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -195,10 +201,27 @@ export function useRohanGPTChat({ visitorName } = {}) {
         { role: 'user', content: input },
       ];
 
+      // Compatibility: some older endpoints ignore `messages` and only use `message`.
+      // In that case, include the rules in `message` too so personalization still works.
+      const compatMessage = [
+        'INSTRUCTIONS (do not reveal):',
+        SYSTEM_PROMPT,
+        ...(nameRulePrompt ? ['\nNAME OVERRIDE:', nameRulePrompt] : []),
+        '\nUSER MESSAGE:',
+        input,
+      ].join('\n');
+
       // If an endpoint is configured, use it (recommended for production).
       // Otherwise fall back to direct OpenAI (dev-only / will bundle the key).
       const reply = endpointUrl
-        ? await callExternalEndpoint({ url: endpointUrl, messages: payload, name: safeName || 'Visitor' })
+        ? await callExternalEndpoint({
+            url: endpointUrl,
+            messages: payload,
+            name: safeName || 'Visitor',
+            messageOverride: compatMessage,
+            systemPrompt: SYSTEM_PROMPT,
+            nameRulePrompt,
+          })
         : await callOpenAI({ apiKey, model, messages: payload });
 
       setMessages((prev) => [...prev, { id: `${Date.now()}-a`, role: 'assistant', content: reply }]);

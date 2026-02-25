@@ -45,7 +45,7 @@ export default function Navbar() {
             onClick={e => handleNavClick(e, 'about')}
             className="transition hover:text-white"
           >
-            About Me
+            About
           </a>
           <a
             href="#rohangpt"

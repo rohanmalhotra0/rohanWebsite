@@ -14,6 +14,7 @@ const ScrollReveal = ({
   containerClassName = '',
   textSizeClassName = 'text-[clamp(1.6rem,4vw,3rem)]',
   textClassName = '',
+  scrub = true,
   rotationEnd = 'bottom bottom',
   wordAnimationEnd = 'bottom bottom'
 }) => {
@@ -48,7 +49,7 @@ const ScrollReveal = ({
           scroller,
           start: 'top bottom',
           end: rotationEnd,
-          scrub: true
+          scrub
         }
       }
     );
@@ -67,7 +68,7 @@ const ScrollReveal = ({
           scroller,
           start: 'top bottom-=20%',
           end: wordAnimationEnd,
-          scrub: true
+          scrub
         }
       }
     );
@@ -85,7 +86,7 @@ const ScrollReveal = ({
             scroller,
             start: 'top bottom-=20%',
             end: wordAnimationEnd,
-            scrub: true
+            scrub
           }
         }
       );
@@ -94,7 +95,7 @@ const ScrollReveal = ({
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
+  }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength, scrub]);
 
   return (
     <h2 ref={containerRef} className={`my-5 ${containerClassName}`}>

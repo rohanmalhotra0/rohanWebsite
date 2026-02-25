@@ -1,6 +1,6 @@
 import React from 'react';
-import { File, Folder, Tree } from "@/components/ui/file-tree";
 import { Highlighter } from "@/components/ui/highlighter";
+import { EducationShowcase } from "@/components/ui/education-showcase";
 
 export default function Education() {
   return (
@@ -14,34 +14,38 @@ export default function Education() {
               </Highlighter>
             </h2>
           </div>
-          <div className="relative flex max-w-lg mx-auto flex-col items-center justify-center overflow-hidden rounded-lg border bg-background p-4">
-            <Tree
-              className="w-full bg-background overflow-hidden rounded-md"
-              initialExpandedItems={["Education", "NYU", "Coursework", "Graduate Coursework"]}
-            >
-              <Folder element="My Education" value="Education">
-                <Folder element="New York University, Courant Institute" value="NYU">
-                  <File value="NYU-Degree">
-                    <p>B.S. in Mathematics and Computer Science (May 2027)</p>
-                  </File>
-                  <File value="NYU-GPA">
-                    <p>GPA: 3.75 / 4.00 (Accelerated 3-Year Program)</p>
-                  </File>
-                  <Folder element="Relevant Coursework" value="Coursework">
-                    <File value="Course-Algorithms"><p>Algorithms</p></File>
-                    <File value="Course-OS"><p>Operating Systems</p></File>
-                    <File value="Course-MVC"><p>Multivariable Calculus</p></File>
-                    <File value="Course-LA"><p>Linear Algebra</p></File>
-                    <File value="Course-Probability"><p>Probability</p></File>
-                    <File value="Course-Statistics"><p>Statistics</p></File>
-                    <File value="Course-Numerical"><p>Numerical Methods</p></File>
-                  </Folder>
-                  <Folder element="Graduate Coursework" value="Graduate Coursework">
-                    <File value="Grad-MathTech"><p>Mathematical Techniques for CS Applications</p></File>
-                  </Folder>
-                </Folder>
-              </Folder>
-            </Tree>
+          <div className="mx-auto max-w-4xl">
+            <EducationShowcase
+              school="New York University, Courant Institute"
+              program="B.A. Mathematics & Computer Science (Accelerated 3-Year Program)"
+              graduation="Graduating May 2027"
+              gpa="3.75 / 4.00"
+              location="New York, NY"
+              highlights={[
+                "Accelerated 3-year program with a combined math + CS curriculum centered on proofs, algorithms, and systems.",
+                "Coursework emphasis: optimization + numerical methods for computation, plus probability/statistics for uncertainty and inference.",
+              ]}
+              relevantCoursework={[
+                "Algorithms",
+                "Operating Systems",
+                "Computer Organization",
+                "Data Structures",
+                "Discrete Mathematics",
+                "Software Engineering",
+                "Machine Learning",
+                "Multivariable Calculus",
+                "Linear Algebra",
+                "Probability Theory",
+                "Statistics",
+                "Real Analysis",
+                "Abstract Algebra",
+                "Differential Equations",
+                "Numerical Methods",
+              ]}
+              graduateCoursework={[
+                "Mathematical Techniques for CS Applications",
+              ]}
+            />
           </div>
         </div>
       </div>

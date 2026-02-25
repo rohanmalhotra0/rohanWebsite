@@ -13,7 +13,7 @@ export default function About({ scrollContainerRef }) {
         <div className="mb-12 flex justify-center text-center">
           <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
             <Highlighter action="underline" color="#FFD700">
-              About Me
+              About
             </Highlighter>
           </h2>
         </div>

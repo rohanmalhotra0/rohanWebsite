@@ -5,7 +5,6 @@ import {
   MessageList,
   Message,
   MessageInput,
-  TypingIndicator,
 } from '@chatscope/chat-ui-kit-react';
 import { Highlighter } from '@/components/ui/highlighter';
 import { useRohanGPTChat } from '../services/rohangptService';
@@ -93,7 +92,7 @@ function RohanGPT() {
       // Give iOS a moment to open the keyboard, then recompute + scroll.
       setTimeout(() => {
         recomputeChatHeight();
-        chatFrameRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+        chatFrameRef.current?.scrollIntoView({ block: 'end', behavior: 'auto' });
       }, 50);
     };
 
@@ -117,10 +116,50 @@ function RohanGPT() {
     };
   }, [recomputeChatHeight]);
 
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
+    const isSmall = () => window.innerWidth < 768;
+    const setInView = (inView) => {
+      document.documentElement.classList.toggle('rgpt-inview', Boolean(inView) && isSmall());
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry?.isIntersecting && (entry.intersectionRatio || 0) > 0.15),
+      { threshold: [0, 0.15] }
+    );
+    io.observe(node);
+
+    const onResize = () => {
+      if (!isSmall()) document.documentElement.classList.remove('rgpt-inview');
+    };
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      io.disconnect();
+      window.removeEventListener('resize', onResize);
+      document.documentElement.classList.remove('rgpt-inview');
+    };
+  }, []);
+
   const { messages, loading, error, sendMessage, messageListRef } = useRohanGPTChat({ visitorName });
 
+  const senderLabel = useMemo(() => (visitorName || '').trim() || 'You', [visitorName]);
+
   const typingIndicator = useMemo(
-    () => (loading ? <TypingIndicator content="RohanGPT is typing" /> : null),
+    () =>
+      loading ? (
+        <div className="rgpt-typing-indicator" aria-live="polite" aria-label="RohanGPT is typing">
+          <span className="rgpt-typing-label">RohanGPT</span>
+          <span className="rgpt-typing-text">typing</span>
+          <span className="rgpt-typing-dots" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+        </div>
+      ) : null,
     [loading]
   );
 
@@ -146,23 +185,24 @@ function RohanGPT() {
         </div>
 
         <div className="max-w-screen-md mx-auto">
-          <div className="mb-4 flex justify-center">
-            <div className="w-full max-w-sm text-left">
-              <label htmlFor="rgpt-name" className="block text-sm font-medium text-gray-700">
-                Your name
-              </label>
-              <input
-                id="rgpt-name"
-                type="text"
-                value={visitorName}
-                onChange={(e) => setVisitorName(e.target.value)}
-                placeholder="e.g., Zach"
-                autoComplete="name"
-                className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-              />
-            </div>
-          </div>
           <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden bg-white">
+            <div className="px-4 py-3 border-b border-gray-200 bg-white">
+              <div className="flex items-center justify-between gap-3">
+                <label htmlFor="rgpt-name" className="text-sm font-medium text-gray-700">
+                  Your name
+                </label>
+                <input
+                  id="rgpt-name"
+                  type="text"
+                  value={visitorName}
+                  onChange={(e) => setVisitorName(e.target.value)}
+                  placeholder="Enter your name"
+                  autoComplete="name"
+                  inputMode="text"
+                  className="w-[220px] max-w-[60vw] rounded-xl border border-gray-300 bg-white px-4 py-2 text-[16px] text-gray-900 shadow-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                />
+              </div>
+            </div>
             <div
               ref={chatFrameRef}
               className="h-[560px]"
@@ -183,7 +223,7 @@ function RohanGPT() {
                     ))}
                   </MessageList>
                   <MessageInput
-                    placeholder="Ask RohanGPT anything..."
+                    placeholder={`${senderLabel}: Ask RohanGPT anything...`}
                     onSend={handleSend}
                     disabled={loading}
                     attachButton={false}
