@@ -35,6 +35,13 @@ export const projects = [
     tags: ['Platform', 'Collaboration', 'Infrastructure'],
   },
   {
+    title: 'Gavindle',
+    description:
+      'Fully functional Wordle game used by 20+ users daily. PostgreSQL and React full-stack development.',
+    imageUrl: assetUrl('website-photos/projectsPhotos/Gavindle.png'),
+    tags: ['React', 'PostgreSQL', 'Full Stack'],
+  },
+  {
     title: 'Automated Raspberry Pi Binomial Options System',
     description:
       'Raspberry Pi pipeline for live data ingestion, binomial tree pricing, and automated execution with guardrails.',
