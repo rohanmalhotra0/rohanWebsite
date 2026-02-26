@@ -39,6 +39,7 @@ export const projects = [
     description:
       'Fully functional Wordle game used by 20+ users daily. PostgreSQL and React full-stack development.',
     imageUrl: assetUrl('website-photos/projectsPhotos/Gavindle.png'),
+    liveUrl: 'https://gavindle.com',
     tags: ['React', 'PostgreSQL', 'Full Stack'],
   },
   {
