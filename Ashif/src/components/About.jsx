@@ -1,7 +1,7 @@
 import React from 'react';
 import { Highlighter } from "@/components/ui/highlighter";
 import ScrollReveal from './ScrollReveal';
-import HeadshotCarousel from './HeadshotCarousel';
+import InteractivePolaroids from './InteractivePolaroids';
 import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function About({ scrollContainerRef }) {
@@ -16,7 +16,7 @@ export default function About({ scrollContainerRef }) {
         className="fill-gray-300/25 stroke-gray-300/60 [mask-image:radial-gradient(520px_circle_at_center,white,transparent)]"
       />
 
-      <div className="relative z-10 max-w-4xl w-full">
+      <div className="relative z-10 max-w-5xl w-full">
         <div className="mb-12 flex justify-center text-center">
           <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
             <Highlighter action="underline" color="#FFD700">
@@ -25,12 +25,12 @@ export default function About({ scrollContainerRef }) {
           </h2>
         </div>
 
-        <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:gap-12">
-          <div className="w-full max-w-[220px] sm:max-w-[240px] md:max-w-[280px] flex-shrink-0">
-            <HeadshotCarousel />
+        <div className="flex flex-col items-center gap-10 md:flex-row md:items-center md:gap-12">
+          <div className="w-full md:w-[42%] lg:w-[38%] flex-shrink-0 flex justify-center md:justify-start">
+            <InteractivePolaroids />
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <ScrollReveal
               scrollContainerRef={scrollContainerRef}
               baseOpacity={0}
@@ -41,7 +41,7 @@ export default function About({ scrollContainerRef }) {
               textSizeClassName="text-[22px] sm:text-[26px] md:text-[30px]"
               textClassName="font-sans leading-relaxed text-center md:text-left font-normal"
             >
-              I am a Mathematics and Computer Science student at NYU Courant. My work spans algorithms and systems engineering, concurrency and multithreaded programming, statistical modeling and applied mathematics, real-time data pipelines, and research-driven software design. I builds structured systems grounded in mathematical reasoning and practical implementation.
+              I am a Mathematics and Computer Science student at NYU Courant. My work spans algorithms and systems engineering, concurrency and multithreaded programming, statistical modeling and applied mathematics, real-time data pipelines, and research-driven software design. I build structured systems grounded in mathematical reasoning and practical implementation.
             </ScrollReveal>
           </div>
         </div>
