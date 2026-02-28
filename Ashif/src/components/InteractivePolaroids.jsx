@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion, useSpring } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
@@ -52,8 +53,9 @@ function PushPin({ active, size = 12, id = 'pin' }) {
   );
 }
 
-function PolaroidCard({ p, index, isMobile, prefersReducedMotion, onSelect }) {
+function PolaroidCard({ p, index, isMobile, prefersReducedMotion, onSelect, containerRef }) {
   const ref = useRef(null);
+  const justDraggedRef = useRef(false);
   const rotateX = useSpring(0, { damping: 30, stiffness: 100, mass: 2 });
   const rotateY = useSpring(0, { damping: 30, stiffness: 100, mass: 2 });
   const scale = useSpring(1, { damping: 30, stiffness: 100, mass: 2 });
@@ -61,6 +63,7 @@ function PolaroidCard({ p, index, isMobile, prefersReducedMotion, onSelect }) {
   const [isHovered, setIsHovered] = useState(false);
 
   const shouldReduceMotion = isMobile || prefersReducedMotion;
+  const dragEnabled = true;
 
   const handleMouseMove = (e) => {
     if (!ref.current || isDragging || shouldReduceMotion) return;
@@ -87,6 +90,15 @@ function PolaroidCard({ p, index, isMobile, prefersReducedMotion, onSelect }) {
     }
   };
 
+  const handleClick = (e) => {
+    e.stopPropagation();
+    if (justDraggedRef.current) {
+      justDraggedRef.current = false;
+      return;
+    }
+    onSelect?.(p);
+  };
+
   const positionStyle = {
     ...(p.left !== undefined && { left: p.left }),
     ...(p.right !== undefined && { right: p.right }),
@@ -97,19 +109,25 @@ function PolaroidCard({ p, index, isMobile, prefersReducedMotion, onSelect }) {
   return (
     <motion.div
       ref={ref}
-      className="absolute cursor-pointer"
+      className="absolute cursor-grab active:cursor-grabbing"
       style={{
         ...positionStyle,
         width: 'clamp(100px, 22vw, 170px)',
-        zIndex: isHovered ? 50 : index + 1,
+        zIndex: isHovered || isDragging ? 50 : index + 1,
       }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
+      drag={dragEnabled}
+      dragConstraints={containerRef}
+      dragElastic={0.08}
+      onDragStart={() => { setIsDragging(true); justDraggedRef.current = false; }}
+      onDrag={() => { justDraggedRef.current = true; }}
+      onDragEnd={() => setIsDragging(false)}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={() => onSelect?.(p)}
+      onClick={handleClick}
     >
       <motion.div
         className="relative w-full rounded-sm overflow-hidden bg-[#faf8f5] pt-5 px-2 pb-4 shadow-[0_2px_12px_rgba(0,0,0,0.1)]"
@@ -146,6 +164,7 @@ const DEFAULT_POLAROIDS = [
 ];
 
 export default function InteractivePolaroids({ polaroids = DEFAULT_POLAROIDS }) {
+  const containerRef = useRef(null);
   const isMobile = useIsMobile();
   const prefersReducedMotion = useReducedMotion();
   const [selected, setSelected] = useState(null);
@@ -163,7 +182,10 @@ export default function InteractivePolaroids({ polaroids = DEFAULT_POLAROIDS }) 
 
   return (
     <>
-      <div className="relative w-full min-h-[280px] sm:min-h-[320px] md:min-h-[360px] max-w-[480px] mx-auto md:mx-0">
+      <div
+        ref={containerRef}
+        className="relative w-full min-h-[280px] sm:min-h-[320px] md:min-h-[400px] max-w-[640px] mx-auto md:mx-0"
+      >
         {polaroids.map((p, i) => (
           <PolaroidCard
             key={p.id}
@@ -172,49 +194,54 @@ export default function InteractivePolaroids({ polaroids = DEFAULT_POLAROIDS }) 
             isMobile={isMobile}
             prefersReducedMotion={!!prefersReducedMotion}
             onSelect={setSelected}
+            containerRef={containerRef}
           />
         ))}
       </div>
 
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            key="polaroid-popup"
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={false}
-          >
+      {createPortal(
+        <AnimatePresence>
+          {selected && (
             <motion.div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              onClick={() => setSelected(null)}
-            />
-            <motion.div
-              className="relative z-10 max-w-[90vw] max-h-[90vh] rounded-lg overflow-hidden shadow-2xl bg-[#faf8f5] p-3 pb-6"
-              initial={{ opacity: 0, scale: 0.7, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 10 }}
-              transition={{
-                type: 'spring',
-                damping: 25,
-                stiffness: 300,
-              }}
-              onClick={(e) => e.stopPropagation()}
+              key="polaroid-popup"
+              className="fixed inset-0 flex items-center justify-center p-4"
+              style={{ zIndex: 9999 }}
+              initial={false}
             >
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
-                <PushPin active={true} size={14} id="popup-pin" />
-              </div>
-              <img
-                src={typeof selected.src === 'string' ? selected.src : assetUrl(selected.src)}
-                alt={selected.alt}
-                className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-sm"
+              <motion.div
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                onClick={() => setSelected(null)}
               />
+              <motion.div
+                className="relative z-10 max-w-[90vw] max-h-[90vh] rounded-lg overflow-hidden shadow-2xl bg-[#faf8f5] p-3 pb-6"
+                initial={{ opacity: 0, scale: 0.7, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                transition={{
+                  type: 'spring',
+                  damping: 25,
+                  stiffness: 300,
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
+                  <PushPin active={true} size={14} id="popup-pin" />
+                </div>
+                <img
+                  src={typeof selected.src === 'string' ? selected.src : assetUrl(selected.src)}
+                  alt={selected.alt}
+                  className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-sm"
+                />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

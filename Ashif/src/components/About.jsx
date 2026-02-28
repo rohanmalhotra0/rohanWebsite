@@ -1,10 +1,9 @@
 import React from 'react';
 import { Highlighter } from "@/components/ui/highlighter";
-import ScrollReveal from './ScrollReveal';
 import InteractivePolaroids from './InteractivePolaroids';
 import { GridPattern } from "@/components/ui/grid-pattern";
 
-export default function About({ scrollContainerRef }) {
+export default function About() {
   return (
     <section
       id="about"
@@ -26,23 +25,14 @@ export default function About({ scrollContainerRef }) {
         </div>
 
         <div className="flex flex-col items-center gap-10 md:flex-row md:items-center md:gap-12">
-          <div className="w-full md:w-[42%] lg:w-[38%] flex-shrink-0 flex justify-center md:justify-start">
+          <div className="w-full md:w-[50%] lg:w-[48%] flex-shrink-0 flex justify-center md:justify-start">
             <InteractivePolaroids />
           </div>
 
           <div className="flex-1 min-w-0">
-            <ScrollReveal
-              scrollContainerRef={scrollContainerRef}
-              baseOpacity={0}
-              enableBlur={true}
-              baseRotation={1.2}
-              blurStrength={10}
-              containerClassName="my-0"
-              textSizeClassName="text-[22px] sm:text-[26px] md:text-[30px]"
-              textClassName="font-sans leading-relaxed text-center md:text-left font-normal"
-            >
+            <p className="my-0 text-[22px] sm:text-[26px] md:text-[30px] font-sans leading-relaxed text-center md:text-left font-normal">
               I am a Mathematics and Computer Science student at NYU Courant. My work spans algorithms and systems engineering, concurrency and multithreaded programming, statistical modeling and applied mathematics, real-time data pipelines, and research-driven software design. I build structured systems grounded in mathematical reasoning and practical implementation.
-            </ScrollReveal>
+            </p>
           </div>
         </div>
       </div>
