@@ -124,5 +124,13 @@ export const research = [
     liveUrl: assetUrl('website-photos/Research/AnEconomic%20Approachto%20OptimizeCapital%20Allocation.pdf'),
     tags: ['Monte Carlo', 'Optimization', 'Risk'],
   },
+  {
+    title: 'Hedging Personal Income Risk Using Prediction Markets',
+    description:
+      'Using prediction markets to hedge against personal income volatility and labor market uncertainty.',
+    imageUrl: assetUrl('website-photos/Research/economic.png'),
+    liveUrl: assetUrl('website-photos/Research/currentModel%20(2).pdf'),
+    tags: ['Prediction Markets', 'Risk', 'Income Hedging'],
+  },
 ];
 
