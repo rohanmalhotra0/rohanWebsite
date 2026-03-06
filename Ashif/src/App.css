@@ -145,10 +145,10 @@
   }
 }
 
-/* Research: single column 3x1 layout */
+/* Research: single column layout - all cards stacked vertically */
 #research-grid {
-  display: grid !important;
-  grid-template-columns: 1fr !important;
+  display: flex !important;
+  flex-direction: column !important;
   gap: 1.5rem;
   max-width: 42rem;
   margin-left: auto;

@@ -167,7 +167,7 @@ export default function Projects() {
                 </div>
                 <div
                     id="research-grid"
-                    className="grid grid-cols-1 gap-6 max-w-screen-lg mx-auto"
+                    className="flex flex-col gap-6 max-w-screen-lg mx-auto w-full"
                 >
                     {research.map((item) => (
                         <div key={item.title}>
