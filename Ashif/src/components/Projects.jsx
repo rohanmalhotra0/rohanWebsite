@@ -167,10 +167,10 @@ export default function Projects() {
                 </div>
                 <div
                     id="research-grid"
-                    className="grid gap-6 max-w-screen-lg mx-auto"
+                    className="grid grid-cols-1 gap-6 max-w-screen-lg mx-auto"
                 >
                     {research.map((item) => (
-                        <div key={item.title} className="aspect-square">
+                        <div key={item.title}>
                             <Card item={item} />
                         </div>
                     ))}

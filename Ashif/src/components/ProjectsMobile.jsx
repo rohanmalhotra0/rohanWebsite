@@ -66,7 +66,7 @@ export default function ProjectsMobile() {
             <div
                 id="research-grid"
                 className="relative z-10 grid gap-4 max-w-md mx-auto"
-                style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}
+                style={{ gridTemplateColumns: '1fr' }}
             >
                 {research.map((item) => (
                     <div key={item.title} className="bg-white rounded-xl shadow p-4 flex flex-col">
