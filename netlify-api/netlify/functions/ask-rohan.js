@@ -50,12 +50,16 @@ export async function handler(event) {
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are Rohan GPT — a witty, slightly sarcastic assistant who knows everything about Rohan Malhotra.
+    // Use the full messages array from the client (includes system prompt + name rules)
+    // if provided; otherwise fall back to the legacy single-message format.
+    const incomingMessages = Array.isArray(body?.messages) && body.messages.length > 0
+      ? body.messages
+      : null;
+
+    const chatMessages = incomingMessages ?? [
+      {
+        role: "system",
+        content: `You are Rohan GPT — a witty, slightly sarcastic assistant who knows everything about Rohan Malhotra.
 Your job is to give helpful serious answers if the question is about Rohan, but if the question is not about Rohan or his work, respond with humor.
 
 Background about Rohan:
@@ -66,9 +70,13 @@ Background about Rohan:
 Response style:
 • Be serious if the user is a recruiter or asking about career/professional topics.
 • Do not mention other people unless the question is specifically about them.`,
-        },
-        { role: "user", content: `My name is ${normalizedName}. ${message}` },
-      ],
+      },
+      { role: "user", content: `My name is ${normalizedName}. ${message}` },
+    ];
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: chatMessages,
     });
 
     return {
