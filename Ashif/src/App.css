@@ -648,3 +648,59 @@
   pointer-events: none;
   transform: translateY(8px);
 }
+
+/* Kill the default blue focus ring / outline around the chat input
+   (applies to both the main RohanGPT section and the popup) */
+#rohangpt .cs-message-input,
+#rohangpt .cs-message-input *,
+#rohangpt-popup .cs-message-input,
+#rohangpt-popup .cs-message-input * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+#rohangpt .cs-message-input__content-editor,
+#rohangpt .cs-message-input__content-editor-container,
+#rohangpt .cs-message-input__content-editor-wrapper,
+#rohangpt-popup .cs-message-input__content-editor,
+#rohangpt-popup .cs-message-input__content-editor-container,
+#rohangpt-popup .cs-message-input__content-editor-wrapper {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* Kill ChatScope's default light-blue container background that bleeds
+   out around the rounded input pill */
+#rohangpt .cs-message-input__content-editor-container,
+#rohangpt-popup .cs-message-input__content-editor-container {
+  background: transparent !important;
+}
+
+#rohangpt .cs-message-input__content-editor:focus,
+#rohangpt .cs-message-input__content-editor:focus-visible,
+#rohangpt .cs-message-input__content-editor:focus-within,
+#rohangpt .cs-message-input__content-editor-container:focus,
+#rohangpt .cs-message-input__content-editor-container:focus-visible,
+#rohangpt .cs-message-input__content-editor-container:focus-within,
+#rohangpt .cs-message-input__content-editor-wrapper:focus,
+#rohangpt .cs-message-input__content-editor-wrapper:focus-visible,
+#rohangpt .cs-message-input__content-editor-wrapper:focus-within,
+#rohangpt .cs-message-input--focused .cs-message-input__content-editor,
+#rohangpt .cs-message-input--focused .cs-message-input__content-editor-container,
+#rohangpt .cs-message-input--focused .cs-message-input__content-editor-wrapper,
+#rohangpt-popup .cs-message-input__content-editor:focus,
+#rohangpt-popup .cs-message-input__content-editor:focus-visible,
+#rohangpt-popup .cs-message-input__content-editor:focus-within,
+#rohangpt-popup .cs-message-input__content-editor-container:focus,
+#rohangpt-popup .cs-message-input__content-editor-container:focus-visible,
+#rohangpt-popup .cs-message-input__content-editor-container:focus-within,
+#rohangpt-popup .cs-message-input__content-editor-wrapper:focus,
+#rohangpt-popup .cs-message-input__content-editor-wrapper:focus-visible,
+#rohangpt-popup .cs-message-input__content-editor-wrapper:focus-within,
+#rohangpt-popup .cs-message-input--focused .cs-message-input__content-editor,
+#rohangpt-popup .cs-message-input--focused .cs-message-input__content-editor-container,
+#rohangpt-popup .cs-message-input--focused .cs-message-input__content-editor-wrapper {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
