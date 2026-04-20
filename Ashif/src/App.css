@@ -388,3 +388,263 @@
     padding-bottom: calc(160px + env(safe-area-inset-bottom));
   }
 }
+
+/* ====== RohanGPT floating popup ====== */
+.rgpt-popup-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer !important;
+  z-index: 1000;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.rgpt-popup-toggle:hover {
+  transform: translateY(-2px);
+  background: #000000;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22), 0 4px 8px rgba(0, 0, 0, 0.14);
+}
+
+.rgpt-popup-toggle:active {
+  transform: translateY(0);
+}
+
+.rgpt-popup-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 88px;
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  height: 560px;
+  max-height: calc(100vh - 120px);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), 0 6px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+  animation: rgpt-popup-in 0.16s ease-out;
+}
+
+@keyframes rgpt-popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rgpt-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.rgpt-popup-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rgpt-popup-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rgpt-popup-name-btn {
+  font-size: 12px;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer !important;
+}
+
+.rgpt-popup-name-btn:hover {
+  background: #f3f4f6;
+}
+
+.rgpt-popup-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer !important;
+}
+
+.rgpt-popup-close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.rgpt-popup-body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.rgpt-popup-error {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border-top: 1px solid #fee2e2;
+}
+
+/* Scope ChatScope styles to the popup so they match the main section */
+#rohangpt-popup .cs-main-container,
+#rohangpt-popup .cs-chat-container,
+#rohangpt-popup .cs-message-input {
+  background: #ffffff;
+  color: #111827;
+}
+
+#rohangpt-popup .cs-message-list {
+  background: #f9fafb;
+  color: #111827;
+}
+
+#rohangpt-popup .cs-message-list__scroll-wrapper {
+  padding: 12px 10px;
+}
+
+#rohangpt-popup .cs-message {
+  max-width: 82%;
+}
+
+#rohangpt-popup .cs-message__content {
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px 12px;
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+#rohangpt-popup .cs-message--incoming .cs-message__content {
+  background: #ffffff;
+  border-radius: 16px 16px 16px 6px;
+}
+
+#rohangpt-popup .cs-message--outgoing .cs-message__content {
+  background: #007aff;
+  color: #ffffff;
+  border-radius: 16px 16px 6px 16px;
+}
+
+#rohangpt-popup .cs-message__sender-name {
+  display: none;
+}
+
+#rohangpt-popup .cs-message-input__content-editor-wrapper {
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+#rohangpt-popup .cs-message-input {
+  padding: 10px;
+  background: #ffffff;
+}
+
+#rohangpt-popup .cs-message-input__content-editor {
+  border-radius: 999px;
+  background: #f3f4f6;
+  padding: 10px 14px;
+  color: #111827;
+  caret-color: #111827;
+}
+
+#rohangpt-popup .cs-message-input__placeholder {
+  color: #9ca3af;
+}
+
+#rohangpt-popup .cs-message-input__content-editor:focus,
+#rohangpt-popup .cs-message-input__content-editor-wrapper:focus-within {
+  background: #f3f4f6;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Reuse typing-indicator styling inside the popup */
+#rohangpt-popup .rgpt-typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 10px 10px;
+  padding: 8px 12px;
+  max-width: 82%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px 16px 16px 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  color: #111827;
+}
+#rohangpt-popup .rgpt-typing-label { font-size: 12px; font-weight: 600; color: #111827; }
+#rohangpt-popup .rgpt-typing-text { font-size: 12px; color: #6b7280; }
+#rohangpt-popup .rgpt-typing-dots { display: inline-flex; align-items: center; gap: 4px; margin-left: 2px; }
+#rohangpt-popup .rgpt-typing-dots > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #9ca3af;
+  animation: rgpt-dot-bounce 1.05s infinite ease-in-out;
+}
+#rohangpt-popup .rgpt-typing-dots > span:nth-child(2) { animation-delay: 0.12s; }
+#rohangpt-popup .rgpt-typing-dots > span:nth-child(3) { animation-delay: 0.24s; }
+
+/* Mobile: full-screen sheet */
+@media (max-width: 767px) {
+  .rgpt-popup-toggle {
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    width: 52px;
+    height: 52px;
+  }
+
+  .rgpt-popup-panel {
+    right: 10px;
+    left: 10px;
+    bottom: calc(78px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    height: calc(100vh - 120px - env(safe-area-inset-bottom));
+    max-height: calc(100vh - 120px - env(safe-area-inset-bottom));
+  }
+
+  #rohangpt-popup .cs-message__content { font-size: 16px; line-height: 1.5; }
+  #rohangpt-popup .cs-message-input__content-editor { font-size: 16px; }
+  #rohangpt-popup .cs-message-input__content-editor-wrapper { min-height: 44px !important; }
+  #rohangpt-popup .cs-message-input__send-button { min-width: 44px !important; min-height: 44px !important; }
+  #rohangpt-popup .cs-message-input { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+}
+
+/* Hide floating button when user is inside the main RohanGPT section to avoid duplication */
+.rgpt-inview .rgpt-popup-toggle {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+}

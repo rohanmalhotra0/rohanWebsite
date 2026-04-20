@@ -16,6 +16,7 @@ import { SmoothCursor } from './components/ui/smooth-cursor';
 import './App.css'
 
 const RohanGPT = lazy(() => import('./components/RohanGPT'));
+const RohanGPTPopup = lazy(() => import('./components/RohanGPTPopup'));
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -69,6 +70,9 @@ function App() {
         <ContactForm />
         <SocialMagnet />
       </main>
+      <Suspense fallback={null}>
+        <RohanGPTPopup />
+      </Suspense>
     </>
   )
 }
