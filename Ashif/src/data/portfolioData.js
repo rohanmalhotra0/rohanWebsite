@@ -74,6 +74,16 @@ export const projects = [
 
 export const workExperience = [
   {
+    title: 'IBM — Application Developer Intern',
+    location: 'Dallas, TX',
+    date: 'May 2026 – Aug 2026',
+    description:
+      'Supported Oracle EPM Cloud configuration, testing, and validation for planning and reporting workflows. Translated business needs into technical configurations, data mappings, and cloud solution components. Troubleshot system issues, documented processes, and supported cloud deployment readiness.',
+    imageUrl: assetUrl('website-photos/work/ibm_logo.png'),
+    imageFit: 'contain',
+    tags: ['Oracle EPM', 'Cloud', 'Configuration', 'Data Mapping'],
+  },
+  {
     title: 'Kalshi — Quantitative Developer Intern',
     description:
       'Built a C++ prediction-market hedging engine, converted price representations (cents ↔ probability ↔ basis points), implemented Kelly-based sizing logic, and architected a real-time WebSocket data pipeline.',

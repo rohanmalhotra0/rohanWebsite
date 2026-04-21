@@ -78,14 +78,29 @@ function RohanGPTPopup() {
   const typingIndicator = useMemo(
     () =>
       loading ? (
-        <div className="rgpt-typing-indicator" aria-live="polite" aria-label="RohanGPT is typing">
-          <span className="rgpt-typing-label">RohanGPT</span>
-          <span className="rgpt-typing-text">typing</span>
-          <span className="rgpt-typing-dots" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
+        <div className="rgpt-ai-loading" aria-live="polite" aria-label="RohanGPT is thinking">
+          <div className="rgpt-ai-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="rgpt-ai-brain">
+              <path
+                d="M12 2a5 5 0 0 1 4.9 4.1A4 4 0 0 1 19 10a4 4 0 0 1-1 2.7V15a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3v-2.3A4 4 0 0 1 5 10a4 4 0 0 1 2.1-3.9A5 5 0 0 1 12 2z"
+                stroke="url(#rgpt-grad)"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+              <circle cx="9.5" cy="10" r="1" fill="url(#rgpt-grad)" />
+              <circle cx="14.5" cy="10" r="1" fill="url(#rgpt-grad)" />
+              <defs>
+                <linearGradient id="rgpt-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#a855f7" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div className="rgpt-ai-bars" aria-hidden="true">
+            <span /><span /><span /><span /><span />
+          </div>
+          <span className="rgpt-ai-label">Thinking…</span>
         </div>
       ) : null,
     [loading]
