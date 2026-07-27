@@ -61,10 +61,10 @@ export const workExperience = [
     role: 'Applications Developer Intern · via IBM',
     location: 'Dallas, TX',
     date: 'May 2026 – Aug 2026',
-    imageUrl: assetUrl('website-photos/work/drw-logo.svg'),
+    imageUrl: assetUrl('website-photos/work/drw-logo-transparent.webp'),
     imageAlt: 'DRW wordmark',
     imageLabel: 'DRW · IBM delivery team',
-    logoClassName: 'h-[72px] w-auto max-w-[78%]',
+    logoClassName: 'h-[72px] w-auto max-w-[74%]',
     summary:
       'At DRW through IBM, I worked on Oracle EPM forecasting, cloud integrations, and an on-prem assistant for finance teams.',
     highlights: [
