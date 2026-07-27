@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { Shuffle, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { photos } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
 
@@ -10,9 +10,7 @@ const MotionFigure = motion.figure;
 export default function InteractivePolaroids({ className }) {
   const reduceMotion = useReducedMotion();
   const dialogRef = useRef(null);
-  const [orderedPhotos, setOrderedPhotos] = useState(photos);
   const [activePhoto, setActivePhoto] = useState(null);
-  const [shuffleCount, setShuffleCount] = useState(0);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -28,18 +26,6 @@ export default function InteractivePolaroids({ className }) {
     }
   };
 
-  const shufflePhotos = () => {
-    setOrderedPhotos((current) => {
-      const next = [...current];
-      for (let index = next.length - 1; index > 0; index -= 1) {
-        const swapIndex = Math.floor(Math.random() * (index + 1));
-        [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
-      }
-      return next;
-    });
-    setShuffleCount((count) => count + 1);
-  };
-
   return (
     <>
       <div
@@ -50,26 +36,8 @@ export default function InteractivePolaroids({ className }) {
         )}
         aria-label="Photo board of Rohan Malhotra"
       >
-        <div className="mb-4 flex items-center justify-between gap-4">
-          <div>
-            <p className="font-pixel text-xs text-gray-600">PHOTO BOARD</p>
-            <p className="mt-1 text-xs text-gray-500">Open a photo or mix them up.</p>
-          </div>
-          <button
-            type="button"
-            onClick={shufflePhotos}
-            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-          >
-            <Shuffle className="size-4" aria-hidden="true" />
-            Shuffle
-          </button>
-          <span className="sr-only" aria-live="polite">
-            {shuffleCount ? `Photo board shuffled ${shuffleCount} times.` : ''}
-          </span>
-        </div>
-
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {orderedPhotos.map((photo, index) => (
+          {photos.map((photo, index) => (
             <MotionFigure
               layout={!reduceMotion}
               key={photo.id}

@@ -295,9 +295,6 @@ export const projects = [
       'I labeled the data, trained and tested the model, connected it to the robot, and helped turn it into a live retrieval demo.',
     imageUrl: assetUrl('website-photos/project-covers/spot-vision.jpg'),
     imageAlt: 'Boston Dynamics Spot quadruped robot in motion',
-    imageCredit: 'Jonatan Holmgren · CC BY-SA 4.0',
-    imageCreditUrl:
-      'https://commons.wikimedia.org/wiki/File:Spot_by_Boston_Dynamics.jpg',
     repoUrl: 'https://github.com/rohanmalhotra0',
     tags: ['YOLO11', 'OpenCV', 'Spot SDK', 'gRPC'],
     featured: true,
