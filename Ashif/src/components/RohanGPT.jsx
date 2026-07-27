@@ -56,9 +56,8 @@ function RohanGPT() {
               <p className="font-pixel text-[11px] text-gray-500">08 / ROHANGPT</p>
               <h2 className="mt-1 text-xl font-semibold text-gray-950">RohanGPT</h2>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-              <span className="size-2 rounded-full bg-emerald-500" aria-hidden="true" />
-              Online
+            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600">
+              Ask about my work
             </span>
           </div>
           <div className="h-[32rem] max-h-[70dvh] min-h-96">

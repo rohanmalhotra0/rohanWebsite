@@ -105,7 +105,7 @@
     {
       "file": "Research/RedditSetiment.png",
       "label": "Reddit sentiment research",
-      "alt": "Reddit sentiment research paper preview"
+      "alt": "Reddit sentiment research paper figure"
     },
     {
       "file": "Research/economic.png",
@@ -161,12 +161,6 @@
       "source": "https://github.com/rohanmalhotra0/epm"
     },
     {
-      "file": "project-covers/curious-ai.png",
-      "label": "CuriousAI",
-      "alt": "CuriousAI repository preview",
-      "source": "https://github.com/rohanmalhotra0/CuriousAi"
-    },
-    {
       "file": "project-covers/epm-interactive-guide.png",
       "label": "Oracle EPM Interactive Guide",
       "alt": "Oracle EPM interactive learning guide homepage",
@@ -181,7 +175,7 @@
     {
       "file": "project-covers/casen.png",
       "label": "Casen repository card",
-      "alt": "Casen consulting casebook repository preview",
+      "alt": "Casen consulting casebook project image",
       "source": "https://github.com/rohanmalhotra0/lab"
     },
     {
@@ -193,7 +187,7 @@
     {
       "file": "project-covers/nightshift.png",
       "label": "NightShift repository card",
-      "alt": "NightShift automated job platform repository preview",
+      "alt": "NightShift automated job platform project image",
       "source": "https://github.com/rohanmalhotra0/NightShift"
     },
     {
@@ -206,67 +200,67 @@
     {
       "file": "project-covers/ai-quiz-maker.png",
       "label": "AI Quiz Maker",
-      "alt": "AI Quiz Maker repository preview",
+      "alt": "AI Quiz Maker project image",
       "source": "https://github.com/rohanmalhotra0/ai-quiz-generator"
     },
     {
       "file": "project-covers/kalshi-live-kelly.png",
       "label": "Kalshi Live Kelly Dashboard",
-      "alt": "Kalshi Live Kelly Dashboard repository preview",
+      "alt": "Kalshi Live Kelly Dashboard project image",
       "source": "https://github.com/rohanmalhotra0/KalshiHedgingDashboard"
     },
     {
       "file": "project-covers/ibm-internship-tracker.png",
       "label": "IBM Internship Progress Tracker",
-      "alt": "IBM internship tracker repository preview",
+      "alt": "IBM internship tracker interface",
       "source": "https://github.com/rohanmalhotra0/blogs"
     },
     {
       "file": "project-covers/love-island-roi.png",
       "label": "Love Island ROI Analysis",
-      "alt": "Love Island ROI analysis repository preview",
+      "alt": "Love Island ROI analysis slide",
       "source": "https://github.com/rohanmalhotra0/BAC"
     },
     {
       "file": "project-covers/spy-gradient-boosting.png",
       "label": "SPY Gradient Boosting Predictor",
-      "alt": "SPY gradient boosting model repository preview",
+      "alt": "SPY gradient boosting model chart",
       "source": "https://github.com/rohanmalhotra0/GBM-Model-Python"
     },
     {
       "file": "project-covers/rohan-lab.png",
       "label": "rohan.lab Study Notebooks",
-      "alt": "rohan.lab study notebooks repository preview",
+      "alt": "rohan.lab study notebooks interface",
       "source": "https://github.com/rohanmalhotra0/schoolwork"
     },
     {
       "file": "project-covers/german-study-lab.png",
       "label": "German II Study Lab",
-      "alt": "German II Study Lab repository preview",
+      "alt": "German II Study Lab interface",
       "source": "https://github.com/rohanmalhotra0/german"
     },
     {
       "file": "project-covers/democracies-survive.png",
       "label": "Why Do Democracies Survive?",
-      "alt": "Why Do Democracies Survive project repository preview",
+      "alt": "Why Do Democracies Survive multimedia page",
       "source": "https://github.com/rohanmalhotra0/Vox"
     },
     {
       "file": "project-covers/indytrack-api.png",
       "label": "IndyTrack API",
-      "alt": "IndyTrack backend repository preview",
+      "alt": "IndyTrack backend project image",
       "source": "https://github.com/rohanmalhotra0/IndyTrack1"
     },
     {
       "file": "project-covers/physics-calculator.png",
       "label": "Physics Calculator",
-      "alt": "Physics Calculator repository preview",
+      "alt": "Physics Calculator project image",
       "source": "https://github.com/rohanmalhotra0/physicscalc"
     },
     {
       "file": "project-covers/algorithms-practice.png",
       "label": "Algorithms Practice",
-      "alt": "Algorithms practice repository preview",
+      "alt": "Algorithms practice project image",
       "source": "https://github.com/rohanmalhotra0/leet-code-daily"
     }
   ]

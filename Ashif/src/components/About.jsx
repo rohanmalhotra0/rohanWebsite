@@ -5,21 +5,6 @@ import SectionHeading from './SectionHeading';
 import { GridPattern } from '@/components/ui/grid-pattern';
 import { profile } from '@/data/portfolioData';
 
-const principles = [
-  {
-    label: 'Build the whole system',
-    value: 'Models, APIs, interfaces, deployment, and documentation.',
-  },
-  {
-    label: 'Measure the result',
-    value: 'Accuracy, latency, risk, and operational usefulness—not demo theater.',
-  },
-  {
-    label: 'Explain the hard parts',
-    value: 'Research and engineering are only useful when other people can act on them.',
-  },
-];
-
 const MotionDiv = motion.div;
 
 export default function About() {
@@ -39,8 +24,7 @@ export default function About() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="01 / ABOUT"
-          title="Technical depth, shipped."
-          description="I like hard problems that cross boundaries: an AI model that still has to fit a business workflow, a robot that has to move in real time, or a financial model that has to become a product someone can actually use."
+          title="Hi, I’m Rohan."
         />
 
         <div className="mt-16 grid items-start gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-20">
@@ -52,11 +36,25 @@ export default function About() {
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
-            <p className="text-pretty text-2xl font-medium leading-10 text-gray-950 sm:text-3xl sm:leading-[1.4]">
-              I’m a Computer Science student and Mathematics minor at NYU Courant,
-              finishing an accelerated three-year degree while working across
-              financial systems, applied AI, quantitative research, and robotics.
+            <p className="text-pretty text-xl font-medium leading-8 text-gray-950 sm:text-2xl sm:leading-9">
+              I learn by building. If I get curious about prediction markets, I
+              make a hedging model. If I want to understand computer vision, I
+              train a robot to find a toy. This site is basically the trail of
+              whatever I was trying to figure out next.
             </p>
+
+            <p className="mt-6 text-pretty text-base leading-7 text-gray-600">
+              I’m studying Computer Science and Mathematics at NYU Courant and
+              finishing the degree in three years. Most of my work sits somewhere
+              between finance, robotics, and software that people can actually use.
+            </p>
+
+            <div className="mt-7 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
+              <p className="text-sm leading-6 text-gray-800">
+                Right now: finishing NYU, working across IBM and DRW, and trying
+                not to turn every random idea into another side project.
+              </p>
+            </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-gray-600">
               <span className="inline-flex items-center gap-2">
@@ -82,23 +80,6 @@ export default function About() {
                 <ArrowUpRight className="size-4" aria-hidden="true" />
               </a>
             </div>
-
-            <dl className="mt-10 divide-y divide-gray-200 border-y border-gray-200">
-              {principles.map((principle, index) => (
-                <div
-                  key={principle.label}
-                  className="grid gap-2 py-5 sm:grid-cols-[2.25rem_12rem_1fr] sm:gap-4"
-                >
-                  <span className="font-pixel text-xs text-gray-400">
-                    0{index + 1}
-                  </span>
-                  <dt className="font-semibold text-gray-950">{principle.label}</dt>
-                  <dd className="text-pretty text-sm leading-6 text-gray-600">
-                    {principle.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </MotionDiv>
         </div>
       </div>

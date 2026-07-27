@@ -29,8 +29,8 @@ export default function Education() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="06 / EDUCATION"
-          title="The theory underneath the builds."
-          description="NYU Courant provides the proof-heavy computer science and mathematics foundation. Internships and research keep that theory honest."
+          title="What I’m studying at NYU."
+          description="I’m finishing an accelerated Computer Science degree with a Mathematics minor, and I use the coursework directly in my research and engineering work."
         />
 
         <article className="mt-14 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[18rem_minmax(0,1fr)]">

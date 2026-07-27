@@ -8,7 +8,7 @@ function ProjectImage({ project, className }) {
   const [failed, setFailed] = useState(false);
 
   return (
-    <figure
+    <div
       className={cn(
         'relative flex items-center justify-center overflow-hidden bg-gray-100',
         className
@@ -28,9 +28,6 @@ function ProjectImage({ project, className }) {
           className="size-full object-contain"
         />
       )}
-      <figcaption className="absolute bottom-3 left-3 max-w-[85%] rounded-md bg-black/85 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm">
-        Project preview · {project.title}
-      </figcaption>
       {project.imageCredit ? (
         <a
           href={project.imageCreditUrl}
@@ -41,7 +38,7 @@ function ProjectImage({ project, className }) {
           {project.imageCredit}
         </a>
       ) : null}
-    </figure>
+    </div>
   );
 }
 
@@ -167,7 +164,7 @@ export default function Projects() {
           <SectionHeading
             eyebrow="03 / PROJECTS"
             title="Projects."
-            description={`Browse all ${projects.length} projects by category, technology, or name. Featured work appears first.`}
+            description={`There are ${projects.length} projects here, from internship work to small tools I built for myself. Search or filter if you’re looking for something specific.`}
           />
 
           <label className="relative block w-full lg:max-w-sm">

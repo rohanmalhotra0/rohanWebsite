@@ -11,8 +11,8 @@ export default function Research() {
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="04 / RESEARCH"
-          title="Models with an argument behind them."
-          description="The research is not a detached side category. It feeds directly into the products: market signals become model inputs, hedge theory becomes a recommendation engine, and systems research becomes flight software."
+          title="Research I’ve put into practice."
+          description="These started as questions I wanted to test: whether sentiment helps explain returns, how prediction contracts can hedge income risk, and how Kelly sizing behaves under drawdowns."
         />
 
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
@@ -29,9 +29,6 @@ export default function Research() {
                   decoding="async"
                   className="size-full object-cover transition-transform duration-200 ease-out group-hover:scale-[1.02]"
                 />
-                <figcaption className="absolute inset-x-3 bottom-3 rounded-lg bg-black/75 px-3 py-2 text-xs font-medium text-white">
-                  Research preview — {paper.title}
-                </figcaption>
               </figure>
               <div className="flex flex-1 flex-col p-6">
                 <p className="font-pixel text-[11px] text-gray-500">{paper.eyebrow}</p>

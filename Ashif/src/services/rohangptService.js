@@ -1,57 +1,57 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const SYSTEM_PROMPT = `You are RohanGPT, the professional portfolio guide for Rohan Malhotra.
+const SYSTEM_PROMPT = `You are RohanGPT. Answer as Rohan in a conversational first-person voice.
 
-Keep answers concise, accurate, friendly, and grounded in this public profile:
+Be specific and factual. Avoid résumé-speak, hype, and phrases such as "at the intersection of," "cutting-edge," or "shipped." Use this public profile:
 - NYU Courant: B.A. Computer Science, Mathematics minor, accelerated three-year path, expected May 2027, GPA 3.7.
 - DRW via IBM: Oracle EPM forecasting, Oracle Integration Cloud banking pipelines, an XGBoost cash-flow model, Qwen-Coder-32B fine-tuning, and an on-prem RAG/MCP EPM assistant.
 - IBM Robotics: a Boston Dynamics Spot perception stack using YOLO11, OpenCV, gRPC, multithreading, and lock-free queues; about 99.5% mAP@50.
 - Kalshi: job-loss hazard modeling, Monte Carlo hedge research, a Next.js/Python recommendation engine, C++ risk tools, and FRED/BLS integrations.
 - Hume Center: C imaging and signal-processing tests for ContentCube, deployed into low Earth orbit.
-- Featured products: EPM Wizard, CuriousAI, Oracle EPM Interactive Guide, Casen, NightShift, Refrax, ModelKalshi, GreenSticker, and Rohan's research tools.
+- Featured products: EPM Wizard, Oracle EPM Interactive Guide, Casen, NightShift, Refrax, ModelKalshi, GreenSticker, and Rohan's research tools.
 
-Do not invent employers, metrics, dates, publications, or project claims. If a fact is not in this context, say so and direct the visitor to the résumé or GitHub.`;
+Do not invent employers, metrics, dates, publications, or project claims. If a fact is not here, say that plainly and point to my résumé or GitHub.`;
 
 const QUICK_ANSWERS = [
   {
     matches: ['ibm', 'robot', 'spot', 'yolo'],
     answer:
-      'At IBM, Rohan built the perception and autonomy stack for a Boston Dynamics Spot retrieval demo. He trained YOLO11 on 898 labeled images (about 99.5% mAP@50), connected inference through OpenCV, gRPC, multithreading, and lock-free queues, and demoed the autonomous toy finder at IBM DevCon.',
+      'At IBM, I built the perception and autonomy stack for a Boston Dynamics Spot retrieval demo. I trained YOLO11 on 898 labeled images (about 99.5% mAP@50), connected inference through OpenCV and gRPC, and demoed the toy finder at IBM DevCon.',
   },
   {
     matches: ['drw', 'epm', 'oracle', 'qwen'],
     answer:
-      'On the IBM delivery team at DRW, Rohan shipped Oracle EPM forecasting and close workflows, integrated banking data through Oracle Integration Cloud, fine-tuned Qwen-Coder-32B from 36.7% to 95.0% task accuracy, and deployed an on-prem RAG/MCP assistant for EPM artifact creation.',
+      'On IBM’s delivery team at DRW, I built Oracle EPM forecasting and close workflows, connected banking data through Oracle Integration Cloud, fine-tuned Qwen-Coder-32B from 36.7% to 95.0% task accuracy, and built an on-prem assistant for creating EPM artifacts.',
   },
   {
     matches: ['kalshi', 'hedg', 'monte carlo', 'prediction market'],
     answer:
-      'For Kalshi, Rohan co-authored income-risk hedging research, modeled job loss as a macro-sensitive hazard process, ran Monte Carlo tail-risk comparisons, and turned the work into a Next.js/Python recommendation engine with FRED, BLS, Docker, and C++ risk tools.',
+      'For Kalshi, I co-authored research on hedging income risk, modeled job loss as a macro-sensitive hazard process, ran Monte Carlo tail-risk comparisons, and turned the work into a Next.js/Python recommendation tool.',
   },
   {
     matches: ['best project', 'featured', 'project'],
     answer:
-      'The best starting points are EPM Wizard for applied enterprise AI, the IBM Spot pipeline for robotics, ModelKalshi for quantitative product work, CuriousAI for evidence-backed RAG, and Refrax for interactive quantitative research. The project archive includes more than twenty additional builds.',
+      'I’d start with EPM Wizard for enterprise AI, the Spot vision system for robotics, the Kalshi hedging engine for quantitative work, and Refrax for interactive research.',
   },
   {
     matches: ['research', 'paper', 'reddit', 'kelly'],
     answer:
-      'Rohan’s research spans prediction-market income hedging, Reddit sentiment in financial applications, Kelly-style capital allocation, and CubeSat imaging systems. Each paper or artifact is linked in the Research section.',
+      'My research covers prediction-market income hedging, Reddit sentiment in financial applications, Kelly-style capital allocation, and CubeSat imaging systems.',
   },
   {
     matches: ['nyu', 'education', 'course', 'gpa'],
     answer:
-      'Rohan is completing a B.A. in Computer Science with a Mathematics minor at NYU Courant on an accelerated three-year path. His expected graduation is May 2027 and his current GPA is 3.7/4.0.',
+      'I’m completing a B.A. in Computer Science with a Mathematics minor at NYU Courant on an accelerated three-year path. I expect to graduate in May 2027; my current GPA is 3.7/4.0.',
   },
   {
     matches: ['skill', 'stack', 'language'],
     answer:
-      'His working stack includes Python, Java, C/C++, SQL, Groovy, PyTorch, YOLO11, OpenCV, XGBoost, RAG, Docker, AWS, gRPC, PostgreSQL, Oracle EPM, OIC, and Monte Carlo tooling.',
+      'I work mostly in Python, Java, C/C++, SQL, PyTorch, OpenCV, XGBoost, Docker, AWS, gRPC, PostgreSQL, Oracle EPM, and OIC.',
   },
   {
     matches: ['resume', 'contact', 'email', 'hire'],
     answer:
-      'Use “View Resume” in the navigation for the recruiter-facing profile and downloadable PDF. You can reach Rohan at rohanm8974@gmail.com or through the LinkedIn and GitHub links in the contact section.',
+      'You can open my résumé from the navigation, email me at rohanm8974@gmail.com, or use the LinkedIn and GitHub links in the contact section.',
   },
 ];
 
@@ -102,7 +102,7 @@ export function useRohanGPTChat({ visitorName } = {}) {
       id: 'rgpt-welcome',
       role: 'assistant',
       content:
-        'I’m the fast portfolio guide. Ask about IBM robotics, the DRW/EPM work, Kalshi research, projects, skills, or the résumé.',
+        'Hey — ask me about the work, projects, research, skills, or résumé.',
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -174,7 +174,7 @@ export function useRohanGPTChat({ visitorName } = {}) {
               id: `${Date.now()}-offline`,
               role: 'assistant',
               content:
-                'The live model is offline in this preview, but the instant portfolio answers are ready. Try asking about IBM, DRW, Kalshi, projects, research, skills, or the résumé.',
+                'I can’t reach the full chat service from here. Try asking about IBM, DRW, Kalshi, my projects, research, skills, or résumé; those answers are available locally.',
             },
           ]);
           return;

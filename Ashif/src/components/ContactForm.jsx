@@ -22,8 +22,8 @@ export default function ContactForm() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="09 / CONTACT"
-          title="Let’s build something difficult."
-          description="The best fit is a team working on applied AI, robotics, quantitative systems, developer infrastructure, or a problem that refuses to stay inside one category."
+          title="Want to talk?"
+          description="I’m interested in applied AI, robotics, quantitative systems, and developer tools. Send me a note if the work overlaps."
         />
 
         <div className="mt-14 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[0.72fr_1.28fr]">

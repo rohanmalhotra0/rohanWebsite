@@ -21,8 +21,8 @@ export default function Skills() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="07 / WORKING SET"
-          title="A stack shaped by the problem."
-          description="The tools span low-level systems, AI, cloud applications, and financial planning because the work does too. I’m happiest when the boundaries between those layers are visible."
+          title="Tools I use."
+          description="My recent work has moved between Python models, C and C++ systems code, cloud services, and Oracle finance tooling."
         />
 
         <div className="mt-14 grid gap-4 md:grid-cols-2">
