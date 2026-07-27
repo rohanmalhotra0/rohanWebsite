@@ -64,6 +64,7 @@ export const workExperience = [
     imageUrl: assetUrl('website-photos/work/drw-logo.svg'),
     imageAlt: 'DRW wordmark',
     imageLabel: 'DRW · IBM delivery team',
+    logoClassName: 'h-[72px] w-auto max-w-[78%]',
     summary:
       'At DRW through IBM, I worked on Oracle EPM forecasting, cloud integrations, and an on-prem assistant for finance teams.',
     highlights: [
@@ -82,6 +83,7 @@ export const workExperience = [
     imageUrl: assetUrl('website-photos/work/ibm_logo.webp'),
     imageAlt: 'IBM logo',
     imageLabel: 'IBM Robotics',
+    logoClassName: 'h-[68px] w-auto max-w-[72%]',
     summary:
       'I trained the vision system for a Boston Dynamics Spot demo and connected real-time detection to the robot.',
     highlights: [
@@ -100,6 +102,8 @@ export const workExperience = [
     imageUrl: assetUrl('website-photos/work/kalshi_logo.jpeg'),
     imageAlt: 'Kalshi logo',
     imageLabel: 'Kalshi',
+    logoClassName:
+      'size-[84px] rounded-lg border border-black/5 shadow-sm',
     summary:
       'I turned research on income risk into a working prediction-market hedging tool.',
     highlights: [
@@ -115,9 +119,10 @@ export const workExperience = [
     role: 'Systems Engineering Researcher',
     location: 'Blacksburg, VA',
     date: 'Research experience',
-    imageUrl: assetUrl('website-photos/work/humecenter_logo.jpeg'),
+    imageUrl: assetUrl('website-photos/work/hume-center-logo.jpg'),
     imageAlt: 'Hume Center for National Security and Technology logo',
     imageLabel: 'Virginia Tech Hume Center',
+    logoClassName: 'h-[76px] w-auto max-w-[82%]',
     summary:
       'I worked on embedded imaging and signal-processing tests for a CubeSat that reached low Earth orbit.',
     highlights: [
@@ -132,9 +137,10 @@ export const workExperience = [
     role: 'Machine Learning Intern',
     location: 'Earlier experience',
     date: 'Earlier experience',
-    imageUrl: assetUrl('website-photos/work/aress_software_logo.jpeg'),
+    imageUrl: assetUrl('website-photos/work/aress-logo.png'),
     imageAlt: 'Aress Software logo',
     imageLabel: 'Aress Software',
+    logoClassName: 'h-[58px] w-auto max-w-[74%]',
     summary:
       'I trained PyTorch models on multimodal data and brought several reporting sources into one analytics workflow.',
     highlights: [
@@ -148,9 +154,10 @@ export const workExperience = [
     role: 'Data Engineering Intern',
     location: 'Earlier experience',
     date: 'Earlier experience',
-    imageUrl: assetUrl('website-photos/work/y_axis_logo.jpeg'),
+    imageUrl: assetUrl('website-photos/work/y-axis-logo.webp'),
     imageAlt: 'Y-Axis Overseas Careers logo',
     imageLabel: 'Y-Axis',
+    logoClassName: 'h-[52px] w-auto max-w-[72%]',
     summary:
       'I cleaned SQL data, built predictive features, and automated recurring Excel reporting.',
     highlights: [

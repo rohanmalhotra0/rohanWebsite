@@ -7,17 +7,17 @@ function WorkLogo({ job }) {
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className="flex h-28 items-center justify-center border-b border-gray-200 bg-gray-100 p-5">
+    <div className="flex h-28 items-center justify-center overflow-hidden border-b border-gray-200 bg-[#f4f4f2] px-6 py-4">
       {failed ? (
         <span className="font-pixel text-sm text-gray-900">{job.company}</span>
       ) : (
         <img
           src={job.imageUrl}
-          alt=""
+          alt={job.imageAlt}
           loading="lazy"
           decoding="async"
           onError={() => setFailed(true)}
-          className="max-h-full w-full object-contain"
+          className={`block object-contain transition-transform duration-300 group-hover:scale-[1.035] ${job.logoClassName}`}
         />
       )}
     </div>
@@ -26,7 +26,7 @@ function WorkLogo({ job }) {
 
 function ExperienceCard({ job }) {
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md">
       <WorkLogo job={job} />
 
       <div className="flex min-w-0 flex-1 flex-col p-4">
