@@ -11,9 +11,14 @@ function ProjectImage({ project, className }) {
   const [failed, setFailed] = useState(false);
 
   return (
-    <figure className={cn('overflow-hidden bg-gray-100', className)}>
+    <figure
+      className={cn(
+        'relative flex items-center justify-center overflow-hidden bg-gray-100',
+        className
+      )}
+    >
       {failed ? (
-        <div className="flex size-full min-h-48 items-center justify-center bg-gray-950 p-8 text-center text-white">
+        <div className="flex size-full min-h-48 items-center justify-center bg-gray-100 p-8 text-center text-gray-700">
           <span className="font-pixel text-lg">{project.title}</span>
         </div>
       ) : (
@@ -23,10 +28,22 @@ function ProjectImage({ project, className }) {
           loading="lazy"
           decoding="async"
           onError={() => setFailed(true)}
-          className="size-full object-cover transition-transform duration-200 ease-out group-hover:scale-[1.02]"
+          className="size-full object-contain"
         />
       )}
-      <figcaption className="sr-only">Project preview — {project.title}</figcaption>
+      <figcaption className="absolute bottom-3 left-3 max-w-[85%] rounded-md bg-black/85 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm">
+        Project preview · {project.title}
+      </figcaption>
+      {project.imageCredit ? (
+        <a
+          href={project.imageCreditUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="absolute right-3 top-3 max-w-[70%] rounded-md bg-black/85 px-2.5 py-1.5 text-xs font-medium text-white"
+        >
+          {project.imageCredit}
+        </a>
+      ) : null}
     </figure>
   );
 }
@@ -79,34 +96,37 @@ function FeaturedProject({ project, index }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
-      className="group grid overflow-hidden rounded-2xl border border-white/15 bg-[#101010] shadow-lg lg:grid-cols-[1.08fr_0.92fr]"
+      className="group grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[1.08fr_0.92fr]"
     >
-      <ProjectImage project={project} className="min-h-64 lg:min-h-[26rem]" />
-      <div className="flex flex-col p-6 sm:p-8">
+      <ProjectImage
+        project={project}
+        className="aspect-[16/10] min-h-64 lg:aspect-auto lg:min-h-[26rem]"
+      />
+      <div className="flex min-w-0 flex-col p-6 sm:p-8">
         <div className="flex items-center justify-between gap-4">
-          <p className="font-pixel text-xs text-yellow-300">
+          <p className="font-pixel text-xs text-amber-700">
             FEATURED / {String(index + 1).padStart(2, '0')}
           </p>
-          <span className="text-xs text-white/45">{project.year || 'Current'}</span>
+          <span className="text-xs text-gray-500">{project.year || 'Current'}</span>
         </div>
-        <h3 className="mt-6 text-balance text-3xl font-semibold text-white">
+        <h3 className="mt-6 text-balance text-3xl font-semibold text-gray-950">
           {project.title}
         </h3>
-        <p className="mt-4 text-pretty text-base leading-7 text-white/65">
+        <p className="mt-4 text-pretty text-base leading-7 text-gray-600">
           {project.longDescription || project.description}
         </p>
         <ul className="mt-6 flex flex-wrap gap-2" aria-label="Project technologies">
           {project.tags.map((tag) => (
             <li
               key={tag}
-              className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/70"
+              className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-gray-700"
             >
               {tag}
             </li>
           ))}
         </ul>
         <div className="mt-auto pt-8">
-          <ProjectLinks project={project} inverse />
+          <ProjectLinks project={project} />
         </div>
       </div>
     </MotionArticle>
@@ -116,16 +136,18 @@ function FeaturedProject({ project, index }) {
 function ArchiveProject({ project }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <ProjectImage project={project} className="aspect-[16/10]" />
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-center justify-between gap-3 text-xs text-gray-500">
-          <span className="font-semibold text-gray-700">{project.category}</span>
-          <span className="tabular-nums">{project.year || 'Current'}</span>
+      <ProjectImage project={project} className="aspect-video" />
+      <div className="flex min-w-0 flex-1 flex-col p-5">
+        <div className="flex min-w-0 items-center justify-between gap-3 text-xs text-gray-500">
+          <span className="truncate font-semibold text-gray-700">
+            {project.category}
+          </span>
+          <span className="shrink-0 tabular-nums">{project.year || 'Current'}</span>
         </div>
-        <h3 className="mt-3 text-balance text-xl font-semibold text-gray-950">
+        <h3 className="mt-3 line-clamp-2 text-balance text-xl font-semibold text-gray-950">
           {project.title}
         </h3>
-        <p className="mt-3 text-pretty text-sm leading-6 text-gray-600">
+        <p className="mt-3 line-clamp-3 text-pretty text-sm leading-6 text-gray-600">
           {project.description}
         </p>
         {project.longDescription ? (
@@ -186,19 +208,17 @@ export default function Projects() {
 
   return (
     <section id="projects" className="scroll-mt-24">
-      <div className="relative overflow-hidden bg-[#050505] px-5 py-24 text-white sm:px-8 md:px-12 lg:px-16 lg:py-32">
+      <div className="relative overflow-hidden bg-[#e7e7e5] px-5 py-24 text-gray-950 sm:px-8 md:px-12 lg:px-16 lg:py-32">
         <div
-          className="absolute inset-0 bg-[linear-gradient(#1f1f1f_1px,transparent_1px),linear-gradient(90deg,#1f1f1f_1px,transparent_1px)] bg-[size:44px_44px] opacity-30"
+          className="absolute inset-0 bg-[linear-gradient(#d2d2cf_1px,transparent_1px),linear-gradient(90deg,#d2d2cf_1px,transparent_1px)] bg-[size:44px_44px] opacity-70"
           aria-hidden="true"
         />
         <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="[&_h2]:text-white [&_p]:text-white/60">
-            <SectionHeading
-              eyebrow="03 / SELECTED PROJECTS"
-              title="Products, models, and systems."
-              description="The strongest work gets case-study treatment here. The complete archive below is intentionally broad: production apps, research tools, quantitative models, learning systems, and experiments."
-            />
-          </div>
+          <SectionHeading
+            eyebrow="03 / SELECTED PROJECTS"
+            title="Products, models, and systems."
+            description="The strongest work gets case-study treatment here. The complete archive below is intentionally broad: production apps, research tools, quantitative models, learning systems, and experiments."
+          />
           <div className="mt-14 space-y-6">
             {featured.map((project, index) => (
               <FeaturedProject key={project.slug} project={project} index={index} />

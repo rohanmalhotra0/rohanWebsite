@@ -141,6 +141,133 @@
       "file": "work/y_axis_logo.jpeg",
       "label": "Y-Axis",
       "alt": "Y-Axis Overseas Careers logo"
+    },
+    {
+      "file": "work/drw-logo.png",
+      "label": "DRW campaign artwork",
+      "alt": "DRW brand artwork with the words Where markets are made",
+      "source": "https://www.drw.com/"
+    },
+    {
+      "file": "work/drw-logo.svg",
+      "label": "DRW wordmark",
+      "alt": "DRW wordmark",
+      "source": "https://www.drw.com/"
+    },
+    {
+      "file": "project-covers/epm-wizard.png",
+      "label": "EPM Wizard",
+      "alt": "EPM Wizard product interface",
+      "source": "https://github.com/rohanmalhotra0/epm"
+    },
+    {
+      "file": "project-covers/curious-ai.png",
+      "label": "CuriousAI",
+      "alt": "CuriousAI repository preview",
+      "source": "https://github.com/rohanmalhotra0/CuriousAi"
+    },
+    {
+      "file": "project-covers/epm-interactive-guide.png",
+      "label": "Oracle EPM Interactive Guide",
+      "alt": "Oracle EPM interactive learning guide homepage",
+      "source": "https://github.com/rohanmalhotra0/capstone"
+    },
+    {
+      "file": "project-covers/casen-live.png",
+      "label": "Casen",
+      "alt": "Casen consulting casebook landing page",
+      "source": "https://getcasen.com"
+    },
+    {
+      "file": "project-covers/casen.png",
+      "label": "Casen repository card",
+      "alt": "Casen consulting casebook repository preview",
+      "source": "https://github.com/rohanmalhotra0/lab"
+    },
+    {
+      "file": "project-covers/nightshift-live.png",
+      "label": "NightShift",
+      "alt": "NightShift automated job platform landing page",
+      "source": "https://night-shift-two.vercel.app"
+    },
+    {
+      "file": "project-covers/nightshift.png",
+      "label": "NightShift repository card",
+      "alt": "NightShift automated job platform repository preview",
+      "source": "https://github.com/rohanmalhotra0/NightShift"
+    },
+    {
+      "file": "project-covers/spot-vision.jpg",
+      "label": "Spot Vision Pipeline",
+      "alt": "Boston Dynamics Spot quadruped robot in motion",
+      "source": "https://commons.wikimedia.org/wiki/File:Spot_by_Boston_Dynamics.jpg",
+      "credit": "Jonatan Holmgren, CC BY-SA 4.0"
+    },
+    {
+      "file": "project-covers/ai-quiz-maker.png",
+      "label": "AI Quiz Maker",
+      "alt": "AI Quiz Maker repository preview",
+      "source": "https://github.com/rohanmalhotra0/ai-quiz-generator"
+    },
+    {
+      "file": "project-covers/kalshi-live-kelly.png",
+      "label": "Kalshi Live Kelly Dashboard",
+      "alt": "Kalshi Live Kelly Dashboard repository preview",
+      "source": "https://github.com/rohanmalhotra0/KalshiHedgingDashboard"
+    },
+    {
+      "file": "project-covers/ibm-internship-tracker.png",
+      "label": "IBM Internship Progress Tracker",
+      "alt": "IBM internship tracker repository preview",
+      "source": "https://github.com/rohanmalhotra0/blogs"
+    },
+    {
+      "file": "project-covers/love-island-roi.png",
+      "label": "Love Island ROI Analysis",
+      "alt": "Love Island ROI analysis repository preview",
+      "source": "https://github.com/rohanmalhotra0/BAC"
+    },
+    {
+      "file": "project-covers/spy-gradient-boosting.png",
+      "label": "SPY Gradient Boosting Predictor",
+      "alt": "SPY gradient boosting model repository preview",
+      "source": "https://github.com/rohanmalhotra0/GBM-Model-Python"
+    },
+    {
+      "file": "project-covers/rohan-lab.png",
+      "label": "rohan.lab Study Notebooks",
+      "alt": "rohan.lab study notebooks repository preview",
+      "source": "https://github.com/rohanmalhotra0/schoolwork"
+    },
+    {
+      "file": "project-covers/german-study-lab.png",
+      "label": "German II Study Lab",
+      "alt": "German II Study Lab repository preview",
+      "source": "https://github.com/rohanmalhotra0/german"
+    },
+    {
+      "file": "project-covers/democracies-survive.png",
+      "label": "Why Do Democracies Survive?",
+      "alt": "Why Do Democracies Survive project repository preview",
+      "source": "https://github.com/rohanmalhotra0/Vox"
+    },
+    {
+      "file": "project-covers/indytrack-api.png",
+      "label": "IndyTrack API",
+      "alt": "IndyTrack backend repository preview",
+      "source": "https://github.com/rohanmalhotra0/IndyTrack1"
+    },
+    {
+      "file": "project-covers/physics-calculator.png",
+      "label": "Physics Calculator",
+      "alt": "Physics Calculator repository preview",
+      "source": "https://github.com/rohanmalhotra0/physicscalc"
+    },
+    {
+      "file": "project-covers/algorithms-practice.png",
+      "label": "Algorithms Practice",
+      "alt": "Algorithms practice repository preview",
+      "source": "https://github.com/rohanmalhotra0/leet-code-daily"
     }
   ]
 }

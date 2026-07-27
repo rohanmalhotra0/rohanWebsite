@@ -50,7 +50,7 @@ function DockLink({ name, href, Icon, onClick }) {
 
 export default function SocialMagnet() {
   return (
-    <div className="social-magnet fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 z-40 -translate-x-1/2">
+    <div className="social-magnet fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 z-40 hidden -translate-x-1/2 sm:block">
       <TooltipProvider>
         <Dock className="border border-black/10 bg-white/95 shadow-lg">
           <DockLink

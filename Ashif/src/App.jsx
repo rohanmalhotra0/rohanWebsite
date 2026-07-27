@@ -47,7 +47,7 @@ function Portfolio() {
       >
         Skip to main content
       </a>
-      <Navbar />
+      <Navbar variant="light" />
       <main id="main-content">
         <Hero />
         <Experience />

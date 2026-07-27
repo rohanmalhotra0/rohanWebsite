@@ -61,9 +61,9 @@ export const workExperience = [
     role: 'Applications Developer Intern · via IBM',
     location: 'Dallas, TX',
     date: 'May 2026 – Aug 2026',
-    imageUrl: assetUrl('website-photos/work/ibm_logo.webp'),
-    imageAlt: 'IBM logo',
-    imageLabel: 'IBM delivery team at DRW',
+    imageUrl: assetUrl('website-photos/work/drw-logo.svg'),
+    imageAlt: 'DRW wordmark',
+    imageLabel: 'DRW · IBM delivery team',
     summary:
       'Shipping forecasting, cloud integration, and applied-AI systems for financial planning workflows.',
     highlights: [
@@ -209,8 +209,7 @@ export const projects = [
       'Local-first AI workspace for designing, previewing, approving, and deploying Oracle EPM implementation artifacts.',
     longDescription:
       'Combines validated structured specifications, deterministic artifact generation, approval safeguards, deployment verification, a narrated browser extension, and a fine-tuned EPM coding model.',
-    imageUrl:
-      'https://raw.githubusercontent.com/rohanmalhotra0/epm/main/frontend/public/og-professional.png',
+    imageUrl: assetUrl('website-photos/project-covers/epm-wizard.png'),
     imageAlt: 'EPM Wizard product interface',
     repoUrl: 'https://github.com/rohanmalhotra0/epm',
     tags: ['FastAPI', 'React', 'IBM Carbon', 'Groovy', 'Playwright'],
@@ -225,8 +224,7 @@ export const projects = [
       'Private personal knowledge system with citation-backed answers, confidence scoring, expert routing, and durable memory.',
     longDescription:
       'Ingests personal documents into a pgvector-backed evidence layer, then generates cited answers, mind maps, and evidence-based skill profiles through specialized expert routes.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/CuriousAi',
+    imageUrl: assetUrl('website-photos/project-covers/curious-ai.png'),
     imageAlt: 'CuriousAI repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/CuriousAi',
     tags: ['TypeScript', 'RAG', 'PostgreSQL', 'pgvector', 'Docker'],
@@ -241,8 +239,7 @@ export const projects = [
       'Interactive textbook for Oracle EPM certification and consulting onboarding.',
     longDescription:
       'Includes a module atlas, Mermaid workflow maps, an approval-state simulator, glossary, command palette, and a grounded learning assistant.',
-    imageUrl:
-      'https://raw.githubusercontent.com/rohanmalhotra0/capstone/main/screenshots/home.png',
+    imageUrl: assetUrl('website-photos/project-covers/epm-interactive-guide.png'),
     imageAlt: 'Oracle EPM interactive learning guide homepage',
     liveUrl: 'https://capstone-snowy-sigma.vercel.app',
     repoUrl: 'https://github.com/rohanmalhotra0/capstone',
@@ -258,8 +255,8 @@ export const projects = [
       'Consulting interview platform with 71 cases, AI voice mocks, behavioral practice, and a live job board.',
     longDescription:
       'Brings frameworks, vocabulary drills, resume-to-STAR practice, M&A news, and voice-based case simulations into one focused study system.',
-    imageUrl: 'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/lab',
-    imageAlt: 'Casen consulting casebook repository preview',
+    imageUrl: assetUrl('website-photos/project-covers/casen-live.png'),
+    imageAlt: 'Casen consulting casebook landing page',
     liveUrl: 'https://getcasen.com',
     repoUrl: 'https://github.com/rohanmalhotra0/lab',
     tags: ['JavaScript', 'OpenAI', 'Supabase', 'Voice AI'],
@@ -274,9 +271,8 @@ export const projects = [
       'Automated job-application platform spanning multi-board discovery, AI form filling, verification, and tracking.',
     longDescription:
       'Coordinates Playwright browser automation, FastAPI services, scheduling, email verification, subscription management, and a Next.js control plane.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/NightShift',
-    imageAlt: 'NightShift automated job platform repository preview',
+    imageUrl: assetUrl('website-photos/project-covers/nightshift-live.png'),
+    imageAlt: 'NightShift automated job platform landing page',
     liveUrl: 'https://night-shift-two.vercel.app',
     repoUrl: 'https://github.com/rohanmalhotra0/NightShift',
     tags: ['FastAPI', 'Playwright', 'Next.js', 'Stripe'],
@@ -305,8 +301,11 @@ export const projects = [
       'Real-time YOLO11 perception and autonomy stack for Boston Dynamics Spot.',
     longDescription:
       'A complete data-labeling, training, evaluation, inference, and robot-control workflow with multithreaded queues and a live autonomous retrieval demo.',
-    imageUrl: assetUrl('website-photos/work/ibm_logo.webp'),
-    imageAlt: 'IBM logo representing the Spot robotics project',
+    imageUrl: assetUrl('website-photos/project-covers/spot-vision.jpg'),
+    imageAlt: 'Boston Dynamics Spot quadruped robot in motion',
+    imageCredit: 'Jonatan Holmgren · CC BY-SA 4.0',
+    imageCreditUrl:
+      'https://commons.wikimedia.org/wiki/File:Spot_by_Boston_Dynamics.jpg',
     repoUrl: 'https://github.com/rohanmalhotra0',
     tags: ['YOLO11', 'OpenCV', 'Spot SDK', 'gRPC'],
     featured: true,
@@ -420,8 +419,7 @@ export const projects = [
     year: '2026',
     description:
       'Turns PDF, text, or Markdown uploads into schema-valid quizzes, flashcards, and active-recall prompts.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/ai-quiz-generator',
+    imageUrl: assetUrl('website-photos/project-covers/ai-quiz-maker.png'),
     imageAlt: 'AI Quiz Maker repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/ai-quiz-generator',
     tags: ['Next.js', 'FastAPI', 'OpenAI', 'PDF Extraction'],
@@ -433,8 +431,7 @@ export const projects = [
     year: '2026',
     description:
       'Real-time YES-price dashboard with WebSocket streaming and interactive Kelly-sizing controls.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/KalshiHedgingDashboard',
+    imageUrl: assetUrl('website-photos/project-covers/kalshi-live-kelly.png'),
     imageAlt: 'Kalshi Live Kelly Dashboard repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/KalshiHedgingDashboard',
     tags: ['FastAPI', 'WebSocket', 'Plotly', 'Kelly Criterion'],
@@ -446,7 +443,7 @@ export const projects = [
     year: '2026',
     description:
       'Nine-week dashboard with manager and detailed views, workstreams, weekly outcomes, training, and reflections.',
-    imageUrl: 'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/blogs',
+    imageUrl: assetUrl('website-photos/project-covers/ibm-internship-tracker.png'),
     imageAlt: 'IBM internship tracker repository preview',
     liveUrl: 'https://rohanmalhotra0.github.io/blogs/',
     repoUrl: 'https://github.com/rohanmalhotra0/blogs',
@@ -459,7 +456,7 @@ export const projects = [
     year: '2025',
     description:
       'Interactive strategy deck comparing reach, engagement, cost, and modeled entertainment ROI.',
-    imageUrl: 'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/BAC',
+    imageUrl: assetUrl('website-photos/project-covers/love-island-roi.png'),
     imageAlt: 'Love Island ROI analysis repository preview',
     liveUrl: 'https://rohanmalhotra0.github.io/BAC/',
     repoUrl: 'https://github.com/rohanmalhotra0/BAC',
@@ -472,8 +469,7 @@ export const projects = [
     year: '2025',
     description:
       'Next-day SPY close predictor using EMA, RSI, MACD, standardization, PCA, and gradient boosting.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/GBM-Model-Python',
+    imageUrl: assetUrl('website-photos/project-covers/spy-gradient-boosting.png'),
     imageAlt: 'SPY gradient boosting model repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/GBM-Model-Python',
     tags: ['scikit-learn', 'PCA', 'Gradient Boosting', 'yfinance'],
@@ -485,8 +481,7 @@ export const projects = [
     year: '2026',
     description:
       'Unified study hub for operating systems, politics, German, Oracle EPM, quizzes, flashcards, and source material.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/schoolwork',
+    imageUrl: assetUrl('website-photos/project-covers/rohan-lab.png'),
     imageAlt: 'rohan.lab study notebooks repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/schoolwork',
     tags: ['JavaScript', 'Study Tools', 'Voice Chat'],
@@ -498,7 +493,7 @@ export const projects = [
     year: '2026',
     description:
       'Adaptive practice interface with flashcards, quizzes, grammar references, and vocabulary grids.',
-    imageUrl: 'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/german',
+    imageUrl: assetUrl('website-photos/project-covers/german-study-lab.png'),
     imageAlt: 'German II Study Lab repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/german',
     tags: ['JavaScript', 'Adaptive Practice', 'Education'],
@@ -510,7 +505,7 @@ export const projects = [
     year: '2026',
     description:
       'Responsive multimedia political-science explainer featuring institutional analysis and a South Korea case study.',
-    imageUrl: 'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/Vox',
+    imageUrl: assetUrl('website-photos/project-covers/democracies-survive.png'),
     imageAlt: 'Why Do Democracies Survive project repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/Vox',
     tags: ['Multimedia', 'Research', 'Responsive Web'],
@@ -522,8 +517,7 @@ export const projects = [
     year: '2025',
     description:
       'Flask API for users, tasks, due-date calculations, alerts, and notifications with SQL persistence.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/IndyTrack1',
+    imageUrl: assetUrl('website-photos/project-covers/indytrack-api.png'),
     imageAlt: 'IndyTrack backend repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/IndyTrack1',
     tags: ['Flask', 'SQLAlchemy', 'PostgreSQL', 'API'],
@@ -535,8 +529,7 @@ export const projects = [
     year: '2025',
     description:
       'Compact Python calculator for kinematics and electric-field problem solving.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/physicscalc',
+    imageUrl: assetUrl('website-photos/project-covers/physics-calculator.png'),
     imageAlt: 'Physics Calculator repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/physicscalc',
     tags: ['Python', 'Physics', 'Utilities'],
@@ -548,8 +541,7 @@ export const projects = [
     year: 'Ongoing',
     description:
       'Daily data-structures and algorithms practice tracked across LeetCode and NeetCode submissions.',
-    imageUrl:
-      'https://opengraph.githubassets.com/portfolio/rohanmalhotra0/leet-code-daily',
+    imageUrl: assetUrl('website-photos/project-covers/algorithms-practice.png'),
     imageAlt: 'Algorithms practice repository preview',
     repoUrl: 'https://github.com/rohanmalhotra0/leet-code-daily',
     tags: ['Algorithms', 'Data Structures', 'Practice'],

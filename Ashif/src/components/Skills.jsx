@@ -12,20 +12,18 @@ export default function Skills() {
   return (
     <section
       id="skills"
-      className="relative scroll-mt-24 overflow-hidden bg-[#090909] px-5 py-24 text-white sm:px-8 md:px-12 lg:px-16 lg:py-32"
+      className="relative scroll-mt-24 overflow-hidden bg-[#efefed] px-5 py-24 text-gray-950 sm:px-8 md:px-12 lg:px-16 lg:py-32"
     >
       <div
-        className="absolute inset-0 bg-[linear-gradient(#202020_1px,transparent_1px),linear-gradient(90deg,#202020_1px,transparent_1px)] bg-[size:44px_44px] opacity-30"
+        className="absolute inset-0 bg-[linear-gradient(#d8d8d4_1px,transparent_1px),linear-gradient(90deg,#d8d8d4_1px,transparent_1px)] bg-[size:44px_44px] opacity-55"
         aria-hidden="true"
       />
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="[&_h2]:text-white [&_p]:text-white/60">
-          <SectionHeading
-            eyebrow="07 / WORKING SET"
-            title="A stack shaped by the problem."
-            description="The tools span low-level systems, AI, cloud applications, and financial planning because the work does too. I’m happiest when the boundaries between those layers are visible."
-          />
-        </div>
+        <SectionHeading
+          eyebrow="07 / WORKING SET"
+          title="A stack shaped by the problem."
+          description="The tools span low-level systems, AI, cloud applications, and financial planning because the work does too. I’m happiest when the boundaries between those layers are visible."
+        />
 
         <div className="mt-14 grid gap-4 md:grid-cols-2">
           {skillGroups.map((group, index) => {
@@ -37,17 +35,17 @@ export default function Skills() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-10%' }}
                 transition={{ duration: 0.18, ease: 'easeOut' }}
-                className="rounded-2xl border border-white/15 bg-black/45 p-6 sm:p-8"
+                className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="font-pixel text-sm text-yellow-300">{group.label}</h3>
-                  <Icon className="size-5 text-white/45" aria-hidden="true" />
+                  <h3 className="font-pixel text-sm text-amber-700">{group.label}</h3>
+                  <Icon className="size-5 text-gray-400" aria-hidden="true" />
                 </div>
                 <ul className="mt-7 flex flex-wrap gap-2.5">
                   {group.items.map((skill) => (
                     <li
                       key={skill}
-                      className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm font-medium text-white/80"
+                      className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700"
                     >
                       {skill}
                     </li>

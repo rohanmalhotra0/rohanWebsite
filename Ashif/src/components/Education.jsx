@@ -34,7 +34,7 @@ export default function Education() {
         />
 
         <article className="mt-14 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[18rem_minmax(0,1fr)]">
-          <div className="border-b border-gray-200 bg-[#111] p-7 text-white lg:border-b-0 lg:border-r">
+          <div className="border-b border-gray-200 bg-gray-100 p-7 text-gray-950 lg:border-b-0 lg:border-r">
             <figure>
               <img
                 src={assetUrl(
@@ -47,8 +47,8 @@ export default function Education() {
                 New York University
               </figcaption>
             </figure>
-            <p className="mt-8 font-pixel text-xs text-white/45">2024 — 2027</p>
-            <p className="mt-3 flex items-center gap-2 text-sm text-white/65">
+            <p className="mt-8 font-pixel text-xs text-gray-500">2024 — 2027</p>
+            <p className="mt-3 flex items-center gap-2 text-sm text-gray-600">
               <MapPin className="size-4" aria-hidden="true" />
               New York, NY
             </p>

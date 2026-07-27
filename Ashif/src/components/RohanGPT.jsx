@@ -66,32 +66,32 @@ function RohanGPT() {
         />
 
         <div className="mt-14 grid gap-6 lg:grid-cols-[0.72fr_1.28fr]">
-          <aside className="rounded-2xl border border-gray-200 bg-[#111] p-6 text-white shadow-sm sm:p-8">
+          <aside className="rounded-2xl border border-gray-200 bg-gray-100 p-6 text-gray-950 shadow-sm sm:p-8">
             <div className="flex size-12 items-center justify-center rounded-xl bg-yellow-300 text-black">
               <Bot className="size-6" aria-hidden="true" />
             </div>
             <h3 className="mt-6 text-balance text-2xl font-semibold">
               A faster, cleaner RohanGPT.
             </h3>
-            <p className="mt-3 text-pretty text-sm leading-6 text-white/60">
+            <p className="mt-3 text-pretty text-sm leading-6 text-gray-600">
               Recruiter questions stay factual, project summaries stay current, and common answers do not need a network round trip.
             </p>
 
             <div className="mt-7 grid gap-3">
-              <div className="flex gap-3 rounded-xl border border-white/15 p-4">
-                <Gauge className="mt-0.5 size-5 shrink-0 text-yellow-300" aria-hidden="true" />
+              <div className="flex gap-3 rounded-xl border border-gray-200 bg-white p-4">
+                <Gauge className="mt-0.5 size-5 shrink-0 text-amber-700" aria-hidden="true" />
                 <div>
                   <p className="text-sm font-semibold">Instant profile answers</p>
-                  <p className="mt-1 text-xs leading-5 text-white/55">
+                  <p className="mt-1 text-xs leading-5 text-gray-500">
                     IBM, DRW, Kalshi, research, skills, and résumé context.
                   </p>
                 </div>
               </div>
-              <div className="flex gap-3 rounded-xl border border-white/15 p-4">
-                <Sparkles className="mt-0.5 size-5 shrink-0 text-yellow-300" aria-hidden="true" />
+              <div className="flex gap-3 rounded-xl border border-gray-200 bg-white p-4">
+                <Sparkles className="mt-0.5 size-5 shrink-0 text-amber-700" aria-hidden="true" />
                 <div>
                   <p className="text-sm font-semibold">Grounded portfolio mode</p>
-                  <p className="mt-1 text-xs leading-5 text-white/55">
+                  <p className="mt-1 text-xs leading-5 text-gray-500">
                     No invented employers, dates, metrics, or project claims.
                   </p>
                 </div>
@@ -99,7 +99,7 @@ function RohanGPT() {
             </div>
 
             <div className="mt-8">
-              <p className="font-pixel text-[11px] text-white/40">TRY A PROMPT</p>
+              <p className="font-pixel text-[11px] text-gray-500">TRY A PROMPT</p>
               <div className="mt-3 flex flex-col gap-2">
                 {suggestions.map((suggestion) => (
                   <button
@@ -107,7 +107,7 @@ function RohanGPT() {
                     type="button"
                     disabled={loading}
                     onClick={() => sendMessage(suggestion)}
-                    className="min-h-11 rounded-lg border border-white/15 px-3 py-2 text-left text-xs font-medium text-white/75 transition-colors duration-150 hover:bg-white/10 disabled:opacity-50"
+                    className="min-h-11 rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-xs font-medium text-gray-700 transition-colors duration-150 hover:bg-gray-50 disabled:opacity-50"
                   >
                     {suggestion}
                   </button>

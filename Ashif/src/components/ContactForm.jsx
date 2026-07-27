@@ -27,12 +27,12 @@ export default function ContactForm() {
         />
 
         <div className="mt-14 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[0.72fr_1.28fr]">
-          <aside className="bg-[#111] p-7 text-white sm:p-9">
-            <p className="font-pixel text-xs text-yellow-300">NEW YORK, NY</p>
+          <aside className="border-b border-gray-200 bg-gray-100 p-7 text-gray-950 sm:p-9 lg:border-b-0 lg:border-r">
+            <p className="font-pixel text-xs text-amber-700">NEW YORK, NY</p>
             <h3 className="mt-5 text-balance text-2xl font-semibold">
               Open to ambitious engineering conversations.
             </h3>
-            <p className="mt-3 text-pretty text-sm leading-6 text-white/60">
+            <p className="mt-3 text-pretty text-sm leading-6 text-gray-600">
               Send a note about the team, the technical problem, and what success would look like.
             </p>
             <ul className="mt-8 space-y-2">
@@ -42,7 +42,7 @@ export default function ContactForm() {
                     href={href}
                     target={href.startsWith('mailto:') ? undefined : '_blank'}
                     rel={href.startsWith('mailto:') ? undefined : 'noreferrer'}
-                    className="flex min-h-11 items-center justify-between rounded-lg border border-white/15 px-3 py-2 text-sm text-white/75 transition-colors duration-150 hover:bg-white/10 hover:text-white"
+                    className="flex min-h-11 items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-950"
                   >
                     <span className="inline-flex items-center gap-3">
                       {createElement(Icon, {
