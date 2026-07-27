@@ -1,60 +1,94 @@
-import { motion, useReducedMotion } from 'motion/react';
-import { Braces, BrainCircuit, CloudCog, Landmark } from 'lucide-react';
-import SectionHeading from './SectionHeading';
-import { skillGroups } from '@/data/portfolioData';
+import { Highlighter } from '@/components/ui/highlighter';
+import { GridPattern } from '@/components/ui/grid-pattern';
+import { VelocityText } from './ScrollVelocity';
+import {
+  Cpp,
+  Docker,
+  Git,
+  Javascript,
+  Node,
+  Postman,
+  PyTorch,
+  Python,
+  ReactLogo,
+  Sql,
+  Typescript,
+} from './SkillLogos';
 
-const icons = [Braces, BrainCircuit, CloudCog, Landmark];
-const MotionArticle = motion.article;
+const skillsRow1 = [
+  <Cpp key="cpp" />,
+  <Python key="python" />,
+  <Git key="git" />,
+  <Docker key="docker" />,
+];
+
+const skillsRow2 = [
+  <PyTorch key="pytorch" />,
+  <Sql key="sql" />,
+  <ReactLogo key="react" />,
+  <Node key="node" />,
+  <Javascript key="js" />,
+  <Typescript key="ts" />,
+  <Postman key="postman" />,
+];
 
 export default function Skills() {
-  const reduceMotion = useReducedMotion();
-
   return (
     <section
       id="skills"
-      className="relative scroll-mt-24 overflow-hidden bg-[#efefed] px-5 py-24 text-gray-950 sm:px-8 md:px-12 lg:px-16 lg:py-32"
+      className="relative w-full scroll-mt-24 overflow-hidden bg-white py-24 text-black"
     >
-      <div
-        className="absolute inset-0 bg-[linear-gradient(#d8d8d4_1px,transparent_1px),linear-gradient(90deg,#d8d8d4_1px,transparent_1px)] bg-[size:44px_44px] opacity-55"
-        aria-hidden="true"
+      <GridPattern
+        width={48}
+        height={48}
+        className="fill-gray-300/20 stroke-gray-300/55 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
       />
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <SectionHeading
-          eyebrow="07 / WORKING SET"
-          title="Tools I use."
-          description="My recent work has moved between Python models, C and C++ systems code, cloud services, and Oracle finance tooling."
+
+      <div className="container relative z-10 mx-auto text-center">
+        <div className="mb-12 inline-block">
+          <h2 className="underline-wavy-yellow inline-block font-pixel text-4xl font-bold sm:text-5xl">
+            <Highlighter action="underline" color="#FFD700">
+              My Tech Stack
+            </Highlighter>
+          </h2>
+        </div>
+      </div>
+
+      <div className="relative z-10 mx-auto flex max-w-screen-lg flex-col gap-4">
+        <div
+          className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16"
+          style={{
+            background:
+              'linear-gradient(to right, rgba(255,255,255,0.9) 60%, rgba(255,255,255,0))',
+            filter: 'blur(6px)',
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16"
+          style={{
+            background:
+              'linear-gradient(to left, rgba(255,255,255,0.9) 60%, rgba(255,255,255,0))',
+            filter: 'blur(6px)',
+          }}
+          aria-hidden="true"
         />
 
-        <div className="mt-14 grid gap-4 md:grid-cols-2">
-          {skillGroups.map((group, index) => {
-            const Icon = icons[index];
-            return (
-              <MotionArticle
-                key={group.label}
-                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-10%' }}
-                transition={{ duration: 0.18, ease: 'easeOut' }}
-                className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-pixel text-sm text-amber-700">{group.label}</h3>
-                  <Icon className="size-5 text-gray-400" aria-hidden="true" />
-                </div>
-                <ul className="mt-7 flex flex-wrap gap-2.5">
-                  {group.items.map((skill) => (
-                    <li
-                      key={skill}
-                      className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700"
-                    >
-                      {skill}
-                    </li>
-                  ))}
-                </ul>
-              </MotionArticle>
-            );
-          })}
-        </div>
+        <VelocityText baseVelocity={-45} numCopies={4}>
+          {skillsRow1.map((logo, index) => (
+            <div key={index} className="mx-4 size-20 text-gray-600">
+              {logo}
+            </div>
+          ))}
+        </VelocityText>
+
+        <VelocityText baseVelocity={45} numCopies={4}>
+          {skillsRow2.map((logo, index) => (
+            <div key={index} className="mx-4 size-20 text-gray-600">
+              {logo}
+            </div>
+          ))}
+        </VelocityText>
       </div>
     </section>
   );
