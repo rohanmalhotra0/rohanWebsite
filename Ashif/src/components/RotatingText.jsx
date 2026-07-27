@@ -1,13 +1,10 @@
 'use client';
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { cn } from '@/lib/utils';
 
 const MotionSpan = motion.span;
-
-function cn(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
 
 const RotatingText = forwardRef((props, ref) => {
   const {
@@ -32,6 +29,7 @@ const RotatingText = forwardRef((props, ref) => {
   } = props;
 
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   const splitIntoCharacters = text => {
     if (typeof Intl !== 'undefined' && Intl.Segmenter) {
@@ -137,16 +135,16 @@ const RotatingText = forwardRef((props, ref) => {
   );
 
   useEffect(() => {
-    if (!auto) return;
+    if (!auto || reduceMotion) return;
     const intervalId = setInterval(next, rotationInterval);
     return () => clearInterval(intervalId);
-  }, [next, rotationInterval, auto]);
+  }, [next, rotationInterval, auto, reduceMotion]);
 
   return (
     <MotionSpan
       className={cn('flex flex-wrap whitespace-pre-wrap relative', mainClassName)}
       {...rest}
-      layout
+      layout={!reduceMotion}
       transition={transition}
     >
       <span className="sr-only">{texts[currentTextIndex]}</span>
@@ -154,7 +152,7 @@ const RotatingText = forwardRef((props, ref) => {
         <MotionSpan
           key={currentTextIndex}
           className={cn(splitBy === 'lines' ? 'flex flex-col w-full' : 'flex flex-wrap whitespace-pre-wrap relative')}
-          layout
+          layout={!reduceMotion}
           aria-hidden="true"
         >
           {elements.map((wordObj, wordIndex, array) => {

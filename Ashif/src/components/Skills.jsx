@@ -1,73 +1,62 @@
-import React from 'react';
-import { Highlighter } from "@/components/ui/highlighter";
-import { VelocityText } from './ScrollVelocity';
-import { Cpp, Docker, Git, Javascript, Node, Postman, PyTorch, Python, ReactLogo, Sql, Typescript } from './SkillLogos';
-import { GridPattern } from "@/components/ui/grid-pattern";
+import { motion, useReducedMotion } from 'motion/react';
+import { Braces, BrainCircuit, CloudCog, Landmark } from 'lucide-react';
+import SectionHeading from './SectionHeading';
+import { skillGroups } from '@/data/portfolioData';
 
-const skillsRow1 = [
-  <Cpp key="cpp" />,
-  <Python key="python" />,
-  <Git key="git" />,
-  <Docker key="docker" />,
-];
-
-const skillsRow2 = [
-  <PyTorch key="pytorch" />,
-  <Sql key="sql" />,
-  <ReactLogo key="react" />,
-  <Node key="node" />,
-  <Javascript key="js" />,
-  <Typescript key="ts" />,
-  <Postman key="postman" />,
-];
+const icons = [Braces, BrainCircuit, CloudCog, Landmark];
+const MotionArticle = motion.article;
 
 export default function Skills() {
-  return (
-    <section id="skills" className="relative w-full bg-white text-black py-24 overflow-hidden">
-      <GridPattern
-        width={48}
-        height={48}
-        className="fill-gray-300/20 stroke-gray-300/55 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
-      />
+  const reduceMotion = useReducedMotion();
 
-      <div className="relative z-10 container mx-auto text-center">
-        <div className="inline-block mb-12">
-          <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
-            <Highlighter action="underline" color="#FFD700">
-              My Tech Stack
-            </Highlighter>
-          </h2>
+  return (
+    <section
+      id="skills"
+      className="relative scroll-mt-24 overflow-hidden bg-[#090909] px-5 py-24 text-white sm:px-8 md:px-12 lg:px-16 lg:py-32"
+    >
+      <div
+        className="absolute inset-0 bg-[linear-gradient(#202020_1px,transparent_1px),linear-gradient(90deg,#202020_1px,transparent_1px)] bg-[size:44px_44px] opacity-30"
+        aria-hidden="true"
+      />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="[&_h2]:text-white [&_p]:text-white/60">
+          <SectionHeading
+            eyebrow="07 / WORKING SET"
+            title="A stack shaped by the problem."
+            description="The tools span low-level systems, AI, cloud applications, and financial planning because the work does too. I’m happiest when the boundaries between those layers are visible."
+          />
         </div>
-      </div>
-      <div className="relative z-10 max-w-screen-lg mx-auto flex flex-col gap-4">
-        {/* Left Blur */}
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-16 z-10"
-             style={{
-               background: 'linear-gradient(to right, rgba(255,255,255,0.9) 60%, rgba(255,255,255,0))',
-               filter: 'blur(6px)'
-             }}
-        />
-        {/* Right Blur */}
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-16 z-10"
-             style={{
-               background: 'linear-gradient(to left, rgba(255,255,255,0.9) 60%, rgba(255,255,255,0))',
-               filter: 'blur(6px)'
-             }}
-        />
-        <VelocityText baseVelocity={-45} numCopies={4}>
-          {skillsRow1.map((logo, index) => (
-            <div key={index} className="w-20 h-20 text-gray-600 mx-4">
-              {logo}
-            </div>
-          ))}
-        </VelocityText>
-        <VelocityText baseVelocity={45} numCopies={4}>
-          {skillsRow2.map((logo, index) => (
-            <div key={index} className="w-20 h-20 text-gray-600 mx-4">
-              {logo}
-            </div>
-          ))}
-        </VelocityText>
+
+        <div className="mt-14 grid gap-4 md:grid-cols-2">
+          {skillGroups.map((group, index) => {
+            const Icon = icons[index];
+            return (
+              <MotionArticle
+                key={group.label}
+                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-10%' }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                className="rounded-2xl border border-white/15 bg-black/45 p-6 sm:p-8"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="font-pixel text-sm text-yellow-300">{group.label}</h3>
+                  <Icon className="size-5 text-white/45" aria-hidden="true" />
+                </div>
+                <ul className="mt-7 flex flex-wrap gap-2.5">
+                  {group.items.map((skill) => (
+                    <li
+                      key={skill}
+                      className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm font-medium text-white/80"
+                    >
+                      {skill}
+                    </li>
+                  ))}
+                </ul>
+              </MotionArticle>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

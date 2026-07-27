@@ -1,0 +1,146 @@
+{
+  "updated": "2026-07-27",
+  "owner": "Rohan Malhotra",
+  "photos": [
+    {
+      "file": "me/01.png",
+      "label": "Building in public",
+      "alt": "Rohan Malhotra speaking with attendees at a technology event"
+    },
+    {
+      "file": "me/02.jpg",
+      "label": "Rohan in New York",
+      "alt": "Rohan Malhotra outdoors in New York"
+    },
+    {
+      "file": "me/03.jpg",
+      "label": "Friends and collaborators",
+      "alt": "Rohan Malhotra with friends and collaborators"
+    },
+    {
+      "file": "me/04.jpg",
+      "label": "Based in New York",
+      "alt": "Rohan Malhotra outdoors in New York"
+    },
+    {
+      "file": "me/05.jpg",
+      "label": "Life outside the terminal",
+      "alt": "Rohan Malhotra during a social outing"
+    },
+    {
+      "file": "me/06.png",
+      "label": "Community",
+      "alt": "Rohan Malhotra at a community gathering"
+    },
+    {
+      "file": "me/07.png",
+      "label": "Team builder",
+      "alt": "Rohan Malhotra with a group of friends"
+    },
+    {
+      "file": "me/09.png",
+      "label": "Collaborative by default",
+      "alt": "Rohan Malhotra with friends and collaborators"
+    },
+    {
+      "file": "me/01-headshot.png",
+      "label": "Professional headshot",
+      "alt": "Professional headshot of Rohan Malhotra"
+    },
+    {
+      "file": "me/rohanphoto.jpg",
+      "label": "Portrait",
+      "alt": "Portrait of Rohan Malhotra"
+    },
+    {
+      "file": "projectsPhotos/refrax1.png",
+      "label": "Refrax interface",
+      "alt": "Refrax quantitative visualization interface"
+    },
+    {
+      "file": "projectsPhotos/refrax2.png",
+      "label": "Refrax 3D visualization",
+      "alt": "Refrax three-dimensional quantitative visualization"
+    },
+    {
+      "file": "projectsPhotos/greensticker.png",
+      "label": "GreenSticker",
+      "alt": "GreenSticker computer-vision accessibility interface"
+    },
+    {
+      "file": "projectsPhotos/autism.png",
+      "label": "Autism Research Tool",
+      "alt": "Autism research tool interface"
+    },
+    {
+      "file": "projectsPhotos/pivot.png",
+      "label": "PIVOT",
+      "alt": "PIVOT student research platform"
+    },
+    {
+      "file": "projectsPhotos/Gavindle.png",
+      "label": "Gavindle",
+      "alt": "Gavindle word game interface"
+    },
+    {
+      "file": "projectsPhotos/discreteOptions.jpeg",
+      "label": "Options system",
+      "alt": "Binomial options-pricing model visualization"
+    },
+    {
+      "file": "projectsPhotos/download.png",
+      "label": "Oscillating stock model",
+      "alt": "Wave-inspired stock-model visualization"
+    },
+    {
+      "file": "projectsPhotos/rsi.jpeg",
+      "label": "RSI predictor",
+      "alt": "RSI predictor market chart"
+    },
+    {
+      "file": "projectsPhotos/linear-generator-1.webp",
+      "label": "Wearable linear generator",
+      "alt": "Wearable linear-generator engineering prototype"
+    },
+    {
+      "file": "Research/RedditSetiment.png",
+      "label": "Reddit sentiment research",
+      "alt": "Reddit sentiment research paper preview"
+    },
+    {
+      "file": "Research/economic.png",
+      "label": "Capital-allocation research",
+      "alt": "Capital-allocation research visualization"
+    },
+    {
+      "file": "Research/cubesats.jpeg",
+      "label": "CubeSat systems research",
+      "alt": "CubeSat and space-systems research"
+    },
+    {
+      "file": "work/ibm_logo.webp",
+      "label": "IBM",
+      "alt": "IBM logo"
+    },
+    {
+      "file": "work/kalshi_logo.jpeg",
+      "label": "Kalshi",
+      "alt": "Kalshi logo"
+    },
+    {
+      "file": "work/aress_software_logo.jpeg",
+      "label": "Aress Software",
+      "alt": "Aress Software logo"
+    },
+    {
+      "file": "work/humecenter_logo.jpeg",
+      "label": "Virginia Tech Hume Center",
+      "alt": "Hume Center for National Security and Technology logo"
+    },
+    {
+      "file": "work/y_axis_logo.jpeg",
+      "label": "Y-Axis",
+      "alt": "Y-Axis Overseas Careers logo"
+    }
+  ]
+}

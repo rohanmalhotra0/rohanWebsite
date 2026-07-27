@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import {
   MainContainer,
   ChatContainer,
@@ -6,174 +6,31 @@ import {
   Message,
   MessageInput,
 } from '@chatscope/chat-ui-kit-react';
-import { Highlighter } from '@/components/ui/highlighter';
-import { GridPattern } from "@/components/ui/grid-pattern";
+import { Bot, Gauge, Sparkles } from 'lucide-react';
+import SectionHeading from './SectionHeading';
 import { useRohanGPTChat } from '../services/rohangptService';
 
+const suggestions = [
+  'What did Rohan build at IBM?',
+  'Explain the DRW and EPM work.',
+  'Which projects should a recruiter see first?',
+  'Summarize the Kalshi research.',
+];
+
 function RohanGPT() {
-  const sectionRef = useRef(null);
-  const chatFrameRef = useRef(null);
-
-  const [isMobile, setIsMobile] = useState(() => {
-    try {
-      return window.innerWidth < 768;
-    } catch {
-      return false;
-    }
-  });
-
-  const [chatHeight, setChatHeight] = useState(560);
-  const [kbOffset, setKbOffset] = useState(0);
-
-  const [visitorName, setVisitorName] = useState(() => {
-    try {
-      return localStorage.getItem('rgpt_name') || '';
-    } catch {
-      return '';
-    }
-  });
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  const { messages, loading, error, sendMessage, messageListRef, scrollMessagesToBottom } = useRohanGPTChat({ visitorName });
-
-  useEffect(() => {
-    try {
-      if (visitorName) localStorage.setItem('rgpt_name', visitorName);
-      else localStorage.removeItem('rgpt_name');
-    } catch {
-      // ignore storage failures (private mode, disabled storage, etc.)
-    }
-  }, [visitorName]);
-
-  const recomputeChatHeight = useCallback(() => {
-    const el = chatFrameRef.current;
-    if (!el) return;
-
-    const vv = window.visualViewport;
-    const viewportHeight = vv?.height ?? window.innerHeight;
-    const top = el.getBoundingClientRect().top;
-    const available = Math.floor(viewportHeight - top - 12);
-    const clamped = Math.max(320, Math.min(560, available));
-    setChatHeight(clamped);
-  }, []);
-
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const vv = window.visualViewport;
-    let raf = 0;
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(recomputeChatHeight);
-    };
-
-    schedule();
-    window.addEventListener('resize', schedule);
-    vv?.addEventListener('resize', schedule);
-    vv?.addEventListener('scroll', schedule);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', schedule);
-      vv?.removeEventListener('resize', schedule);
-      vv?.removeEventListener('scroll', schedule);
-    };
-  }, [isMobile, recomputeChatHeight]);
-
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    let raf = 0;
-
-    const update = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-        setKbOffset(offset);
-      });
-    };
-
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
-    update();
-
-    return () => {
-      cancelAnimationFrame(raf);
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
-    };
-  }, [isMobile]);
-
-  useEffect(() => {
-    const node = sectionRef.current;
-    if (!node) return;
-
-    let blurTimer = null;
-
-    const onFocusIn = () => {
-      if (window.innerWidth < 768) document.documentElement.classList.add('rgpt-focused');
-      setTimeout(() => {
-        recomputeChatHeight();
-        scrollMessagesToBottom?.();
-      }, 50);
-    };
-
-    const onFocusOut = () => {
-      if (blurTimer) window.clearTimeout(blurTimer);
-      blurTimer = window.setTimeout(() => {
-        if (!node.contains(document.activeElement)) {
-          document.documentElement.classList.remove('rgpt-focused');
-        }
-      }, 0);
-    };
-
-    node.addEventListener('focusin', onFocusIn);
-    node.addEventListener('focusout', onFocusOut);
-
-    return () => {
-      if (blurTimer) window.clearTimeout(blurTimer);
-      node.removeEventListener('focusin', onFocusIn);
-      node.removeEventListener('focusout', onFocusOut);
-      document.documentElement.classList.remove('rgpt-focused');
-    };
-  }, [recomputeChatHeight, scrollMessagesToBottom]);
-
-  useEffect(() => {
-    const node = sectionRef.current;
-    if (!node) return;
-
-    const setInView = (inView) => {
-      document.documentElement.classList.toggle('rgpt-inview', Boolean(inView));
-    };
-
-    const io = new IntersectionObserver(
-      ([entry]) => setInView(entry?.isIntersecting && (entry.intersectionRatio || 0) > 0.15),
-      { threshold: [0, 0.15] }
-    );
-    io.observe(node);
-
-    return () => {
-      io.disconnect();
-      document.documentElement.classList.remove('rgpt-inview');
-    };
-  }, []);
-
-  const senderLabel = useMemo(() => (visitorName || '').trim() || 'You', [visitorName]);
+  const {
+    messages,
+    loading,
+    error,
+    sendMessage,
+    messageListRef,
+  } = useRohanGPTChat();
 
   const typingIndicator = useMemo(
     () =>
       loading ? (
-        <div className="rgpt-typing-indicator" aria-live="polite" aria-label="RohanGPT is typing">
+        <div className="rgpt-typing-indicator" aria-live="polite">
           <span className="rgpt-typing-label">RohanGPT</span>
-          <span className="rgpt-typing-text">typing</span>
           <span className="rgpt-typing-dots" aria-hidden="true">
             <span />
             <span />
@@ -193,73 +50,101 @@ function RohanGPT() {
 
   return (
     <section
-      ref={sectionRef}
       id="rohangpt"
-      className="relative w-full bg-white text-black py-14 sm:py-20 overflow-hidden"
+      className="relative scroll-mt-24 overflow-hidden bg-white px-5 py-24 text-black sm:px-8 md:px-12 lg:px-16 lg:py-32"
     >
-      <GridPattern
-        width={44}
-        height={44}
-        className="fill-gray-300/20 stroke-gray-300/55 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
+      <div
+        className="absolute inset-0 bg-[linear-gradient(#e8e8e8_1px,transparent_1px),linear-gradient(90deg,#e8e8e8_1px,transparent_1px)] bg-[size:44px_44px] opacity-60"
+        aria-hidden="true"
       />
 
-      <div className="relative z-10 container mx-auto px-4">
-        <div className="text-center mb-10">
-          <h2 className="text-5xl font-bold font-pixel underline-wavy-yellow inline-block">
-            <Highlighter action="underline" color="#FFD700">
-              RohanGPT
-            </Highlighter>
-          </h2>
-          <p className="mt-3 text-sm text-gray-600 max-w-xl mx-auto">
-            Ask about systems work, research themes, or project details.
-          </p>
-        </div>
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <SectionHeading
+          eyebrow="08 / ROHANGPT"
+          title="Ask the portfolio."
+          description="The most common questions answer instantly from a verified local profile. Broader questions use the live assistant when the production endpoint is connected."
+        />
 
-        <div className="max-w-screen-md mx-auto">
-          <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden bg-white">
-            <div className="px-4 py-3 border-b border-gray-200 bg-white">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-medium text-gray-800">RohanGPT</div>
-                <button
-                  type="button"
-                  className="text-sm rounded-full border border-gray-300 px-3 py-1.5 bg-white"
-                  onClick={() => {
-                    const next = prompt('What should I call you?', visitorName || '');
-                    if (next !== null) setVisitorName(next);
-                  }}
-                >
-                  {visitorName?.trim() ? `Name: ${visitorName}` : 'Set name'}
-                </button>
+        <div className="mt-14 grid gap-6 lg:grid-cols-[0.72fr_1.28fr]">
+          <aside className="rounded-2xl border border-gray-200 bg-[#111] p-6 text-white shadow-sm sm:p-8">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-yellow-300 text-black">
+              <Bot className="size-6" aria-hidden="true" />
+            </div>
+            <h3 className="mt-6 text-balance text-2xl font-semibold">
+              A faster, cleaner RohanGPT.
+            </h3>
+            <p className="mt-3 text-pretty text-sm leading-6 text-white/60">
+              Recruiter questions stay factual, project summaries stay current, and common answers do not need a network round trip.
+            </p>
+
+            <div className="mt-7 grid gap-3">
+              <div className="flex gap-3 rounded-xl border border-white/15 p-4">
+                <Gauge className="mt-0.5 size-5 shrink-0 text-yellow-300" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-semibold">Instant profile answers</p>
+                  <p className="mt-1 text-xs leading-5 text-white/55">
+                    IBM, DRW, Kalshi, research, skills, and résumé context.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 rounded-xl border border-white/15 p-4">
+                <Sparkles className="mt-0.5 size-5 shrink-0 text-yellow-300" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-semibold">Grounded portfolio mode</p>
+                  <p className="mt-1 text-xs leading-5 text-white/55">
+                    No invented employers, dates, metrics, or project claims.
+                  </p>
+                </div>
               </div>
             </div>
-            <div
-              ref={chatFrameRef}
-              className="h-[560px]"
-              style={
-                isMobile
-                  ? {
-                      height: `${chatHeight}px`,
-                      paddingBottom: `${kbOffset}px`,
-                    }
-                  : undefined
-              }
-            >
+
+            <div className="mt-8">
+              <p className="font-pixel text-[11px] text-white/40">TRY A PROMPT</p>
+              <div className="mt-3 flex flex-col gap-2">
+                {suggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    disabled={loading}
+                    onClick={() => sendMessage(suggestion)}
+                    className="min-h-11 rounded-lg border border-white/15 px-3 py-2 text-left text-xs font-medium text-white/75 transition-colors duration-150 hover:bg-white/10 disabled:opacity-50"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+              <div>
+                <p className="text-sm font-semibold text-gray-950">RohanGPT</p>
+                <p className="mt-0.5 text-xs text-gray-500">Portfolio guide</p>
+              </div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                <span className="size-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                Instant answers ready
+              </span>
+            </div>
+            <div className="h-[34rem] max-h-[70dvh] min-h-96">
               <MainContainer>
                 <ChatContainer>
                   <MessageList ref={messageListRef} typingIndicator={typingIndicator}>
-                    {messages.map((m) => (
+                    {messages.map((message) => (
                       <Message
-                        key={m.id}
+                        key={message.id}
                         model={{
-                          message: m.content,
-                          sender: m.role,
-                          direction: m.role === 'user' ? 'outgoing' : 'incoming',
+                          message: message.content,
+                          sender: message.role,
+                          direction:
+                            message.role === 'user' ? 'outgoing' : 'incoming',
                         }}
                       />
                     ))}
                   </MessageList>
                   <MessageInput
-                    placeholder={`${senderLabel}: Ask RohanGPT anything...`}
+                    placeholder="Ask about the work…"
                     onSend={handleSend}
                     disabled={loading}
                     attachButton={false}
@@ -267,12 +152,11 @@ function RohanGPT() {
                 </ChatContainer>
               </MainContainer>
             </div>
-
-            {error && (
-              <div className="px-4 py-3 text-sm text-red-700 bg-red-50 border-t border-red-100">
+            {error ? (
+              <p className="border-t border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {error}
-              </div>
-            )}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>
@@ -281,4 +165,3 @@ function RohanGPT() {
 }
 
 export default memo(RohanGPT);
-

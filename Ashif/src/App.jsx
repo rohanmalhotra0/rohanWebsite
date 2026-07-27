@@ -1,81 +1,77 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
-import Lenis from 'lenis';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import Hero from './components/hero';
 import Navbar from './components/Navbar';
-import About from './components/About';
-import Skills from './components/Skills';
+import Experience from './components/Experience';
 import Projects from './components/Projects';
-import ProjectsMobile from './components/ProjectsMobile';
+import Research from './components/Research';
+import About from './components/About';
 import Education from './components/Education';
-import SocialMagnet from './components/SocialMagnet';
+import Skills from './components/Skills';
 import ContactForm from './components/ContactForm';
-import { SmoothCursor } from './components/ui/smooth-cursor';
-
-import './App.css'
+import SocialMagnet from './components/SocialMagnet';
+import ResumeView from './components/ResumeView';
+import './App.css';
 
 const RohanGPT = lazy(() => import('./components/RohanGPT'));
-const RohanGPTPopup = lazy(() => import('./components/RohanGPTPopup'));
 
-function App() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+function useResumeRoute() {
+  const [isResume, setIsResume] = useState(
+    () => window.location.hash === '#/resume'
+  );
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+    const onHashChange = () => {
+      const next = window.location.hash === '#/resume';
+      setIsResume(next);
+      if (next) window.scrollTo({ top: 0 });
     };
-
-    window.addEventListener('resize', handleResize);
-
-    // 1. Initialize Lenis with custom settings for scroll speed
-    const lenis = new Lenis({
-      duration: 1.2, // Affects the animation duration
-      lerp: 0.05, // Lower values (e.g., 0.05) are smoother and "floatier". Higher values (e.g., 0.2) are more responsive.
-      smoothWheel: true,
-    });
-
-    // 2. Connect Lenis to GSAP's ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
-
-    // 3. Use GSAP's ticker to drive Lenis's animation loop
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-
-    gsap.ticker.lagSmoothing(0);
-
-    // 4. Cleanup on component unmount
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      lenis.destroy();
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      gsap.ticker.remove(lenis.raf);
-    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
+  useEffect(() => {
+    document.title = isResume
+      ? 'Rohan Malhotra — Resume'
+      : 'Rohan Malhotra — Applied AI, Robotics & Quant Systems';
+  }, [isResume]);
+
+  return isResume;
+}
+
+function Portfolio() {
   return (
     <>
-      {!isMobile && <SmoothCursor />}
+      <a
+        href="#main-content"
+        className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black"
+      >
+        Skip to main content
+      </a>
       <Navbar />
-      <main>
+      <main id="main-content">
         <Hero />
+        <Experience />
+        <Projects />
+        <Research />
         <About />
-        <Skills />
         <Education />
-        {isMobile ? <ProjectsMobile /> : <Projects />}
-        <Suspense fallback={null}>
+        <Skills />
+        <Suspense
+          fallback={
+            <section className="bg-white px-5 py-24" aria-label="Loading RohanGPT">
+              <div className="mx-auto h-96 max-w-5xl animate-pulse rounded-2xl bg-gray-100" />
+            </section>
+          }
+        >
           <RohanGPT />
         </Suspense>
         <ContactForm />
-        <SocialMagnet />
       </main>
-      <Suspense fallback={null}>
-        <RohanGPTPopup />
-      </Suspense>
+      <SocialMagnet />
     </>
-  )
+  );
 }
 
-export default App
-
+export default function App() {
+  return useResumeRoute() ? <ResumeView /> : <Portfolio />;
+}

@@ -1,89 +1,112 @@
-import React, { useState } from 'react';
-import { cn } from "@/lib/utils";
-import { Highlighter } from "@/components/ui/highlighter";
-import { GridPattern } from "@/components/ui/grid-pattern";
+import { createElement } from 'react';
+import { ArrowUpRight, Github, Linkedin, Mail } from 'lucide-react';
+import SectionHeading from './SectionHeading';
+import { profile } from '@/data/portfolioData';
+
+const links = [
+  { label: 'Email', href: `mailto:${profile.email}`, Icon: Mail },
+  { label: 'LinkedIn', href: profile.linkedin, Icon: Linkedin },
+  { label: 'GitHub', href: profile.github, Icon: Github },
+];
 
 export default function ContactForm() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
   return (
-    <div id="contact" className="relative flex w-full items-center justify-center overflow-hidden bg-background pt-16 pb-32 md:pt-24 md:pb-48">
-      <GridPattern
-        width={30}
-        height={30}
-        x={-1}
-        y={-1}
-        className={cn(
-          "fill-gray-300/25 stroke-gray-300/60 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
-        )}
+    <section
+      id="contact"
+      className="relative scroll-mt-24 overflow-hidden bg-[#f7f7f5] px-5 pb-36 pt-24 sm:px-8 md:px-12 lg:px-16 lg:pb-40 lg:pt-32"
+    >
+      <div
+        className="absolute inset-0 bg-[linear-gradient(#e4e4e4_1px,transparent_1px),linear-gradient(90deg,#e4e4e4_1px,transparent_1px)] bg-[size:44px_44px] opacity-60"
+        aria-hidden="true"
       />
-      <div className="relative z-10 container px-4 mx-auto">
-        {/* Centered Form */}
-        <div className="max-w-md mx-auto px-8 py-6 bg-gray-50 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-1 text-center">
-            <Highlighter action="underline" color="#FFD700">
-              Contact
-            </Highlighter>
-          </h2>
-          <p className="text-center text-sm text-gray-600 mb-5">
-            New York, NY · <a className="underline hover:text-gray-900" href="https://rohanm.org" target="_blank" rel="noopener noreferrer">rohanm.org</a>
-          </p>
-          <form 
-            action="https://formspree.io/f/xrbwdkqb" 
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <SectionHeading
+          eyebrow="09 / CONTACT"
+          title="Let’s build something difficult."
+          description="The best fit is a team working on applied AI, robotics, quantitative systems, developer infrastructure, or a problem that refuses to stay inside one category."
+        />
+
+        <div className="mt-14 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[0.72fr_1.28fr]">
+          <aside className="bg-[#111] p-7 text-white sm:p-9">
+            <p className="font-pixel text-xs text-yellow-300">NEW YORK, NY</p>
+            <h3 className="mt-5 text-balance text-2xl font-semibold">
+              Open to ambitious engineering conversations.
+            </h3>
+            <p className="mt-3 text-pretty text-sm leading-6 text-white/60">
+              Send a note about the team, the technical problem, and what success would look like.
+            </p>
+            <ul className="mt-8 space-y-2">
+              {links.map(({ label, href, Icon }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target={href.startsWith('mailto:') ? undefined : '_blank'}
+                    rel={href.startsWith('mailto:') ? undefined : 'noreferrer'}
+                    className="flex min-h-11 items-center justify-between rounded-lg border border-white/15 px-3 py-2 text-sm text-white/75 transition-colors duration-150 hover:bg-white/10 hover:text-white"
+                  >
+                    <span className="inline-flex items-center gap-3">
+                      {createElement(Icon, {
+                        className: 'size-4',
+                        'aria-hidden': true,
+                      })}
+                      {label}
+                    </span>
+                    <ArrowUpRight className="size-4" aria-hidden="true" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+
+          <form
+            action="https://formspree.io/f/xrbwdkqb"
             method="POST"
+            className="p-7 sm:p-9"
           >
-            <div className="mb-4">
-              <label className="block text-gray-800 mb-1" htmlFor="name">Your Name</label>
-              <input
-                className="w-full px-4 py-2 bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
-                placeholder="Enter your name"
-                type="text"
-                name="name"
-                id="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="block">
+                <span className="text-sm font-semibold text-gray-900">Name</span>
+                <input
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  className="mt-2 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-950 outline-none focus:border-black focus:ring-2 focus:ring-black/10"
+                  placeholder="Your name"
+                />
+              </label>
+              <label className="block">
+                <span className="text-sm font-semibold text-gray-900">Email</span>
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="mt-2 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-950 outline-none focus:border-black focus:ring-2 focus:ring-black/10"
+                  placeholder="you@company.com"
+                />
+              </label>
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-800 mb-1" htmlFor="email">Your Email</label>
-              <input
-                className="w-full px-4 py-2 bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
-                placeholder="Enter your email"
-                name="email"
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-800 mb-1" htmlFor="message">Your Message</label>
+            <label className="mt-5 block">
+              <span className="text-sm font-semibold text-gray-900">What are you building?</span>
               <textarea
-                className="w-full px-4 py-2 bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
-                rows="4"
-                placeholder="Enter your message"
                 name="message"
-                id="message"
-                value={form.message}
-                onChange={handleChange}
+                rows="6"
                 required
-              ></textarea>
-            </div>
+                className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-base text-gray-950 outline-none focus:border-black focus:ring-2 focus:ring-black/10"
+                placeholder="A little context goes a long way…"
+              />
+            </label>
             <button
-              className="w-full bg-yellow-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-yellow-400 transition duration-300"
               type="submit"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5"
             >
-              Send Message
+              Send message
+              <ArrowUpRight className="size-4" aria-hidden="true" />
             </button>
           </form>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

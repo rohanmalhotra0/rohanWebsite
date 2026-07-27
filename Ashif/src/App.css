@@ -1,178 +1,3 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --animate-line-shadow: line-shadow 15s linear infinite;
-  @keyframes line-shadow {
-  0% {
-    background-position: 0 0;
-    }
-  100% {
-    background-position: 100% -100%;
-    }
-  }
-}
-
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Work Experience: force 2x2 grid */
-#work-experience-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 1.5rem;
-  max-width: 42rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-@media (max-width: 767px) {
-  #work-experience-grid {
-    gap: 1rem;
-    max-width: 100%;
-  }
-}
-
-/* Research: 3 columns, 1 row */
-#research-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 1.5rem;
-  max-width: 56rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-@media (max-width: 767px) {
-  #research-grid {
-    gap: 1rem;
-    max-width: 100%;
-  }
-}
-
-/* Particles.js canvas sizing (About section) */
-#about #about-particles .particles-js-canvas-el {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  opacity: 0.75;
-}
-
-/* Minimal, scoped overrides for ChatScope (RohanGPT section) */
 #rohangpt .cs-main-container,
 #rohangpt .cs-chat-container,
 #rohangpt .cs-message-input {
@@ -181,46 +6,94 @@
 }
 
 #rohangpt .cs-message-list {
-  background: #f9fafb;
+  background: #f7f7f5;
   color: #111827;
 }
 
 #rohangpt .cs-message-list__scroll-wrapper {
-  padding: 14px 12px;
-  padding-bottom: 130px;
+  padding: 16px 14px 22px;
 }
 
-/* Polished typing indicator (RohanGPT) */
+#rohangpt .cs-message {
+  max-width: 82%;
+}
+
+#rohangpt .cs-message__content {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px 14px 14px 5px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+
+#rohangpt .cs-message--outgoing .cs-message__content {
+  border-color: #111111;
+  border-radius: 14px 14px 5px 14px;
+  background: #111111;
+  color: #ffffff;
+}
+
+#rohangpt .cs-message__sender-name {
+  display: none;
+}
+
+#rohangpt .cs-message-input {
+  border-top: 1px solid #e5e7eb;
+  padding: 10px;
+}
+
+#rohangpt .cs-message-input__content-editor-wrapper,
+#rohangpt .cs-message-input__content-editor-container {
+  background: transparent;
+}
+
+#rohangpt .cs-message-input__content-editor {
+  min-height: 44px;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 16px;
+  line-height: 1.4;
+  padding: 10px 14px;
+}
+
+#rohangpt .cs-message-input__content-editor:focus-visible,
+#rohangpt .cs-message-input__content-editor-wrapper:focus-within {
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgb(17 17 17 / 0.12);
+  outline: none;
+}
+
+#rohangpt .cs-message-input__send-button {
+  min-height: 44px;
+  min-width: 44px;
+  color: #111111;
+}
+
 #rohangpt .rgpt-typing-indicator {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 6px 0 10px 12px;
-  padding: 8px 12px;
-  max-width: 78%;
-  background: #ffffff;
+  margin: 6px 0 10px 14px;
   border: 1px solid #e5e7eb;
-  border-radius: 16px 16px 16px 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  color: #111827;
+  border-radius: 14px 14px 14px 5px;
+  background: #ffffff;
+  padding: 8px 12px;
 }
 
 #rohangpt .rgpt-typing-label {
+  color: #111827;
   font-size: 12px;
   font-weight: 600;
-  color: #111827;
-}
-
-#rohangpt .rgpt-typing-text {
-  font-size: 12px;
-  color: #6b7280;
 }
 
 #rohangpt .rgpt-typing-dots {
   display: inline-flex;
-  align-items: center;
   gap: 4px;
-  margin-left: 2px;
 }
 
 #rohangpt .rgpt-typing-dots > span {
@@ -228,16 +101,15 @@
   height: 6px;
   border-radius: 999px;
   background: #9ca3af;
-  transform: translateY(0);
-  animation: rgpt-dot-bounce 1.05s infinite ease-in-out;
+  animation: rgpt-dot-bounce 1s ease-in-out infinite;
 }
 
 #rohangpt .rgpt-typing-dots > span:nth-child(2) {
-  animation-delay: 0.12s;
+  animation-delay: 100ms;
 }
 
 #rohangpt .rgpt-typing-dots > span:nth-child(3) {
-  animation-delay: 0.24s;
+  animation-delay: 200ms;
 }
 
 @keyframes rgpt-dot-bounce {
@@ -245,529 +117,58 @@
   80%,
   100% {
     transform: translateY(0);
-    opacity: 0.55;
+    opacity: 0.5;
   }
+
   40% {
     transform: translateY(-3px);
     opacity: 1;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #rohangpt .rgpt-typing-dots > span {
-    animation: none;
-    opacity: 0.8;
+@media (max-width: 640px) {
+  #rohangpt .cs-message {
+    max-width: 90%;
+  }
+
+  #rohangpt .cs-message-list__scroll-wrapper {
+    padding: 12px 10px 18px;
   }
 }
 
-#rohangpt .cs-message {
-  max-width: 78%;
-}
+@media print {
+  @page {
+    margin: 0.45in;
+    size: letter;
+  }
 
-#rohangpt .cs-message__content {
-  font-size: 14px;
-  line-height: 1.4;
-  padding: 10px 12px;
-  border: none;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-}
+  body {
+    background: #ffffff !important;
+    color: #000000;
+  }
 
-#rohangpt .cs-message--incoming .cs-message__content {
-  background: #ffffff;
-  border-radius: 16px 16px 16px 6px;
-}
-
-#rohangpt .cs-message--outgoing .cs-message__content {
-  background: #007aff;
-  color: #ffffff;
-  border-radius: 16px 16px 6px 16px;
-}
-
-#rohangpt .cs-message__sender-name {
-  display: none;
-}
-
-#rohangpt .cs-message-input__content-editor-wrapper {
-  background: #ffffff;
-  border-top: 1px solid #e5e7eb;
-}
-
-#rohangpt .cs-message-input {
-  padding: 10px 10px;
-  background: #ffffff;
-}
-
-#rohangpt .cs-message-input__content-editor-container,
-#rohangpt .cs-message-input__content-editor-wrapper {
-  background: #ffffff;
-}
-
-#rohangpt .cs-message-input__content-editor {
-  border-radius: 999px;
-  background: #f3f4f6;
-  padding: 10px 14px;
-  color: #111827;
-  caret-color: #111827;
-}
-
-#rohangpt .cs-message-input__placeholder {
-  color: #9ca3af;
-}
-
-#rohangpt .cs-message-input__content-editor-wrapper:focus-within {
-  background: #ffffff;
-  box-shadow: none;
-}
-
-#rohangpt .cs-message-input--focused .cs-message-input__content-editor {
-  background: #f3f4f6;
-}
-
-#rohangpt .cs-message-input__content-editor:focus {
-  background: #f3f4f6;
-  box-shadow: none;
-  outline: none;
-}
-
-#rohangpt .cs-message-input__content-editor:focus {
-  outline: none;
-}
-
-/* Hide social dock when on RohanGPT so it doesn't block the input */
-.rgpt-inview .social-magnet,
-.rgpt-focused .social-magnet {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* When typing in RohanGPT on mobile, hide floating footer/social dock */
-@media (max-width: 767px) {
-  html.rgpt-focused .floating-social-dock,
-  html.rgpt-focused .site-footer-dock {
+  .resume-toolbar {
     display: none !important;
   }
-}
 
-/* Mobile usability fixes (iOS keyboard + readability) */
-@media (max-width: 767px) {
-  /* Prevent iOS Safari input-zoom and improve readability */
-  #rohangpt .cs-message__content {
-    font-size: 16px;
-    line-height: 1.5;
+  .resume-view {
+    min-height: auto;
+    padding: 0 !important;
+    background: #ffffff !important;
   }
 
-  #rohangpt .cs-message-input__content-editor {
-    font-size: 16px;
+  .resume-paper {
+    max-width: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
   }
 
-  /* iOS tap comfort (44px minimum tap targets) */
-  #rohangpt .cs-message-input__content-editor-wrapper {
-    min-height: 44px !important;
-  }
-  #rohangpt .cs-message-input__content-editor {
-    font-size: 16px !important;
-    line-height: 1.3 !important;
-  }
-  #rohangpt .cs-message-input__send-button {
-    min-width: 44px !important;
-    min-height: 44px !important;
+  .resume-section {
+    break-inside: avoid;
   }
 
-  /* Avoid iPhone safe-area clipping */
-  #rohangpt .cs-message-input {
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  .resume-paper a {
+    color: inherit !important;
+    text-decoration: none !important;
   }
-
-  /* On iOS/mobile: position dock above safe area */
-  .social-magnet {
-    bottom: calc(12px + env(safe-area-inset-bottom));
-  }
-
-  /* Ensure last messages remain visible above the input/keyboard */
-  #rohangpt .cs-message-list__scroll-wrapper {
-    padding-bottom: calc(160px + env(safe-area-inset-bottom));
-  }
-}
-
-/* ====== RohanGPT floating popup ====== */
-.rgpt-popup-toggle {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  background: #111827;
-  color: #ffffff;
-  border: none;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.12);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer !important;
-  z-index: 1000;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-}
-
-.rgpt-popup-toggle:hover {
-  transform: translateY(-2px);
-  background: #000000;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22), 0 4px 8px rgba(0, 0, 0, 0.14);
-}
-
-.rgpt-popup-toggle:active {
-  transform: translateY(0);
-}
-
-.rgpt-popup-panel {
-  position: fixed;
-  right: 20px;
-  bottom: 88px;
-  width: 380px;
-  max-width: calc(100vw - 40px);
-  height: 560px;
-  max-height: calc(100vh - 120px);
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), 0 6px 12px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 1000;
-  animation: rgpt-popup-in 0.16s ease-out;
-}
-
-@keyframes rgpt-popup-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.rgpt-popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
-}
-
-.rgpt-popup-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.rgpt-popup-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.rgpt-popup-name-btn {
-  font-size: 12px;
-  color: #111827;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  padding: 6px 10px;
-  border-radius: 999px;
-  cursor: pointer !important;
-}
-
-.rgpt-popup-name-btn:hover {
-  background: #f3f4f6;
-}
-
-.rgpt-popup-close {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: #6b7280;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer !important;
-}
-
-.rgpt-popup-close:hover {
-  background: #f3f4f6;
-  color: #111827;
-}
-
-.rgpt-popup-body {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.rgpt-popup-error {
-  padding: 8px 12px;
-  font-size: 13px;
-  color: #b91c1c;
-  background: #fef2f2;
-  border-top: 1px solid #fee2e2;
-}
-
-/* Scope ChatScope styles to the popup so they match the main section */
-#rohangpt-popup .cs-main-container,
-#rohangpt-popup .cs-chat-container,
-#rohangpt-popup .cs-message-input {
-  background: #ffffff;
-  color: #111827;
-}
-
-#rohangpt-popup .cs-message-list {
-  background: #f9fafb;
-  color: #111827;
-}
-
-#rohangpt-popup .cs-message-list__scroll-wrapper {
-  padding: 12px 10px;
-}
-
-#rohangpt-popup .cs-message {
-  max-width: 82%;
-}
-
-#rohangpt-popup .cs-message__content {
-  font-size: 14px;
-  line-height: 1.4;
-  padding: 10px 12px;
-  border: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-#rohangpt-popup .cs-message--incoming .cs-message__content {
-  background: #ffffff;
-  border-radius: 16px 16px 16px 6px;
-}
-
-#rohangpt-popup .cs-message--outgoing .cs-message__content {
-  background: #007aff;
-  color: #ffffff;
-  border-radius: 16px 16px 6px 16px;
-}
-
-#rohangpt-popup .cs-message__sender-name {
-  display: none;
-}
-
-#rohangpt-popup .cs-message-input__content-editor-wrapper {
-  background: #ffffff;
-  border-top: 1px solid #e5e7eb;
-}
-
-#rohangpt-popup .cs-message-input {
-  padding: 10px;
-  background: #ffffff;
-}
-
-#rohangpt-popup .cs-message-input__content-editor {
-  border-radius: 999px;
-  background: #f3f4f6;
-  padding: 10px 14px;
-  color: #111827;
-  caret-color: #111827;
-}
-
-#rohangpt-popup .cs-message-input__placeholder {
-  color: #9ca3af;
-}
-
-#rohangpt-popup .cs-message-input__content-editor:focus,
-#rohangpt-popup .cs-message-input__content-editor-wrapper:focus-within {
-  background: #f3f4f6;
-  box-shadow: none;
-  outline: none;
-}
-
-/* Reuse typing-indicator styling inside the popup */
-#rohangpt-popup .rgpt-typing-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 6px 0 10px 10px;
-  padding: 8px 12px;
-  max-width: 82%;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px 16px 16px 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  color: #111827;
-}
-#rohangpt-popup .rgpt-typing-label { font-size: 12px; font-weight: 600; color: #111827; }
-#rohangpt-popup .rgpt-typing-text { font-size: 12px; color: #6b7280; }
-#rohangpt-popup .rgpt-typing-dots { display: inline-flex; align-items: center; gap: 4px; margin-left: 2px; }
-#rohangpt-popup .rgpt-typing-dots > span {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: #9ca3af;
-  animation: rgpt-dot-bounce 1.05s infinite ease-in-out;
-}
-#rohangpt-popup .rgpt-typing-dots > span:nth-child(2) { animation-delay: 0.12s; }
-#rohangpt-popup .rgpt-typing-dots > span:nth-child(3) { animation-delay: 0.24s; }
-
-/* AI animated loading indicator (popup) */
-.rgpt-ai-loading {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-}
-
-.rgpt-ai-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.rgpt-ai-brain {
-  animation: rgpt-ai-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 4px rgba(139,92,246,0.35));
-}
-
-@keyframes rgpt-ai-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.7; transform: scale(0.92); }
-}
-
-.rgpt-ai-bars {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 18px;
-}
-
-.rgpt-ai-bars > span {
-  width: 3px;
-  border-radius: 3px;
-  background: linear-gradient(to top, #6366f1, #a855f7);
-  animation: rgpt-ai-bar 1.1s ease-in-out infinite;
-}
-
-.rgpt-ai-bars > span:nth-child(1) { animation-delay: 0s;    height: 6px; }
-.rgpt-ai-bars > span:nth-child(2) { animation-delay: 0.15s; height: 12px; }
-.rgpt-ai-bars > span:nth-child(3) { animation-delay: 0.3s;  height: 18px; }
-.rgpt-ai-bars > span:nth-child(4) { animation-delay: 0.15s; height: 12px; }
-.rgpt-ai-bars > span:nth-child(5) { animation-delay: 0s;    height: 6px; }
-
-@keyframes rgpt-ai-bar {
-  0%, 100% { transform: scaleY(0.35); opacity: 0.55; }
-  50%       { transform: scaleY(1);   opacity: 1; }
-}
-
-.rgpt-ai-label {
-  font-size: 12px;
-  font-weight: 500;
-  background: linear-gradient(90deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rgpt-ai-brain { animation: none; }
-  .rgpt-ai-bars > span { animation: none; height: 10px !important; opacity: 0.8; }
-}
-
-/* Mobile: full-screen sheet */
-@media (max-width: 767px) {
-  .rgpt-popup-toggle {
-    right: 16px;
-    bottom: calc(16px + env(safe-area-inset-bottom));
-    width: 52px;
-    height: 52px;
-  }
-
-  .rgpt-popup-panel {
-    right: 10px;
-    left: 10px;
-    bottom: calc(78px + env(safe-area-inset-bottom));
-    width: auto;
-    max-width: none;
-    height: calc(100vh - 120px - env(safe-area-inset-bottom));
-    max-height: calc(100vh - 120px - env(safe-area-inset-bottom));
-  }
-
-  #rohangpt-popup .cs-message__content { font-size: 16px; line-height: 1.5; }
-  #rohangpt-popup .cs-message-input__content-editor { font-size: 16px; }
-  #rohangpt-popup .cs-message-input__content-editor-wrapper { min-height: 44px !important; }
-  #rohangpt-popup .cs-message-input__send-button { min-width: 44px !important; min-height: 44px !important; }
-  #rohangpt-popup .cs-message-input { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-}
-
-/* Hide floating button when user is inside the main RohanGPT section to avoid duplication */
-.rgpt-inview .rgpt-popup-toggle {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(8px);
-}
-
-/* Kill the default blue focus ring / outline around the chat input
-   (applies to both the main RohanGPT section and the popup) */
-#rohangpt .cs-message-input,
-#rohangpt .cs-message-input *,
-#rohangpt-popup .cs-message-input,
-#rohangpt-popup .cs-message-input * {
-  -webkit-tap-highlight-color: transparent;
-}
-
-#rohangpt .cs-message-input__content-editor,
-#rohangpt .cs-message-input__content-editor-container,
-#rohangpt .cs-message-input__content-editor-wrapper,
-#rohangpt-popup .cs-message-input__content-editor,
-#rohangpt-popup .cs-message-input__content-editor-container,
-#rohangpt-popup .cs-message-input__content-editor-wrapper {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: transparent !important;
-}
-
-/* Kill ChatScope's default light-blue container background that bleeds
-   out around the rounded input pill */
-#rohangpt .cs-message-input__content-editor-container,
-#rohangpt-popup .cs-message-input__content-editor-container {
-  background: transparent !important;
-}
-
-#rohangpt .cs-message-input__content-editor:focus,
-#rohangpt .cs-message-input__content-editor:focus-visible,
-#rohangpt .cs-message-input__content-editor:focus-within,
-#rohangpt .cs-message-input__content-editor-container:focus,
-#rohangpt .cs-message-input__content-editor-container:focus-visible,
-#rohangpt .cs-message-input__content-editor-container:focus-within,
-#rohangpt .cs-message-input__content-editor-wrapper:focus,
-#rohangpt .cs-message-input__content-editor-wrapper:focus-visible,
-#rohangpt .cs-message-input__content-editor-wrapper:focus-within,
-#rohangpt .cs-message-input--focused .cs-message-input__content-editor,
-#rohangpt .cs-message-input--focused .cs-message-input__content-editor-container,
-#rohangpt .cs-message-input--focused .cs-message-input__content-editor-wrapper,
-#rohangpt-popup .cs-message-input__content-editor:focus,
-#rohangpt-popup .cs-message-input__content-editor:focus-visible,
-#rohangpt-popup .cs-message-input__content-editor:focus-within,
-#rohangpt-popup .cs-message-input__content-editor-container:focus,
-#rohangpt-popup .cs-message-input__content-editor-container:focus-visible,
-#rohangpt-popup .cs-message-input__content-editor-container:focus-within,
-#rohangpt-popup .cs-message-input__content-editor-wrapper:focus,
-#rohangpt-popup .cs-message-input__content-editor-wrapper:focus-visible,
-#rohangpt-popup .cs-message-input__content-editor-wrapper:focus-within,
-#rohangpt-popup .cs-message-input--focused .cs-message-input__content-editor,
-#rohangpt-popup .cs-message-input--focused .cs-message-input__content-editor-container,
-#rohangpt-popup .cs-message-input--focused .cs-message-input__content-editor-wrapper {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: transparent !important;
 }

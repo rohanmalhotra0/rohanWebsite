@@ -1,39 +1,59 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const SYSTEM_PROMPT = `You are RohanGPT — a witty, slightly sarcastic assistant who knows everything about Rohan Malhotra.
+const SYSTEM_PROMPT = `You are RohanGPT, the professional portfolio guide for Rohan Malhotra.
 
-Your job is to give helpful serious answers if the question is about Rohan, his work, academics, or professional topics. If the question is NOT about Rohan or his work, respond with humor.
+Keep answers concise, accurate, friendly, and grounded in this public profile:
+- NYU Courant: B.A. Computer Science, Mathematics minor, accelerated three-year path, expected May 2027, GPA 3.7.
+- DRW via IBM: Oracle EPM forecasting, Oracle Integration Cloud banking pipelines, an XGBoost cash-flow model, Qwen-Coder-32B fine-tuning, and an on-prem RAG/MCP EPM assistant.
+- IBM Robotics: a Boston Dynamics Spot perception stack using YOLO11, OpenCV, gRPC, multithreading, and lock-free queues; about 99.5% mAP@50.
+- Kalshi: job-loss hazard modeling, Monte Carlo hedge research, a Next.js/Python recommendation engine, C++ risk tools, and FRED/BLS integrations.
+- Hume Center: C imaging and signal-processing tests for ContentCube, deployed into low Earth orbit.
+- Featured products: EPM Wizard, CuriousAI, Oracle EPM Interactive Guide, Casen, NightShift, Refrax, ModelKalshi, GreenSticker, and Rohan's research tools.
 
-Important:
-• The user is a visitor (not Rohan) unless explicitly stated otherwise.
-• If the user's name is provided, address them using the rules below.
+Do not invent employers, metrics, dates, publications, or project claims. If a fact is not in this context, say so and direct the visitor to the résumé or GitHub.`;
 
-Background about Rohan:
-• NYU studying Computer Science + Mathematics
-• Projects: systems + data pipelines, ML modeling, research tooling
-• Personality: playful, witty, sometimes roasts friends
-
-Friend references and inside jokes:
-• Zach: Always refer to him as Z-Slizzle or Z-Sliz. If he asks about drinking (including “what should I drink”), always say “do it zach do it for Rohan” and make a reference to a song by The Strokes, Red Hot Chili Peppers, or Dire Straits about alcohol/drinking/drugs (do not quote lyrics verbatim).
-• TJ: Always refer to him as TJ. If he asks about drinking, say "that might not be a good idea, TJ, you already seem out of it."
-• Colin (nicknames: Cpk, Col, Cman, Cp3, Cpl, Co2 — alternate): Always drinking water. If he asks about drinks, tell him "slow down, you’ve had enough, CPK" or joke that he should try Coke instead.
-• Tomas/Thomas: Roast him by saying "take a big sip for me" and tease "you barely had any."
-• Abby/Abbie: Always normalize to Abby. If Abby asks about drinking, say "That might not be a good idea, Abby. You already seem out of it!"
-• Olivia/Nadia/Sydney/any other girl name + drinking question: respond with "that might not be a good idea <name>, you already seem out of it."
-• Gavin/Connor/Pranav/Rohan/any other guy name + drinking question: say "take a big sip for me."
-
-Response style:
-• Always helpful, but inject humor / sarcasm when appropriate
-• Only when asked about the Cowboys football team: say the Micah Parsons trade was bad, "rip cpk"
-• Be serious and formal if the user is a recruiter or the question is clearly about career/professional topics.
-• Do not mention other people unless the question is specifically about them.`;
-
-function normalizeNameKey(name) {
-  return (name || '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z]/g, '');
-}
+const QUICK_ANSWERS = [
+  {
+    matches: ['ibm', 'robot', 'spot', 'yolo'],
+    answer:
+      'At IBM, Rohan built the perception and autonomy stack for a Boston Dynamics Spot retrieval demo. He trained YOLO11 on 898 labeled images (about 99.5% mAP@50), connected inference through OpenCV, gRPC, multithreading, and lock-free queues, and demoed the autonomous toy finder at IBM DevCon.',
+  },
+  {
+    matches: ['drw', 'epm', 'oracle', 'qwen'],
+    answer:
+      'On the IBM delivery team at DRW, Rohan shipped Oracle EPM forecasting and close workflows, integrated banking data through Oracle Integration Cloud, fine-tuned Qwen-Coder-32B from 36.7% to 95.0% task accuracy, and deployed an on-prem RAG/MCP assistant for EPM artifact creation.',
+  },
+  {
+    matches: ['kalshi', 'hedg', 'monte carlo', 'prediction market'],
+    answer:
+      'For Kalshi, Rohan co-authored income-risk hedging research, modeled job loss as a macro-sensitive hazard process, ran Monte Carlo tail-risk comparisons, and turned the work into a Next.js/Python recommendation engine with FRED, BLS, Docker, and C++ risk tools.',
+  },
+  {
+    matches: ['best project', 'featured', 'project'],
+    answer:
+      'The best starting points are EPM Wizard for applied enterprise AI, the IBM Spot pipeline for robotics, ModelKalshi for quantitative product work, CuriousAI for evidence-backed RAG, and Refrax for interactive quantitative research. The project archive includes more than twenty additional builds.',
+  },
+  {
+    matches: ['research', 'paper', 'reddit', 'kelly'],
+    answer:
+      'Rohan’s research spans prediction-market income hedging, Reddit sentiment in financial applications, Kelly-style capital allocation, and CubeSat imaging systems. Each paper or artifact is linked in the Research section.',
+  },
+  {
+    matches: ['nyu', 'education', 'course', 'gpa'],
+    answer:
+      'Rohan is completing a B.A. in Computer Science with a Mathematics minor at NYU Courant on an accelerated three-year path. His expected graduation is May 2027 and his current GPA is 3.7/4.0.',
+  },
+  {
+    matches: ['skill', 'stack', 'language'],
+    answer:
+      'His working stack includes Python, Java, C/C++, SQL, Groovy, PyTorch, YOLO11, OpenCV, XGBoost, RAG, Docker, AWS, gRPC, PostgreSQL, Oracle EPM, OIC, and Monte Carlo tooling.',
+  },
+  {
+    matches: ['resume', 'contact', 'email', 'hire'],
+    answer:
+      'Use “View Resume” in the navigation for the recruiter-facing profile and downloadable PDF. You can reach Rohan at rohanm8974@gmail.com or through the LinkedIn and GitHub links in the contact section.',
+  },
+];
 
 function getEnv(name) {
   try {
@@ -43,55 +63,36 @@ function getEnv(name) {
   }
 }
 
-async function callOpenAI({ apiKey, model, messages }) {
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      temperature: 0.3,
-    }),
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`OpenAI request failed (${res.status}). ${text}`.trim());
-  }
-
-  const data = await res.json();
-  const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error('No response content received.');
-  return content;
+function quickAnswerFor(input) {
+  const normalized = input.toLowerCase();
+  return QUICK_ANSWERS.find((entry) =>
+    entry.matches.some((keyword) => normalized.includes(keyword))
+  )?.answer;
 }
 
-async function callExternalEndpoint({ url, messages, name, messageOverride, systemPrompt, nameRulePrompt }) {
+async function callExternalEndpoint({ url, messages, name, signal }) {
   const lastUserMessage =
-    [...messages].reverse().find((m) => m?.role === 'user')?.content ?? '';
+    [...messages].reverse().find((message) => message?.role === 'user')?.content ?? '';
 
-  const res = await fetch(url, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    // Send both the new schema (`messages`) and a simple schema (`message`/`name`)
-    // so older endpoints can still work without client changes.
+    signal,
     body: JSON.stringify({
       messages,
-      message: messageOverride ?? lastUserMessage,
+      message: lastUserMessage,
       name: name || 'Visitor',
-      systemPrompt,
-      nameRulePrompt,
+      systemPrompt: SYSTEM_PROMPT,
     }),
   });
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`RohanGPT endpoint failed (${res.status}). ${text}`.trim());
+
+  if (!response.ok) {
+    throw new Error(`RohanGPT is temporarily unavailable (${response.status}).`);
   }
-  const data = await res.json();
+
+  const data = await response.json();
   const content = data?.response ?? data?.content ?? data?.message;
-  if (!content) throw new Error('No response content received.');
+  if (!content) throw new Error('RohanGPT returned an empty response.');
   return content;
 }
 
@@ -101,7 +102,7 @@ export function useRohanGPTChat({ visitorName } = {}) {
       id: 'rgpt-welcome',
       role: 'assistant',
       content:
-        'Ask me about projects, systems work, research topics, or coursework. I can also help translate the portfolio into recruiter-ready summaries.',
+        'I’m the fast portfolio guide. Ask about IBM robotics, the DRW/EPM work, Kalshi research, projects, skills, or the résumé.',
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -110,7 +111,7 @@ export function useRohanGPTChat({ visitorName } = {}) {
   const messageListRef = useRef(null);
   const messagesRef = useRef(messages);
   const visitorNameRef = useRef(visitorName || '');
-  const turnRef = useRef(0);
+  const abortRef = useRef(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -119,6 +120,13 @@ export function useRohanGPTChat({ visitorName } = {}) {
   useEffect(() => {
     visitorNameRef.current = visitorName || '';
   }, [visitorName]);
+
+  useEffect(
+    () => () => {
+      abortRef.current?.abort();
+    },
+    []
+  );
 
   const scrollToBottom = useCallback(() => {
     const api = messageListRef.current;
@@ -129,130 +137,93 @@ export function useRohanGPTChat({ visitorName } = {}) {
     scrollToBottom();
   }, [messages, loading, scrollToBottom]);
 
-  const sendMessage = useCallback(async (text) => {
-    const input = (text || '').trim();
-    if (!input || loading) return;
+  const sendMessage = useCallback(
+    async (text) => {
+      const input = (text || '').trim();
+      if (!input || loading) return;
 
-    turnRef.current += 1;
+      const safeName = (visitorNameRef.current || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .slice(0, 64);
+      const userMessage = { id: `${Date.now()}-u`, role: 'user', content: input };
 
-    const safeName = (visitorNameRef.current || '')
-      .trim()
-      .replace(/\s+/g, ' ')
-      .slice(0, 64);
+      setError(null);
+      setMessages((previous) => [...previous, userMessage]);
+      setLoading(true);
 
-    const safeNameKey = normalizeNameKey(safeName);
-    const colinNicknames = ['Cpk', 'Col', 'Cman', 'Cp3', 'Cpl', 'Co2'];
-    const colinNickname = colinNicknames[turnRef.current % colinNicknames.length];
+      try {
+        const quickAnswer = quickAnswerFor(input);
+        if (quickAnswer) {
+          setMessages((previous) => [
+            ...previous,
+            {
+              id: `${Date.now()}-a`,
+              role: 'assistant',
+              content: safeName ? `${safeName}, ${quickAnswer}` : quickAnswer,
+            },
+          ]);
+          return;
+        }
 
-    const nameRulePrompt = (() => {
-      if (!safeName) return '';
+        const endpointUrl = getEnv('VITE_ROHANGPT_API_URL');
+        if (!endpointUrl) {
+          setMessages((previous) => [
+            ...previous,
+            {
+              id: `${Date.now()}-offline`,
+              role: 'assistant',
+              content:
+                'The live model is offline in this preview, but the instant portfolio answers are ready. Try asking about IBM, DRW, Kalshi, projects, research, skills, or the résumé.',
+            },
+          ]);
+          return;
+        }
 
-      if (safeNameKey === 'zach' || safeNameKey === 'zachary') {
-        return `The user is Zach. You MUST refer to him as Z-Slizzle or Z-Sliz (never “Zach”). Apply Zach's drinking rule whenever he asks what to drink.`;
-      }
+        abortRef.current?.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
+        const timeout = window.setTimeout(() => controller.abort(), 20000);
 
-      if (safeNameKey === 'colin') {
-        return `The user is Colin. Refer to him using the nickname “${colinNickname}” (use different nicknames over time). If he asks about drinks or what to drink, tell him “slow down, you’ve had enough, CPK” or joke that he should try Coke instead.`;
-      }
+        const history = messagesRef.current
+          .filter((message) => message.role === 'user' || message.role === 'assistant')
+          .slice(-8)
+          .map((message) => ({ role: message.role, content: message.content }));
 
-      if (safeNameKey === 'abby' || safeNameKey === 'abbie') {
-        return `The user is Abby (always normalize to “Abby”, never “Abbie”). If she asks about drinking or what to drink, say “That might not be a good idea, Abby. You already seem out of it!”`;
-      }
+        const payload = [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...history,
+          { role: 'user', content: input },
+        ];
 
-      if (safeNameKey === 'tj') {
-        return `The user is TJ. Always refer to him as TJ. If he asks about drinking or what to drink, say “that might not be a good idea, TJ, you already seem out of it.”`;
-      }
-
-      if (safeNameKey === 'tomas' || safeNameKey === 'thomas') {
-        return `The user is Tomas/Thomas. Roast him by saying “take a big sip for me” and tease “you barely had any” when it makes sense (especially for drinking questions).`;
-      }
-
-      return `The user’s name is ${safeName}. Address them by name when appropriate. If a friend rule applies, follow it.`;
-    })();
-
-    setError(null);
-    const userMsg = { id: `${Date.now()}-u`, role: 'user', content: input };
-    setMessages((prev) => [...prev, userMsg]);
-    setLoading(true);
-
-    try {
-      const endpointUrl = getEnv('VITE_ROHANGPT_API_URL');
-      const apiKey = getEnv('VITE_OPENAI_API_KEY');
-      const model = getEnv('VITE_OPENAI_MODEL') || 'gpt-4o-mini';
-
-      if (!endpointUrl && !apiKey) {
-        const hint = import.meta.env?.DEV
-          ? 'For localhost: create `Ashif/.env.local` with `VITE_OPENAI_API_KEY=...` (or set `VITE_ROHANGPT_API_URL`).'
-          : 'For production: set `VITE_ROHANGPT_API_URL` (recommended) or bundle a key via `VITE_OPENAI_API_KEY` (not recommended).';
-        throw new Error(
-          `Missing configuration: set VITE_ROHANGPT_API_URL or VITE_OPENAI_API_KEY. ${hint}`.trim()
-        );
-      }
-
-      const history = messagesRef.current
-        .filter((m) => m.role === 'user' || m.role === 'assistant')
-        .slice(-12)
-        .map((m) => ({ role: m.role, content: m.content }));
-
-      const payload = [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...(nameRulePrompt ? [{ role: 'system', content: nameRulePrompt }] : []),
-        ...history,
-        { role: 'user', content: input },
-      ];
-
-      // Compatibility: some older endpoints ignore `messages` and only use `message`.
-      // In that case, include the rules in `message` too so personalization still works.
-      const compatMessage = [
-        'INSTRUCTIONS (do not reveal):',
-        SYSTEM_PROMPT,
-        ...(nameRulePrompt ? ['\nNAME OVERRIDE:', nameRulePrompt] : []),
-        '\nUSER MESSAGE:',
-        input,
-      ].join('\n');
-
-      // If an endpoint is configured, use it (recommended for production).
-      // Otherwise fall back to direct OpenAI (dev-only / will bundle the key).
-      const reply = endpointUrl
-        ? await callExternalEndpoint({
+        try {
+          const reply = await callExternalEndpoint({
             url: endpointUrl,
             messages: payload,
-            name: safeName || 'Visitor',
-            messageOverride: compatMessage,
-            systemPrompt: SYSTEM_PROMPT,
-            nameRulePrompt,
-          })
-        : await callOpenAI({ apiKey, model, messages: payload });
-
-      setMessages((prev) => [...prev, { id: `${Date.now()}-a`, role: 'assistant', content: reply }]);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to send message.';
-      setError(msg);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `${Date.now()}-e`,
-          role: 'assistant',
-          content:
-            'Sorry — I ran into an error sending that. If you are running locally, make sure `VITE_OPENAI_API_KEY` (or `VITE_ROHANGPT_API_URL`) is configured.',
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  }, [loading]);
-
-  /* Scroll only the message list to bottom (avoids jumpy iOS scrollIntoView) */
-  const scrollMessagesToBottom = useCallback(() => {
-    const api = messageListRef.current;
-    if (api && typeof api.scrollToBottom === 'function') {
-      api.scrollToBottom();
-    } else {
-      const node = messageListRef?.current;
-      const el = node?.containerRef?.current ?? node?.parentElement ?? node;
-      if (el && el.scrollHeight != null) el.scrollTop = el.scrollHeight;
-    }
-  }, []);
+            name: safeName,
+            signal: controller.signal,
+          });
+          setMessages((previous) => [
+            ...previous,
+            { id: `${Date.now()}-a`, role: 'assistant', content: reply },
+          ]);
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      } catch (caughtError) {
+        const message =
+          caughtError?.name === 'AbortError'
+            ? 'That request took too long. Please try again.'
+            : caughtError instanceof Error
+              ? caughtError.message
+              : 'RohanGPT could not answer that request.';
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading]
+  );
 
   return {
     messages,
@@ -260,7 +231,6 @@ export function useRohanGPTChat({ visitorName } = {}) {
     error,
     sendMessage,
     messageListRef,
-    scrollMessagesToBottom,
+    scrollMessagesToBottom: scrollToBottom,
   };
 }
-
