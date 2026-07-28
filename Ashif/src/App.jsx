@@ -10,6 +10,7 @@ import Skills from './components/Skills';
 import ContactForm from './components/ContactForm';
 import SocialMagnet from './components/SocialMagnet';
 import ResumeView from './components/ResumeView';
+import { SmoothCursor } from './components/ui/smooth-cursor';
 import './App.css';
 
 const RohanGPT = lazy(() => import('./components/RohanGPT'));
@@ -41,6 +42,7 @@ function useResumeRoute() {
 function Portfolio() {
   return (
     <>
+      <SmoothCursor />
       <a
         href="#main-content"
         className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black"

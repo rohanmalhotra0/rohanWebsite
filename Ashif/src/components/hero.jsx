@@ -60,16 +60,12 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="top"
-      className="relative flex min-h-dvh w-full items-end overflow-hidden bg-[#8d8d89] text-white"
+      className="relative flex min-h-dvh w-full items-end overflow-hidden bg-[#f2f2f0] text-gray-950"
     >
-      <div className="absolute inset-0">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(#b5b5b1_1px,transparent_1px),linear-gradient(90deg,#b5b5b1_1px,transparent_1px)] bg-[size:44px_44px] opacity-45"
-          aria-hidden="true"
-        />
+      <div className="absolute inset-0 bg-[#f2f2f0]">
         <div
           className={cn(
-            'absolute inset-0 transition-opacity duration-200',
+            'absolute inset-x-0 top-0 h-3/5 transition-opacity duration-200 md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-3/5 lg:w-7/12',
             robotReady ? 'opacity-100' : 'opacity-0'
           )}
         >
@@ -81,42 +77,45 @@ export default function Hero() {
                 aria-label="Interactive 3D robot"
                 onLoad={(spline) => {
                   splineRef.current = spline;
-                  [
-                    'ROBOT',
-                    'Robot',
-                    'robot',
-                    'Text',
-                    'text',
-                    'BackgroundText',
-                    'Title',
-                  ].forEach((name) => {
+                  spline?.setBackgroundColor?.('#f2f2f0');
+
+                  const textNamePattern =
+                    /text|title|heading|headline|word|copy|label|logo/i;
+
+                  const sceneObjects = Array.from(
+                    spline?.getAllObjects?.() || []
+                  );
+
+                  sceneObjects.forEach((object) => {
                     try {
-                      const object = spline?.findObjectByName?.(name);
-                      if (object && /text|title/i.test(name)) object.visible = false;
+                      if (
+                        object.type === 'Text' ||
+                        textNamePattern.test(object.name || '')
+                      ) {
+                        object.hide?.();
+                        object.visible = false;
+                      }
                     } catch {
-                      // Spline object labels vary between scene exports.
+                      // Keep the robot running if an exported layer is immutable.
                     }
                   });
+
                   setRobotReady(true);
                 }}
               />
             </Suspense>
           </RobotBoundary>
         </div>
-        <div
-          className="pointer-events-none absolute inset-0 bg-black/45"
-          aria-hidden="true"
-        />
       </div>
 
-      <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-5 pb-24 pt-32 sm:px-8 md:px-12 md:pb-16 lg:px-16">
-        <div className="max-w-4xl self-end">
-          <h1 className="max-w-4xl text-balance font-pixel text-[clamp(2.55rem,7vw,6.2rem)] font-bold leading-[0.94] text-white">
+      <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-5 pb-24 pt-[55dvh] sm:px-8 md:px-12 md:pb-16 md:pt-32 lg:px-16">
+        <div className="max-w-xl self-end">
+          <h1 className="max-w-xl text-balance font-pixel text-[clamp(2.5rem,6.4vw,5.5rem)] font-bold leading-[0.94] text-gray-950">
             Rohan
-            <span className="block text-white/55">Malhotra.</span>
+            <span className="block text-gray-500">Malhotra</span>
           </h1>
 
-          <div className="mt-6 min-h-9 text-xl font-medium text-white sm:text-2xl">
+          <div className="mt-6 min-h-9 text-xl font-medium text-gray-800 sm:text-2xl">
             <RotatingText
               texts={focusAreas}
               rotationInterval={2800}
@@ -131,21 +130,21 @@ export default function Hero() {
             />
           </div>
 
-          <p className="mt-5 max-w-2xl text-pretty text-base leading-7 text-white/70 sm:text-lg">
+          <p className="mt-5 max-w-lg text-pretty text-base leading-7 text-gray-600 sm:text-lg">
             {profile.summary}
           </p>
 
           <div className="pointer-events-auto mt-8 flex flex-wrap gap-3">
             <a
               href="#projects"
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
             >
               Explore the work
               <ArrowDownRight className="size-4" aria-hidden="true" />
             </a>
             <a
               href="#/resume"
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-white/35 bg-black/30 px-5 py-3 text-sm font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white/80 px-5 py-3 text-sm font-semibold text-gray-950 shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
             >
               <FileText className="size-4" aria-hidden="true" />
               View Resume
@@ -154,7 +153,7 @@ export default function Hero() {
               href={profile.github}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 px-2 py-3 text-sm font-semibold text-white/75 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex min-h-11 items-center gap-2 px-2 py-3 text-sm font-semibold text-gray-600 hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
             >
               GitHub
               <ArrowUpRight className="size-4" aria-hidden="true" />

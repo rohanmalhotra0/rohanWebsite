@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react"
-import { motion, useSpring } from "motion/react"
+import { motion, useReducedMotion, useSpring } from "motion/react"
 
 interface Position {
   x: number
@@ -93,12 +93,15 @@ export function SmoothCursor({
     restDelta: 0.001,
   },
 }: SmoothCursorProps) {
-  const [isMoving, setIsMoving] = useState(false)
+  const reduceMotion = useReducedMotion()
+  const [isVisible, setIsVisible] = useState(false)
+  const isVisibleRef = useRef(false)
   const lastMousePos = useRef<Position>({ x: 0, y: 0 })
   const velocity = useRef<Position>({ x: 0, y: 0 })
   const lastUpdateTime = useRef(Date.now())
   const previousAngle = useRef(0)
   const accumulatedRotation = useRef(0)
+  const movementTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const cursorX = useSpring(0, springConfig)
   const cursorY = useSpring(0, springConfig)
@@ -114,6 +117,9 @@ export function SmoothCursor({
   })
 
   useEffect(() => {
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)")
+    if (!finePointer.matches) return
+
     const updateVelocity = (currentPos: Position) => {
       const currentTime = Date.now()
       const deltaTime = currentTime - lastUpdateTime.current
@@ -137,8 +143,18 @@ export function SmoothCursor({
         Math.pow(velocity.current.x, 2) + Math.pow(velocity.current.y, 2)
       )
 
-      cursorX.set(currentPos.x)
-      cursorY.set(currentPos.y)
+      if (!isVisibleRef.current || reduceMotion) {
+        cursorX.jump(currentPos.x)
+        cursorY.jump(currentPos.y)
+      } else {
+        cursorX.set(currentPos.x)
+        cursorY.set(currentPos.y)
+      }
+
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true
+        setIsVisible(true)
+      }
 
       if (speed > 0.1) {
         if (rotateToVelocity) {
@@ -158,14 +174,10 @@ export function SmoothCursor({
         }
 
         scale.set(0.95)
-        setIsMoving(true)
-
-        const timeout = setTimeout(() => {
+        if (movementTimeout.current) clearTimeout(movementTimeout.current)
+        movementTimeout.current = setTimeout(() => {
           scale.set(1)
-          setIsMoving(false)
         }, 150)
-
-        return () => clearTimeout(timeout)
       }
     }
 
@@ -179,18 +191,37 @@ export function SmoothCursor({
       })
     }
 
-    document.body.style.cursor = "none"
+    const showFancyCursor = () => {
+      if (isVisibleRef.current) setIsVisible(true)
+    }
+    const hideFancyCursor = () => setIsVisible(false)
+
+    document.documentElement.dataset.fancyCursor = "true"
     window.addEventListener("mousemove", throttledMouseMove)
+    document.documentElement.addEventListener("mouseenter", showFancyCursor)
+    document.documentElement.addEventListener("mouseleave", hideFancyCursor)
 
     return () => {
       window.removeEventListener("mousemove", throttledMouseMove)
-      document.body.style.cursor = "auto"
+      document.documentElement.removeEventListener("mouseenter", showFancyCursor)
+      document.documentElement.removeEventListener("mouseleave", hideFancyCursor)
+      delete document.documentElement.dataset.fancyCursor
       if (rafId) cancelAnimationFrame(rafId)
+      if (movementTimeout.current) clearTimeout(movementTimeout.current)
     }
-  }, [cursorX, cursorY, idleRotationDeg, rotateToVelocity, rotation, scale])
+  }, [
+    cursorX,
+    cursorY,
+    idleRotationDeg,
+    reduceMotion,
+    rotateToVelocity,
+    rotation,
+    scale,
+  ])
 
   return (
     <motion.div
+      data-fancy-cursor-overlay=""
       style={{
         position: "fixed",
         left: cursorX,
@@ -203,13 +234,10 @@ export function SmoothCursor({
         pointerEvents: "none",
         willChange: "transform",
       }}
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{
-        type: "spring",
-        stiffness: 400,
-        damping: 30,
-      }}
+      aria-hidden="true"
+      initial={false}
+      animate={{ opacity: isVisible ? 1 : 0 }}
+      transition={{ duration: 0.1, ease: "easeOut" }}
     >
       {cursor}
     </motion.div>

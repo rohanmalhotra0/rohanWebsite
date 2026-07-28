@@ -85,6 +85,11 @@
     cursor: pointer;
   }
 
+  html[data-fancy-cursor='true'],
+  html[data-fancy-cursor='true'] * {
+    cursor: none !important;
+  }
+
   ::selection {
     background: #fde047;
     color: #111111;
