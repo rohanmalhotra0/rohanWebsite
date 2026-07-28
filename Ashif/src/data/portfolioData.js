@@ -116,7 +116,7 @@ export const workExperience = [
   },
   {
     company: 'Hume Center',
-    role: 'Systems Engineering Researcher',
+    role: 'Aerospace Researcher',
     location: 'Blacksburg, VA',
     date: 'Research experience',
     imageUrl: assetUrl('website-photos/work/hume-center-logo.jpg'),
