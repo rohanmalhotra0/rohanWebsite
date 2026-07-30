@@ -28,13 +28,13 @@ export default function Navbar({ variant = 'dark' }) {
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-5',
+        'fixed inset-x-0 top-0 z-50 px-2 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5 sm:pt-[max(0.75rem,env(safe-area-inset-top))]',
         dark ? 'text-white' : 'text-black'
       )}
     >
       <nav
         className={cn(
-          'mx-auto flex max-w-7xl items-center justify-between rounded-xl border px-3 py-2 shadow-sm',
+          'mx-auto flex max-w-7xl items-center justify-between rounded-xl border px-2 py-2 shadow-sm sm:px-3',
           dark
             ? 'border-white/15 bg-black/80'
             : 'border-black/10 bg-white/95'
@@ -44,8 +44,8 @@ export default function Navbar({ variant = 'dark' }) {
         <a
           href="#top"
           onClick={(event) => scrollToHash(event, '#top')}
-          className="rounded-md px-2 py-2 font-pixel text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
-          aria-label="Rohan Malhotra — back to top"
+          className="rounded-md px-1.5 py-2 font-pixel text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current sm:px-2"
+          aria-label="Rohan Malhotra, back to top"
         >
           RM
           <span className="text-yellow-300">.</span>
@@ -67,11 +67,11 @@ export default function Navbar({ variant = 'dark' }) {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <a
             href="#/resume"
             className={cn(
-              'inline-flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2',
+              'inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] font-semibold transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:gap-2 sm:px-3 sm:text-xs',
               dark
                 ? 'bg-white text-black focus-visible:outline-white'
                 : 'bg-black text-white focus-visible:outline-black'

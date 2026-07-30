@@ -32,8 +32,8 @@ function useResumeRoute() {
 
   useEffect(() => {
     document.title = isResume
-      ? 'Rohan Malhotra — Resume'
-      : 'Rohan Malhotra — Applied AI, Robotics & Quant Systems';
+      ? 'Rohan Malhotra Resume'
+      : "Rohan's Portfolio";
   }, [isResume]);
 
   return isResume;

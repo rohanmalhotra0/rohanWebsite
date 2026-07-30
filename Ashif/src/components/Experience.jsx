@@ -7,7 +7,7 @@ function WorkLogo({ job }) {
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className="flex h-28 items-center justify-center overflow-hidden border-b border-gray-200 bg-[#f4f4f2] px-6 py-4">
+    <div className="flex h-24 items-center justify-center overflow-hidden border-b border-gray-200 bg-[#f4f4f2] px-5 py-3 sm:h-28 sm:px-6 sm:py-4">
       {failed ? (
         <span className="font-pixel text-sm text-gray-900">{job.company}</span>
       ) : (
@@ -30,9 +30,9 @@ function ExperienceCard({ job }) {
       <WorkLogo job={job} />
 
       <div className="flex min-w-0 flex-1 flex-col p-4">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col items-start gap-1 sm:flex-row sm:justify-between sm:gap-3">
           <p className="text-sm font-semibold text-amber-700">{job.company}</p>
-          <p className="shrink-0 text-right text-xs text-gray-500">{job.date}</p>
+          <p className="shrink-0 text-left text-xs text-gray-500 sm:text-right">{job.date}</p>
         </div>
 
         <h3 className="mt-2 text-balance text-lg font-semibold text-gray-950">
@@ -92,7 +92,7 @@ export default function Experience() {
   return (
     <section
       id="experience"
-      className="relative scroll-mt-24 overflow-hidden border-y border-gray-200 bg-[#ececea] px-5 py-20 text-gray-950 sm:px-8 md:px-12 lg:px-16 lg:py-24"
+      className="relative scroll-mt-24 overflow-hidden border-y border-gray-200 bg-[#ececea] px-4 py-16 text-gray-950 sm:px-8 sm:py-20 md:px-12 lg:px-16 lg:py-24"
     >
       <div
         className="absolute inset-0 bg-[linear-gradient(#d7d7d4_1px,transparent_1px),linear-gradient(90deg,#d7d7d4_1px,transparent_1px)] bg-[size:44px_44px] opacity-70"
@@ -106,7 +106,7 @@ export default function Experience() {
           description="My recent work includes Oracle forecasting at DRW through IBM, real-time vision for Boston Dynamics Spot, and income-risk research for Kalshi. Expand a card for the details."
         />
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 xl:grid-cols-3">
           {workExperience.map((job) => (
             <ExperienceCard
               key={`${job.company}-${job.role}`}

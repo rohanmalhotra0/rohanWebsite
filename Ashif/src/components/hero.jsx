@@ -65,7 +65,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[#f2f2f0]">
         <div
           className={cn(
-            'absolute inset-x-0 top-0 h-3/5 transition-opacity duration-200 md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-3/5 lg:w-7/12',
+            'absolute inset-x-0 top-14 h-[40dvh] transition-opacity duration-200 sm:top-0 sm:h-1/2 md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-3/5 lg:w-7/12',
             robotReady ? 'opacity-100' : 'opacity-0'
           )}
         >
@@ -108,14 +108,14 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-5 pb-24 pt-[55dvh] sm:px-8 md:px-12 md:pb-16 md:pt-32 lg:px-16">
+      <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-4 pb-16 pt-[43dvh] sm:px-8 sm:pb-20 sm:pt-[50dvh] md:px-12 md:pb-16 md:pt-32 lg:px-16">
         <div className="max-w-xl self-end">
           <h1 className="max-w-xl text-balance font-pixel text-[clamp(2.5rem,6.4vw,5.5rem)] font-bold leading-[0.94] text-gray-950">
             Rohan
             <span className="block text-gray-500">Malhotra</span>
           </h1>
 
-          <div className="mt-6 min-h-9 text-xl font-medium text-gray-800 sm:text-2xl">
+          <div className="mt-4 min-h-8 text-lg font-medium text-gray-800 sm:mt-6 sm:min-h-9 sm:text-2xl">
             <RotatingText
               texts={focusAreas}
               rotationInterval={2800}
@@ -130,21 +130,21 @@ export default function Hero() {
             />
           </div>
 
-          <p className="mt-5 max-w-lg text-pretty text-base leading-7 text-gray-600 sm:text-lg">
+          <p className="mt-4 max-w-lg text-pretty text-[15px] leading-6 text-gray-600 sm:mt-5 sm:text-lg sm:leading-7">
             {profile.summary}
           </p>
 
-          <div className="pointer-events-auto mt-8 flex flex-wrap gap-3">
+          <div className="pointer-events-auto mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
             <a
               href="#projects"
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-black px-3 py-3 text-[13px] font-semibold text-white shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black sm:gap-2 sm:px-5 sm:text-sm"
             >
               Explore the work
               <ArrowDownRight className="size-4" aria-hidden="true" />
             </a>
             <a
               href="#/resume"
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white/80 px-5 py-3 text-sm font-semibold text-gray-950 shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-gray-300 bg-white/80 px-3 py-3 text-[13px] font-semibold text-gray-950 shadow-sm transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black sm:gap-2 sm:px-5 sm:text-sm"
             >
               <FileText className="size-4" aria-hidden="true" />
               View Resume
@@ -153,7 +153,7 @@ export default function Hero() {
               href={profile.github}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 px-2 py-3 text-sm font-semibold text-gray-600 hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              className="inline-flex min-h-11 items-center gap-1.5 px-1 py-3 text-[13px] font-semibold text-gray-600 hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black sm:gap-2 sm:px-2 sm:text-sm"
             >
               GitHub
               <ArrowUpRight className="size-4" aria-hidden="true" />

@@ -6,7 +6,7 @@ export default function Research() {
   return (
     <section
       id="research"
-      className="relative scroll-mt-24 overflow-hidden bg-white px-5 py-24 sm:px-8 md:px-12 lg:px-16 lg:py-32"
+      className="relative scroll-mt-24 overflow-hidden bg-white px-4 py-16 sm:px-8 sm:py-24 md:px-12 lg:px-16 lg:py-32"
     >
       <div className="mx-auto max-w-7xl">
         <SectionHeading
@@ -15,7 +15,7 @@ export default function Research() {
           description="These started as questions I wanted to test: whether sentiment helps explain returns, how prediction contracts can hedge income risk, and how Kelly sizing behaves under drawdowns."
         />
 
-        <div className="mt-14 grid gap-5 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:mt-14 lg:grid-cols-3">
           {research.map((paper) => (
             <article
               key={paper.title}
@@ -30,7 +30,7 @@ export default function Research() {
                   className="size-full object-cover transition-transform duration-200 ease-out group-hover:scale-[1.02]"
                 />
               </figure>
-              <div className="flex flex-1 flex-col p-6">
+              <div className="flex flex-1 flex-col p-5 sm:p-6">
                 <p className="font-pixel text-[11px] text-gray-500">{paper.eyebrow}</p>
                 <h3 className="mt-3 text-balance text-xl font-semibold text-gray-950">
                   {paper.title}

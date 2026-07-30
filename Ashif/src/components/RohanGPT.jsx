@@ -42,7 +42,7 @@ function RohanGPT() {
   return (
     <section
       id="rohangpt"
-      className="relative scroll-mt-24 overflow-hidden bg-white px-5 py-20 text-black sm:px-8 md:px-12 lg:px-16 lg:py-24"
+      className="relative scroll-mt-24 overflow-hidden bg-white px-4 py-16 text-black sm:px-8 sm:py-20 md:px-12 lg:px-16 lg:py-24"
     >
       <div
         className="absolute inset-0 bg-[linear-gradient(#e8e8e8_1px,transparent_1px),linear-gradient(90deg,#e8e8e8_1px,transparent_1px)] bg-[size:44px_44px] opacity-60"
@@ -50,17 +50,17 @@ function RohanGPT() {
       />
 
       <div className="relative z-10 mx-auto max-w-5xl">
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg sm:rounded-2xl">
+          <div className="flex items-start justify-between gap-3 border-b border-gray-200 px-4 py-4 sm:items-center sm:px-5">
             <div>
               <p className="font-pixel text-[11px] text-gray-500">08 / ROHANGPT</p>
               <h2 className="mt-1 text-xl font-semibold text-gray-950">RohanGPT</h2>
             </div>
-            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600">
+            <span className="inline-flex shrink-0 items-center rounded-full bg-gray-100 px-2.5 py-1.5 text-[11px] font-semibold text-gray-600 sm:px-3 sm:text-xs">
               Ask about my work
             </span>
           </div>
-          <div className="h-[32rem] max-h-[70dvh] min-h-96">
+          <div className="h-[28rem] max-h-[65dvh] min-h-80 sm:h-[32rem] sm:max-h-[70dvh] sm:min-h-96">
             <MainContainer>
               <ChatContainer>
                 <MessageList ref={messageListRef} typingIndicator={typingIndicator}>

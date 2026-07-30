@@ -20,7 +20,7 @@ export default function Education() {
   return (
     <section
       id="education"
-      className="relative scroll-mt-24 overflow-hidden bg-[#f7f7f5] px-5 py-24 sm:px-8 md:px-12 lg:px-16 lg:py-32"
+      className="relative scroll-mt-24 overflow-hidden bg-[#f7f7f5] px-4 py-16 sm:px-8 sm:py-24 md:px-12 lg:px-16 lg:py-32"
     >
       <div
         className="absolute inset-0 bg-[linear-gradient(#e4e4e4_1px,transparent_1px),linear-gradient(90deg,#e4e4e4_1px,transparent_1px)] bg-[size:44px_44px] opacity-60"
@@ -33,8 +33,8 @@ export default function Education() {
           description="I’m finishing an accelerated Computer Science degree with a Mathematics minor, and I use the coursework directly in my research and engineering work."
         />
 
-        <article className="mt-14 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[18rem_minmax(0,1fr)]">
-          <div className="border-b border-gray-200 bg-gray-100 p-7 text-gray-950 lg:border-b-0 lg:border-r">
+        <article className="mt-10 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:mt-14 lg:grid-cols-[18rem_minmax(0,1fr)]">
+          <div className="border-b border-gray-200 bg-gray-100 p-5 text-gray-950 sm:p-7 lg:border-b-0 lg:border-r">
             <figure>
               <img
                 src={assetUrl(
@@ -47,38 +47,38 @@ export default function Education() {
                 New York University
               </figcaption>
             </figure>
-            <p className="mt-8 font-pixel text-xs text-gray-500">2024 — 2027</p>
+            <p className="mt-6 font-pixel text-xs text-gray-500 sm:mt-8">2024 to 2027</p>
             <p className="mt-3 flex items-center gap-2 text-sm text-gray-600">
               <MapPin className="size-4" aria-hidden="true" />
               New York, NY
             </p>
           </div>
 
-          <div className="p-7 sm:p-10">
-            <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="p-5 sm:p-10">
+            <div className="flex flex-col items-start gap-5 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-6">
               <div>
                 <p className="text-sm font-semibold text-gray-500">
                   Courant Institute of Mathematical Sciences
                 </p>
-                <h3 className="mt-2 text-balance text-3xl font-semibold text-gray-950">
+                <h3 className="mt-2 text-balance text-2xl font-semibold text-gray-950 sm:text-3xl">
                   B.A. Computer Science · Mathematics minor
                 </h3>
               </div>
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-right">
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-left sm:text-right">
                 <p className="tabular-nums text-xl font-semibold text-gray-950">3.7 / 4.0</p>
                 <p className="mt-1 text-xs text-gray-500">Current GPA</p>
               </div>
             </div>
 
-            <div className="mt-8 grid gap-5 sm:grid-cols-2">
-              <div className="rounded-xl border border-gray-200 p-5">
+            <div className="mt-7 grid gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5">
+              <div className="rounded-xl border border-gray-200 p-4 sm:p-5">
                 <GraduationCap className="size-5 text-gray-950" aria-hidden="true" />
                 <h4 className="mt-4 font-semibold text-gray-950">Accelerated path</h4>
                 <p className="mt-2 text-pretty text-sm leading-6 text-gray-600">
                   Completing the degree in three years, with expected graduation in May 2027.
                 </p>
               </div>
-              <div className="rounded-xl border border-gray-200 p-5">
+              <div className="rounded-xl border border-gray-200 p-4 sm:p-5">
                 <p className="font-pixel text-xs text-gray-500">GRADUATE WORK</p>
                 <h4 className="mt-4 font-semibold text-gray-950">
                   Mathematical Techniques for CS Applications

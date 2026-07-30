@@ -153,14 +153,14 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="relative scroll-mt-24 overflow-hidden bg-[#ededeb] px-5 py-20 text-gray-950 sm:px-8 md:px-12 lg:px-16 lg:py-24"
+      className="relative scroll-mt-24 overflow-hidden bg-[#ededeb] px-4 py-16 text-gray-950 sm:px-8 sm:py-20 md:px-12 lg:px-16 lg:py-24"
     >
       <div
         className="absolute inset-0 bg-[linear-gradient(#d7d7d3_1px,transparent_1px),linear-gradient(90deg,#d7d7d3_1px,transparent_1px)] bg-[size:44px_44px] opacity-65"
         aria-hidden="true"
       />
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+        <div className="flex flex-col justify-between gap-6 sm:gap-8 lg:flex-row lg:items-end">
           <SectionHeading
             eyebrow="03 / PROJECTS"
             title="Projects."
@@ -186,7 +186,10 @@ export default function Projects() {
           </label>
         </div>
 
-        <div className="mt-7 flex flex-wrap gap-2" aria-label="Filter projects">
+        <div
+          className="-mx-4 mt-6 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mt-7 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0"
+          aria-label="Filter projects"
+        >
           {categories.map((item) => (
             <button
               key={item}
@@ -197,7 +200,7 @@ export default function Projects() {
                 setShowAll(false);
               }}
               className={cn(
-                'min-h-10 rounded-full border px-4 py-2 text-xs font-semibold transition-colors duration-150',
+                'min-h-10 shrink-0 snap-start rounded-full border px-4 py-2 text-xs font-semibold transition-colors duration-150',
                 category === item
                   ? 'border-black bg-black text-white'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-gray-500'

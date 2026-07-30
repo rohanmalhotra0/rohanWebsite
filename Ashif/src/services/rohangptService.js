@@ -102,7 +102,7 @@ export function useRohanGPTChat({ visitorName } = {}) {
       id: 'rgpt-welcome',
       role: 'assistant',
       content:
-        'Hey — ask me about the work, projects, research, skills, or résumé.',
+        'Hey, ask me about the work, projects, research, skills, or résumé.',
     },
   ]);
   const [loading, setLoading] = useState(false);

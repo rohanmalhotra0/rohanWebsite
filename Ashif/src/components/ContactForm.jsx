@@ -13,7 +13,7 @@ export default function ContactForm() {
   return (
     <section
       id="contact"
-      className="relative scroll-mt-24 overflow-hidden bg-[#f7f7f5] px-5 pb-36 pt-24 sm:px-8 md:px-12 lg:px-16 lg:pb-40 lg:pt-32"
+      className="relative scroll-mt-24 overflow-hidden bg-[#f7f7f5] px-4 pb-20 pt-16 sm:px-8 sm:pb-36 sm:pt-24 md:px-12 lg:px-16 lg:pb-40 lg:pt-32"
     >
       <div
         className="absolute inset-0 bg-[linear-gradient(#e4e4e4_1px,transparent_1px),linear-gradient(90deg,#e4e4e4_1px,transparent_1px)] bg-[size:44px_44px] opacity-60"
@@ -26,8 +26,8 @@ export default function ContactForm() {
           description="I’m interested in applied AI, robotics, quantitative systems, and developer tools. Send me a note if the work overlaps."
         />
 
-        <div className="mt-14 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[0.72fr_1.28fr]">
-          <aside className="border-b border-gray-200 bg-gray-100 p-7 text-gray-950 sm:p-9 lg:border-b-0 lg:border-r">
+        <div className="mt-10 grid overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:mt-14 lg:grid-cols-[0.72fr_1.28fr]">
+          <aside className="border-b border-gray-200 bg-gray-100 p-5 text-gray-950 sm:p-9 lg:border-b-0 lg:border-r">
             <p className="font-pixel text-xs text-amber-700">NEW YORK, NY</p>
             <h3 className="mt-5 text-balance text-2xl font-semibold">
               Open to ambitious engineering conversations.
@@ -61,7 +61,7 @@ export default function ContactForm() {
           <form
             action="https://formspree.io/f/xrbwdkqb"
             method="POST"
-            className="p-7 sm:p-9"
+            className="p-5 sm:p-9"
           >
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block">
@@ -99,7 +99,7 @@ export default function ContactForm() {
             </label>
             <button
               type="submit"
-              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5"
+              className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 sm:w-auto"
             >
               Send message
               <ArrowUpRight className="size-4" aria-hidden="true" />

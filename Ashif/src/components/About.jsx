@@ -13,7 +13,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative scroll-mt-24 overflow-hidden bg-white px-5 py-24 text-black sm:px-8 md:px-12 lg:px-16 lg:py-32"
+      className="relative scroll-mt-24 overflow-hidden bg-white px-4 py-16 text-black sm:px-8 sm:py-24 md:px-12 lg:px-16 lg:py-32"
     >
       <GridPattern
         width={44}
@@ -27,7 +27,7 @@ export default function About() {
           title="Hi, I’m Rohan."
         />
 
-        <div className="mt-16 grid items-start gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-20">
+        <div className="mt-10 grid items-start gap-10 sm:mt-16 sm:gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-20">
           <InteractivePolaroids />
 
           <MotionDiv
@@ -36,7 +36,7 @@ export default function About() {
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
-            <p className="text-pretty text-xl font-medium leading-8 text-gray-950 sm:text-2xl sm:leading-9">
+            <p className="text-pretty text-lg font-medium leading-7 text-gray-950 sm:text-2xl sm:leading-9">
               I learn by building. If I get curious about prediction markets, I
               make a hedging model. If I want to understand computer vision, I
               train a robot to find a toy. This site is basically the trail of
@@ -49,14 +49,14 @@ export default function About() {
               between finance, robotics, and software that people can actually use.
             </p>
 
-            <div className="mt-7 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
+            <div className="mt-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 sm:mt-7">
               <p className="text-sm leading-6 text-gray-800">
                 Right now: finishing NYU, working across IBM and DRW, and trying
                 not to turn every random idea into another side project.
               </p>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+            <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-gray-600 sm:mt-8">
               <span className="inline-flex items-center gap-2">
                 <MapPin className="size-4" aria-hidden="true" />
                 {profile.location}

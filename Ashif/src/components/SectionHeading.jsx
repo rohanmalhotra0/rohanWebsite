@@ -21,13 +21,13 @@ export default function SectionHeading({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-balance text-4xl font-bold text-gray-950 sm:text-5xl">
+      <h2 className="text-balance text-3xl font-bold text-gray-950 sm:text-5xl">
         <Highlighter action="underline" color="#FDE047">
           {title}
         </Highlighter>
       </h2>
       {description ? (
-        <p className="mt-5 text-pretty text-base leading-7 text-gray-600 sm:text-lg">
+        <p className="mt-4 text-pretty text-[15px] leading-6 text-gray-600 sm:mt-5 sm:text-lg sm:leading-7">
           {description}
         </p>
       ) : null}

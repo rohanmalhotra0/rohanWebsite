@@ -26,25 +26,25 @@ export const heroStats = [
 
 export const photos = [
   {
-    id: 'devcon',
+    id: 'switzerland',
     src: assetUrl('website-photos/me/01.png'),
-    alt: 'Rohan Malhotra speaking with attendees at a technology event',
-    label: 'IBM DevCon',
-    caption: 'Talking through the Spot project after the demo.',
+    alt: 'Rohan Malhotra with another person in front of the Swiss Alps',
+    label: 'Switzerland',
+    caption: 'One of those views that makes you stop and stare.',
   },
   {
-    id: 'portrait',
+    id: 'paragliding',
     src: assetUrl('website-photos/me/04.jpg'),
-    alt: 'Rohan Malhotra outdoors in New York',
-    label: 'New York',
-    caption: 'Most days are split between NYU, projects, and the city.',
+    alt: 'Rohan Malhotra tandem paragliding over a mountain valley and lake',
+    label: 'Paragliding',
+    caption: 'Probably the best way I have ever seen the mountains.',
   },
   {
-    id: 'team',
+    id: 'kayaking',
     src: assetUrl('website-photos/me/09.png'),
-    alt: 'Rohan Malhotra with friends and collaborators',
-    label: 'Good people',
-    caption: 'The work is better when I get to build it with people I trust.',
+    alt: 'Rohan Malhotra kayaking on an alpine lake',
+    label: 'Kayaking',
+    caption: 'A little quieter than most of my side projects.',
   },
   {
     id: 'headshot',
@@ -239,7 +239,7 @@ export const projects = [
     featured: true,
   },
   {
-    title: 'Casen — Consulting Casebook',
+    title: 'Casen: Consulting Casebook',
     slug: 'casen',
     category: 'AI & Systems',
     year: '2026',

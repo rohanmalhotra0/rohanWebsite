@@ -36,7 +36,7 @@ export default function Skills() {
   return (
     <section
       id="skills"
-      className="relative w-full scroll-mt-24 overflow-hidden bg-white py-24 text-black"
+      className="relative w-full scroll-mt-24 overflow-hidden bg-white py-16 text-black sm:py-24"
     >
       <GridPattern
         width={48}
@@ -44,9 +44,9 @@ export default function Skills() {
         className="fill-gray-300/20 stroke-gray-300/55 [mask-image:radial-gradient(620px_circle_at_center,white,transparent)]"
       />
 
-      <div className="container relative z-10 mx-auto text-center">
-        <div className="mb-12 inline-block">
-          <h2 className="underline-wavy-yellow inline-block font-pixel text-4xl font-bold sm:text-5xl">
+      <div className="container relative z-10 mx-auto px-4 text-center sm:px-8">
+        <div className="mb-8 inline-block sm:mb-12">
+          <h2 className="underline-wavy-yellow inline-block text-balance font-pixel text-3xl font-bold sm:text-5xl">
             <Highlighter action="underline" color="#FFD700">
               My Tech Stack
             </Highlighter>
@@ -76,7 +76,7 @@ export default function Skills() {
 
         <VelocityText baseVelocity={-45} numCopies={4}>
           {skillsRow1.map((logo, index) => (
-            <div key={index} className="mx-4 size-20 text-gray-600">
+            <div key={index} className="mx-3 size-16 text-gray-600 sm:mx-4 sm:size-20">
               {logo}
             </div>
           ))}
@@ -84,7 +84,7 @@ export default function Skills() {
 
         <VelocityText baseVelocity={45} numCopies={4}>
           {skillsRow2.map((logo, index) => (
-            <div key={index} className="mx-4 size-20 text-gray-600">
+            <div key={index} className="mx-3 size-16 text-gray-600 sm:mx-4 sm:size-20">
               {logo}
             </div>
           ))}
