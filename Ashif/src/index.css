@@ -90,6 +90,16 @@
     cursor: none !important;
   }
 
+  /* Modal dialogs render in the top layer above the custom cursor overlay. */
+  html[data-fancy-cursor='true']:has(dialog[open]),
+  html[data-fancy-cursor='true']:has(dialog[open]) * {
+    cursor: auto !important;
+  }
+
+  html:has(dialog[open]) [data-fancy-cursor-overlay] {
+    display: none;
+  }
+
   ::selection {
     background: #fde047;
     color: #111111;

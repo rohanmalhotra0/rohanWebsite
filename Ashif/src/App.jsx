@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import Hero from './components/hero';
 import Navbar from './components/Navbar';
 import Experience from './components/Experience';
@@ -19,12 +19,15 @@ function useResumeRoute() {
   const [isResume, setIsResume] = useState(
     () => window.location.hash === '#/resume'
   );
+  const wasResume = useRef(isResume);
 
   useEffect(() => {
     const onHashChange = () => {
       const next = window.location.hash === '#/resume';
       setIsResume(next);
-      if (next) window.scrollTo({ top: 0 });
+      // Only reset scroll when switching views; in-page anchors also fire hashchange.
+      if (wasResume.current !== next) window.scrollTo({ top: 0 });
+      wasResume.current = next;
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
@@ -39,13 +42,55 @@ function useResumeRoute() {
   return isResume;
 }
 
+function RohanGPTPlaceholder({ sectionRef }) {
+  return (
+    <section
+      ref={sectionRef}
+      id="rohangpt"
+      className="bg-white px-5 py-24"
+      aria-label="Loading RohanGPT"
+    >
+      <div className="mx-auto h-96 max-w-5xl animate-pulse rounded-2xl bg-gray-100" />
+    </section>
+  );
+}
+
+// Load the chat bundle only when the visitor nears it, so it doesn't compete
+// with the hero robot during the first load.
+function DeferredRohanGPT() {
+  const placeholderRef = useRef(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const element = placeholderRef.current;
+    if (shouldLoad || !element) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setShouldLoad(true);
+      },
+      { rootMargin: '800px 0px' }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  if (!shouldLoad) return <RohanGPTPlaceholder sectionRef={placeholderRef} />;
+
+  return (
+    <Suspense fallback={<RohanGPTPlaceholder />}>
+      <RohanGPT />
+    </Suspense>
+  );
+}
+
 function Portfolio() {
   return (
     <>
       <SmoothCursor />
       <a
         href="#main-content"
-        className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black"
       >
         Skip to main content
       </a>
@@ -58,15 +103,7 @@ function Portfolio() {
         <About />
         <Education />
         <Skills />
-        <Suspense
-          fallback={
-            <section className="bg-white px-5 py-24" aria-label="Loading RohanGPT">
-              <div className="mx-auto h-96 max-w-5xl animate-pulse rounded-2xl bg-gray-100" />
-            </section>
-          }
-        >
-          <RohanGPT />
-        </Suspense>
+        <DeferredRohanGPT />
         <ContactForm />
       </main>
       <SocialMagnet />

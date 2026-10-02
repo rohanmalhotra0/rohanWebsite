@@ -32,6 +32,10 @@ export default function ResumeView() {
     <div className="resume-view min-h-dvh bg-[#ececea] px-4 py-4 text-gray-950 sm:px-6 sm:py-6">
       <a
         href="#resume-content"
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById('resume-content')?.focus();
+        }}
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-black focus:px-4 focus:py-2 focus:text-white"
       >
         Skip to résumé content
@@ -67,6 +71,7 @@ export default function ResumeView() {
 
       <main
         id="resume-content"
+        tabIndex={-1}
         className="resume-paper mx-auto max-w-5xl rounded-sm bg-white px-6 py-10 shadow-xl sm:px-10 lg:px-14 lg:py-14"
       >
         <header className="grid gap-8 border-b-2 border-black pb-8 md:grid-cols-[1fr_auto] md:items-end">

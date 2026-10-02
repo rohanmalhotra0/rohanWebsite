@@ -33,8 +33,8 @@ function RohanGPT() {
   );
 
   const handleSend = useCallback(
-    (text) => {
-      sendMessage(text);
+    (_html, textContent) => {
+      sendMessage(textContent);
     },
     [sendMessage]
   );
@@ -69,6 +69,7 @@ function RohanGPT() {
                       key={message.id}
                       model={{
                         message: message.content,
+                        type: 'text',
                         sender: message.role,
                         direction:
                           message.role === 'user' ? 'outgoing' : 'incoming',
