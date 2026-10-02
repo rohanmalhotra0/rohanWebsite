@@ -152,6 +152,7 @@ export function SmoothCursor({
       }
 
       if (!isVisibleRef.current) {
+        document.documentElement.dataset.fancyCursor = "true"
         isVisibleRef.current = true
         setIsVisible(true)
       }
@@ -196,7 +197,6 @@ export function SmoothCursor({
     }
     const hideFancyCursor = () => setIsVisible(false)
 
-    document.documentElement.dataset.fancyCursor = "true"
     window.addEventListener("mousemove", throttledMouseMove)
     document.documentElement.addEventListener("mouseenter", showFancyCursor)
     document.documentElement.addEventListener("mouseleave", hideFancyCursor)

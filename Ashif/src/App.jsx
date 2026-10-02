@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import Hero from './components/hero';
 import Navbar from './components/Navbar';
 import Experience from './components/Experience';
@@ -19,12 +19,15 @@ function useResumeRoute() {
   const [isResume, setIsResume] = useState(
     () => window.location.hash === '#/resume'
   );
+  const wasResume = useRef(isResume);
 
   useEffect(() => {
     const onHashChange = () => {
       const next = window.location.hash === '#/resume';
       setIsResume(next);
-      if (next) window.scrollTo({ top: 0 });
+      // Only reset scroll when switching views; in-page anchors also fire hashchange.
+      if (wasResume.current !== next) window.scrollTo({ top: 0 });
+      wasResume.current = next;
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
@@ -45,7 +48,7 @@ function Portfolio() {
       <SmoothCursor />
       <a
         href="#main-content"
-        className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black"
       >
         Skip to main content
       </a>
