@@ -1,11 +1,30 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ArrowDownRight, ArrowUpRight, FileText } from 'lucide-react';
 import RotatingText from './RotatingText';
-import { profile } from '@/data/portfolioData';
+import { assetUrl, profile } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
 
-const Spline = lazy(() => import('@splinetool/react-spline'));
 const ROBOT_SCENE = new URL('../../../scene.splinecode', import.meta.url).href;
+// Self-hosted copy of @splinetool/modelling-wasm; keep its version in sync with
+// @splinetool/runtime (pinned in package.json) so Spline never falls back to unpkg.
+const SPLINE_WASM_PATH = new URL(assetUrl('spline-wasm'), document.baseURI).href;
+
+// Start the scene and wasm downloads alongside the Spline bundle instead of
+// waiting for the runtime to request them one after another.
+function preload(href, type) {
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'fetch';
+  link.type = type;
+  link.crossOrigin = 'anonymous';
+  link.href = href;
+  document.head.appendChild(link);
+}
+preload(ROBOT_SCENE, 'application/octet-stream');
+preload(`${SPLINE_WASM_PATH}/process.wasm`, 'application/wasm');
+
+const splineModule = import('@splinetool/react-spline');
+const Spline = lazy(() => splineModule);
 
 class RobotBoundary extends Component {
   state = { failed: false };
@@ -63,9 +82,28 @@ export default function Hero() {
       className="relative flex min-h-dvh w-full items-end overflow-hidden bg-[#f2f2f0] text-gray-950"
     >
       <div className="absolute inset-0 bg-[#f2f2f0]">
+        {/* Still frame of the robot's first pose; the camera scales with height, so
+            height-fit + centered lines it up with the live scene while it loads. */}
+        <div
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute inset-x-0 top-14 h-[40dvh] overflow-hidden transition-opacity duration-500 sm:top-0 sm:h-1/2 md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-3/5 lg:w-7/12',
+            robotReady ? 'opacity-0' : 'opacity-100'
+          )}
+        >
+          <img
+            src={assetUrl('robot-poster.webp')}
+            alt=""
+            width="1678"
+            height="1800"
+            fetchPriority="high"
+            decoding="async"
+            className="absolute left-1/2 top-0 h-full w-auto max-w-none -translate-x-1/2"
+          />
+        </div>
         <div
           className={cn(
-            'absolute inset-x-0 top-14 h-[40dvh] transition-opacity duration-200 sm:top-0 sm:h-1/2 md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-3/5 lg:w-7/12',
+            'absolute inset-x-0 top-14 h-[40dvh] transition-opacity duration-500 sm:top-0 sm:h-1/2 md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-3/5 lg:w-7/12',
             robotReady ? 'opacity-100' : 'opacity-0'
           )}
         >
@@ -73,6 +111,7 @@ export default function Hero() {
             <Suspense fallback={null}>
               <Spline
                 scene={ROBOT_SCENE}
+                wasmPath={SPLINE_WASM_PATH}
                 renderOnDemand
                 aria-label="Interactive 3D robot"
                 onLoad={(spline) => {

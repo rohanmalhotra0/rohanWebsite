@@ -42,6 +42,48 @@ function useResumeRoute() {
   return isResume;
 }
 
+function RohanGPTPlaceholder({ sectionRef }) {
+  return (
+    <section
+      ref={sectionRef}
+      id="rohangpt"
+      className="bg-white px-5 py-24"
+      aria-label="Loading RohanGPT"
+    >
+      <div className="mx-auto h-96 max-w-5xl animate-pulse rounded-2xl bg-gray-100" />
+    </section>
+  );
+}
+
+// Load the chat bundle only when the visitor nears it, so it doesn't compete
+// with the hero robot during the first load.
+function DeferredRohanGPT() {
+  const placeholderRef = useRef(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const element = placeholderRef.current;
+    if (shouldLoad || !element) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setShouldLoad(true);
+      },
+      { rootMargin: '800px 0px' }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  if (!shouldLoad) return <RohanGPTPlaceholder sectionRef={placeholderRef} />;
+
+  return (
+    <Suspense fallback={<RohanGPTPlaceholder />}>
+      <RohanGPT />
+    </Suspense>
+  );
+}
+
 function Portfolio() {
   return (
     <>
@@ -61,15 +103,7 @@ function Portfolio() {
         <About />
         <Education />
         <Skills />
-        <Suspense
-          fallback={
-            <section className="bg-white px-5 py-24" aria-label="Loading RohanGPT">
-              <div className="mx-auto h-96 max-w-5xl animate-pulse rounded-2xl bg-gray-100" />
-            </section>
-          }
-        >
-          <RohanGPT />
-        </Suspense>
+        <DeferredRohanGPT />
         <ContactForm />
       </main>
       <SocialMagnet />
