@@ -51,7 +51,7 @@ export default function About() {
 
             <div className="mt-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 sm:mt-7">
               <p className="text-sm leading-6 text-gray-800">
-                Right now: finishing NYU, working across IBM and DRW, and trying
+                Right now: finishing NYU, working at IBM, and trying
                 not to turn every random idea into another side project.
               </p>
             </div>

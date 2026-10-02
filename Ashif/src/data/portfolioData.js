@@ -57,16 +57,16 @@ export const photos = [
 
 export const workExperience = [
   {
-    company: 'DRW',
-    role: 'Applications Developer Intern · via IBM',
+    company: 'IBM',
+    role: 'Applications Developer Intern',
     location: 'Dallas, TX',
     date: 'May 2026 – Aug 2026',
-    imageUrl: assetUrl('website-photos/work/drw-logo-transparent.webp'),
-    imageAlt: 'DRW wordmark',
-    imageLabel: 'DRW · IBM delivery team',
-    logoClassName: 'h-[72px] w-auto max-w-[74%]',
+    imageUrl: assetUrl('website-photos/work/ibm_logo.webp'),
+    imageAlt: 'IBM logo',
+    imageLabel: 'IBM Consulting',
+    logoClassName: 'h-[68px] w-auto max-w-[72%]',
     summary:
-      'At DRW through IBM, I worked on Oracle EPM forecasting, cloud integrations, and an on-prem assistant for finance teams.',
+      'At IBM, I worked on Oracle EPM forecasting, cloud integrations, and an on-prem assistant for finance teams.',
     highlights: [
       'Built rolling 13-day cash forecasts, SOFR loan calculations, interest accrual models, close reports, and an XGBoost cash-flow model in Oracle EPM Planning.',
       'Integrated banking APIs through Oracle Integration Cloud, creating JSON pipelines into ERP Financials and EPM while migrating Excel workflows to Oracle Cloud.',

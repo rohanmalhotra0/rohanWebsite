@@ -4,7 +4,7 @@ const SYSTEM_PROMPT = `You are RohanGPT. Answer as Rohan in a conversational fir
 
 Be specific and factual. Avoid résumé-speak, hype, and phrases such as "at the intersection of," "cutting-edge," or "shipped." Use this public profile:
 - NYU Courant: B.A. Computer Science, Mathematics minor, accelerated three-year path, expected May 2027, GPA 3.7.
-- DRW via IBM: Oracle EPM forecasting, Oracle Integration Cloud banking pipelines, an XGBoost cash-flow model, Qwen-Coder-32B fine-tuning, and an on-prem RAG/MCP EPM assistant.
+- IBM (Applications Developer): Oracle EPM forecasting, Oracle Integration Cloud banking pipelines, an XGBoost cash-flow model, Qwen-Coder-32B fine-tuning, and an on-prem RAG/MCP EPM assistant.
 - IBM Robotics: a Boston Dynamics Spot perception stack using YOLO11, OpenCV, gRPC, multithreading, and lock-free queues; about 99.5% mAP@50.
 - Kalshi: job-loss hazard modeling, Monte Carlo hedge research, a Next.js/Python recommendation engine, C++ risk tools, and FRED/BLS integrations.
 - Hume Center: C imaging and signal-processing tests for ContentCube, deployed into low Earth orbit.
@@ -19,9 +19,9 @@ const QUICK_ANSWERS = [
       'At IBM, I built the perception and autonomy stack for a Boston Dynamics Spot retrieval demo. I trained YOLO11 on 898 labeled images (about 99.5% mAP@50), connected inference through OpenCV and gRPC, and demoed the toy finder at IBM DevCon.',
   },
   {
-    matches: ['drw', 'epm', 'oracle', 'qwen'],
+    matches: ['epm', 'oracle', 'qwen'],
     answer:
-      'On IBM’s delivery team at DRW, I built Oracle EPM forecasting and close workflows, connected banking data through Oracle Integration Cloud, fine-tuned Qwen-Coder-32B from 36.7% to 95.0% task accuracy, and built an on-prem assistant for creating EPM artifacts.',
+      'On IBM’s Oracle delivery team, I built Oracle EPM forecasting and close workflows, connected banking data through Oracle Integration Cloud, fine-tuned Qwen-Coder-32B from 36.7% to 95.0% task accuracy, and built an on-prem assistant for creating EPM artifacts.',
   },
   {
     matches: ['kalshi', 'hedg', 'monte carlo', 'prediction market'],
@@ -174,7 +174,7 @@ export function useRohanGPTChat({ visitorName } = {}) {
               id: `${Date.now()}-offline`,
               role: 'assistant',
               content:
-                'I can’t reach the full chat service from here. Try asking about IBM, DRW, Kalshi, my projects, research, skills, or résumé; those answers are available locally.',
+                'I can’t reach the full chat service from here. Try asking about IBM, Kalshi, my projects, research, skills, or résumé; those answers are available locally.',
             },
           ]);
           return;
