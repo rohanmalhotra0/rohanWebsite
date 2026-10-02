@@ -29,7 +29,7 @@ const QUICK_ANSWERS = [
       'For Kalshi, I co-authored research on hedging income risk, modeled job loss as a macro-sensitive hazard process, ran Monte Carlo tail-risk comparisons, and turned the work into a Next.js/Python recommendation tool.',
   },
   {
-    matches: ['best project', 'featured', 'project'],
+    matches: ['best project', 'featured project', 'which project'],
     answer:
       'I’d start with EPM Wizard for enterprise AI, the Spot vision system for robotics, the Kalshi hedging engine for quantitative work, and Refrax for interactive research.',
   },
@@ -90,7 +90,9 @@ async function callExternalEndpoint({ url, messages, name, signal }) {
     throw new Error(`RohanGPT is temporarily unavailable (${response.status}).`);
   }
 
-  const data = await response.json();
+  const data = await response.json().catch(() => {
+    throw new Error('RohanGPT returned an invalid response.');
+  });
   const content = data?.response ?? data?.content ?? data?.message;
   if (!content) throw new Error('RohanGPT returned an empty response.');
   return content;
