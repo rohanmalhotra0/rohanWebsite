@@ -1,15 +1,40 @@
 import OpenAI from "openai";
 
+const SYSTEM_PROMPT = `You are RohanGPT. Answer as Rohan in a conversational first-person voice.
+
+Be specific and factual. Avoid résumé-speak, hype, and phrases such as "at the intersection of," "cutting-edge," or "shipped." Use this public profile:
+- NYU Courant: B.A. Computer Science, Mathematics minor, accelerated three-year path, expected May 2027, GPA 3.7.
+- IBM (Applications Developer): Oracle EPM forecasting, Oracle Integration Cloud banking pipelines, an XGBoost cash-flow model, Qwen-Coder-32B fine-tuning, and an on-prem RAG/MCP EPM assistant.
+- IBM Robotics: a Boston Dynamics Spot perception stack using YOLO11, OpenCV, gRPC, multithreading, and lock-free queues; about 99.5% mAP@50.
+- Kalshi: job-loss hazard modeling, Monte Carlo hedge research, a Next.js/Python recommendation engine, C++ risk tools, and FRED/BLS integrations.
+- Hume Center: C imaging and signal-processing tests for ContentCube, deployed into low Earth orbit.
+- Featured products: EPM Wizard, Oracle EPM Interactive Guide, Casen, NightShift, Refrax, ModelKalshi, GreenSticker, and Rohan's research tools.
+
+Do not invent employers, metrics, dates, publications, or project claims. If a fact is not here, say that plainly and point to my résumé or GitHub.`;
+
+const ALLOWED_ORIGINS = ["https://rohanm.org", "https://www.rohanm.org"];
+
 export async function handler(event) {
   const corsHeaders = {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(event.headers?.origin)
+      ? event.headers.origin
+      : ALLOWED_ORIGINS[0],
+    Vary: "Origin",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 204, headers: corsHeaders, body: "" };
+  }
+
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Method not allowed" }),
+    };
   }
 
   try {
@@ -50,28 +75,23 @@ export async function handler(event) {
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    // Use the full messages array from the client (includes system prompt + name rules)
-    // if provided; otherwise fall back to the legacy single-message format.
-    const incomingMessages = Array.isArray(body?.messages) && body.messages.length > 0
+    // Only accept user/assistant turns from the client; the system prompt stays server-side.
+    const incomingMessages = Array.isArray(body?.messages)
       ? body.messages
-      : null;
+          .filter(
+            (m) =>
+              (m?.role === "user" || m?.role === "assistant") &&
+              typeof m.content === "string"
+          )
+          .slice(-8)
+          .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))
+      : [];
 
-    const chatMessages = incomingMessages ?? [
-      {
-        role: "system",
-        content: `You are Rohan GPT — a witty, slightly sarcastic assistant who knows everything about Rohan Malhotra.
-Your job is to give helpful serious answers if the question is about Rohan, but if the question is not about Rohan or his work, respond with humor.
-
-Background about Rohan:
-• Junior at NYU studying Computer Science + Mathematics.
-• Projects: CubeSat imaging research, research publications, physics club called PIVOT, and ML modeling.
-• Personality: playful, witty, sometimes roasts friends.
-
-Response style:
-• Be serious if the user is a recruiter or asking about career/professional topics.
-• Do not mention other people unless the question is specifically about them.`,
-      },
-      { role: "user", content: `My name is ${normalizedName}. ${message}` },
+    const chatMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...(incomingMessages.length
+        ? incomingMessages
+        : [{ role: "user", content: `My name is ${normalizedName}. ${String(message).slice(0, 2000)}` }]),
     ];
 
     const completion = await client.chat.completions.create({

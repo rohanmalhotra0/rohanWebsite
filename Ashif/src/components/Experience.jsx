@@ -103,7 +103,7 @@ export default function Experience() {
         <SectionHeading
           eyebrow="02 / EXPERIENCE"
           title="Work experience."
-          description="My recent work includes Oracle forecasting at DRW through IBM, real-time vision for Boston Dynamics Spot, and income-risk research for Kalshi. Expand a card for the details."
+          description="My recent work includes Oracle forecasting at IBM, real-time vision for Boston Dynamics Spot, and income-risk research for Kalshi. Expand a card for the details."
         />
 
         <div className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 xl:grid-cols-3">
