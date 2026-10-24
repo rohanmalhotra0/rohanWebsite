@@ -92,7 +92,7 @@ function Success({ onReset }) {
 export default function ContactForm() {
   const id = useId();
   const reduceMotion = useReducedMotion();
-  const showShortcut = useMediaQuery('(hover: hover) and (pointer: fine)');
+  const showShortcut = useMediaQuery('(hover: hover) and (pointer: fine) and (min-width: 640px)');
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | sending | success | error

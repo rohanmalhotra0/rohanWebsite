@@ -213,18 +213,19 @@ export function useFocusTrap(ref, active) {
 }
 
 /**
- * Focus handling for a modal. On open: remember what had focus and focus
- * `initialRef`. On close: give focus back, unless the caller set the returned
- * ref to false first (a link took the user somewhere) or something outside
- * the modal has already taken focus.
+ * Focus handling for a modal. On open: remember what had focus (or use
+ * `returnRef`, for a modal with one fixed trigger) and focus `initialRef`.
+ * On close: give focus back, unless the caller set the returned ref to false
+ * first (a link took the user somewhere) or something outside the modal has
+ * already taken focus.
  */
-export function useModalFocus(open, initialRef, containerRef) {
+export function useModalFocus(open, { initialRef, containerRef, returnRef }) {
   const returnTo = useRef(null);
   const restore = useRef(true);
 
   useLayoutEffect(() => {
     if (open) {
-      returnTo.current = document.activeElement;
+      returnTo.current = returnRef?.current ?? document.activeElement;
       restore.current = true;
       initialRef.current?.focus({ preventScroll: true });
       return;
@@ -236,7 +237,7 @@ export function useModalFocus(open, initialRef, containerRef) {
     const focusIsLost =
       !current || current === document.body || containerRef.current?.contains(current);
     if (focusIsLost) target.focus({ preventScroll: true });
-  }, [open, initialRef, containerRef]);
+  }, [open, initialRef, containerRef, returnRef]);
 
   return restore;
 }

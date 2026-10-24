@@ -29,13 +29,13 @@
   --paper-rule: #e3e2dc;
   --paper-link: #cfcec7;
   --paper-accent: #ff5b14;
-  --paper-label: 98px;
-  --paper-gap: 18px;
+  --paper-label: 90px;
+  --paper-gap: 16px;
 
   width: 100%;
   max-width: 816px;
   margin-inline: auto;
-  padding: 48px 52px 56px;
+  padding: 48px 48px 56px;
   border-radius: 2px;
   background: #fff;
   color: var(--paper-text);
@@ -97,8 +97,8 @@
   justify-content: space-between;
   align-items: baseline;
   column-gap: 24px;
-  row-gap: 8px;
-  padding-bottom: 16px;
+  row-gap: 7px;
+  padding-bottom: 15px;
   border-bottom: 1px solid var(--paper-ink);
 }
 
@@ -147,8 +147,8 @@
   grid-template-columns: var(--paper-label) minmax(0, 1fr);
   column-gap: var(--paper-gap);
   align-items: baseline;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 13px;
+  padding-top: 11px;
   border-top: 1px solid var(--paper-rule);
 }
 
@@ -165,7 +165,7 @@
 }
 
 .rv-section-body > * + * {
-  margin-top: 10px;
+  margin-top: 9px;
 }
 
 /* ---------- Entries ---------- */
@@ -193,7 +193,7 @@
   color: var(--paper-ink);
   font-size: 13px;
   font-weight: 650;
-  line-height: 18px;
+  line-height: 17px;
   letter-spacing: -0.005em;
 }
 
@@ -257,7 +257,7 @@
 
 /* Bullets hang in the gutter so the text lines up with the role title. */
 .rv-bullets {
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 .rv-bullets li {
@@ -450,7 +450,7 @@
 
 @page resume {
   size: letter;
-  margin: 48px 52px 56px;
+  margin: 48px 48px 56px;
 
   @bottom-left {
     content: "Rohan Malhotra";
