@@ -49,7 +49,8 @@ Almost everything on the page comes from `Ashif/src/data/portfolioData.js`.
 Add a project there and it shows up in the projects section, the archive, the
 command palette, and RohanGPT's quick answers.
 
-Images live in `Ashif/public/img` as optimized WebP. Originals are kept in
+Images live in `Ashif/public/img` as optimized WebP. Full-size originals are
+kept, undeployed, in `Ashif/source-images`. PDFs and logos stay in
 `Ashif/public/website-photos`. Use `assetUrl('img/…')` for public files so the
 relative `base` keeps working on GitHub Pages.
 
