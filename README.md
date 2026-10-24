@@ -33,7 +33,7 @@ Ashif/src
 ├── components/
 │   ├── primitives/          # Section, SectionHeader, Reveal, Button, TechList
 │   ├── theme/               # ThemeProvider (light/dark, circular reveal toggle)
-│   ├── nav/                 # floating navbar + ⌘K command palette
+│   ├── nav/                 # navbar + ⌘K command palette
 │   ├── hero/                # three.js robot fetch demo
 │   ├── experience/  projects/  research/  about/  education/
 │   ├── rohangpt/            # chat UI
