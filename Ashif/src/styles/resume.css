@@ -1,0 +1,472 @@
+/* Résumé view (#/resume).
+   The chrome around the sheet follows the site theme; the sheet is always
+   white. It is set in CSS px on an 816px (8.5in) page with the same margins
+   as print, so on a desktop screen it matches the printed pages line for
+   line. */
+
+/* Toolbar and sheet share one frame, so their edges line up. */
+.rv-frame {
+  --rv-gutter: 16px;
+  width: 100%;
+  max-width: calc(816px + 2 * var(--rv-gutter));
+  margin-inline: auto;
+  padding-inline: max(var(--rv-gutter), env(safe-area-inset-left))
+    max(var(--rv-gutter), env(safe-area-inset-right));
+}
+
+@media (min-width: 640px) {
+  .rv-frame {
+    --rv-gutter: 24px;
+  }
+}
+
+/* ---------- The sheet ---------- */
+
+.rv-paper {
+  --paper-ink: #141414;
+  --paper-text: #2b2b27;
+  --paper-meta: #66665f;
+  --paper-rule: #e3e2dc;
+  --paper-link: #cfcec7;
+  --paper-accent: #ff5b14;
+  --paper-label: 104px;
+  --paper-gap: 20px;
+
+  width: 100%;
+  max-width: 816px;
+  margin-inline: auto;
+  padding: 48px 56px 56px;
+  border-radius: 2px;
+  background: #fff;
+  color: var(--paper-text);
+  color-scheme: light;
+  font-family: var(--font-sans, "Mona Sans Variable", system-ui, sans-serif);
+  font-size: 12px;
+  line-height: 1.5;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  box-shadow:
+    0 0 0 1px rgb(20 20 20 / 0.06),
+    0 1px 2px rgb(20 20 20 / 0.04),
+    0 18px 48px -20px rgb(20 20 20 / 0.18);
+  animation: rv-enter 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+[data-theme="dark"] .rv-paper {
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.04),
+    0 28px 72px -28px rgb(0 0 0 / 0.9);
+}
+
+@keyframes rv-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.rv-paper :focus-visible {
+  outline-color: #b83a0a;
+  outline-offset: 2px;
+}
+
+/* Links read as text; a faint underline marks them on screen. */
+.rv-link {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--paper-link);
+  transition: text-decoration-color 150ms ease;
+}
+
+@media (hover: hover) {
+  .rv-link:hover {
+    text-decoration-color: var(--paper-accent);
+  }
+}
+
+/* ---------- Header ---------- */
+
+.rv-head {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--paper-ink);
+}
+
+/* The one orange detail: a short tab on the head rule. A border, not a
+   background, so it prints without "background graphics". */
+.rv-head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 24px;
+  border-top: 3px solid var(--paper-accent);
+}
+
+.rv-name {
+  color: var(--paper-ink);
+  font-size: 34px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.rv-headline {
+  margin-top: 10px;
+  color: var(--paper-text);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.rv-contact {
+  font-size: 11.5px;
+  font-style: normal;
+  line-height: 17px;
+}
+
+/* ---------- Sections: a hanging title column and a body column ---------- */
+
+.rv-section {
+  display: grid;
+  grid-template-columns: var(--paper-label) minmax(0, 1fr);
+  column-gap: var(--paper-gap);
+  align-items: baseline;
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid var(--paper-rule);
+}
+
+.rv-head + .rv-section {
+  margin-top: 4px;
+  border-top: 0;
+}
+
+.rv-section-title {
+  color: var(--paper-ink);
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.005em;
+}
+
+.rv-section-body > * + * {
+  margin-top: 12px;
+}
+
+/* ---------- Entries ---------- */
+
+.rv-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 16px;
+}
+
+.rv-meta {
+  flex: none;
+  margin-left: auto;
+  color: var(--paper-meta);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.rv-org {
+  color: var(--paper-ink);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 18px;
+  letter-spacing: -0.005em;
+}
+
+.rv-org-note {
+  color: var(--paper-meta);
+  font-weight: 400;
+}
+
+.rv-role {
+  color: var(--paper-ink);
+  font-weight: 520;
+}
+
+.rv-job + .rv-job {
+  margin-top: 8px;
+}
+
+.rv-title-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 10px;
+}
+
+.rv-title {
+  color: var(--paper-ink);
+  font-size: 12.5px;
+  font-weight: 620;
+  line-height: 18px;
+}
+
+.rv-url {
+  color: var(--paper-meta);
+  font-size: 11.5px;
+}
+
+.rv-text {
+  margin-top: 1px;
+  text-wrap: pretty;
+}
+
+.rv-stack {
+  margin-top: 2px;
+  color: var(--paper-meta);
+  font-size: 11.5px;
+}
+
+.rv-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bullets hang in the gutter so the text lines up with the role title. */
+.rv-bullets {
+  margin-top: 3px;
+}
+
+.rv-bullets li {
+  position: relative;
+  text-wrap: pretty;
+}
+
+.rv-bullets li + li {
+  margin-top: 2px;
+}
+
+.rv-bullets li::before {
+  content: "";
+  position: absolute;
+  top: 0.75em;
+  left: -13px;
+  width: 6px;
+  border-top: 1px solid var(--paper-meta);
+}
+
+/* Key and value lines: education facts and skills. */
+.rv-facts {
+  margin-top: 5px;
+}
+
+.rv-facts > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  column-gap: 12px;
+}
+
+.rv-facts > div + div {
+  margin-top: 3px;
+}
+
+.rv-facts dt {
+  color: var(--paper-ink);
+  font-weight: 520;
+}
+
+/* ---------- Narrower screens ---------- */
+
+@media (max-width: 879px) {
+  .rv-paper {
+    padding: 40px 40px 44px;
+  }
+}
+
+@media (max-width: 639px) {
+  .rv-paper {
+    padding: 28px 20px 32px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .rv-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 20px;
+  }
+
+  .rv-name {
+    font-size: 28px;
+    line-height: 1.05;
+  }
+
+  .rv-headline {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .rv-contact {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .rv-section {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+
+  .rv-head + .rv-section {
+    margin-top: 8px;
+  }
+
+  .rv-section-title {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .rv-section-body > * + * {
+    margin-top: 20px;
+  }
+
+  .rv-org {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .rv-org-note {
+    display: block;
+  }
+
+  .rv-org-sep {
+    display: none;
+  }
+
+  .rv-title {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .rv-row {
+    row-gap: 2px;
+  }
+
+  .rv-meta {
+    margin-left: 0;
+    flex-basis: 100%;
+    font-size: 13px;
+    white-space: normal;
+  }
+
+  .rv-url,
+  .rv-stack {
+    font-size: 13px;
+  }
+
+  .rv-job + .rv-job {
+    margin-top: 14px;
+  }
+
+  .rv-bullets {
+    margin-top: 6px;
+  }
+
+  .rv-bullets li {
+    padding-left: 16px;
+  }
+
+  .rv-bullets li + li {
+    margin-top: 6px;
+  }
+
+  .rv-bullets li::before {
+    left: 1px;
+    width: 7px;
+  }
+
+  .rv-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rv-facts > div + div {
+    margin-top: 10px;
+  }
+}
+
+/* ---------- Print: US Letter ----------
+   A named page keeps these rules off the portfolio if it is printed after a
+   visit to the résumé (the stylesheet stays loaded). */
+
+@page resume {
+  size: letter;
+  margin: 48px 56px 56px;
+
+  @bottom-left {
+    content: "Rohan Malhotra";
+    color: #66665f;
+    font-family: "Mona Sans Variable", system-ui, sans-serif;
+    font-size: 8pt;
+  }
+
+  @bottom-right {
+    content: counter(page) " of " counter(pages);
+    color: #66665f;
+    font-family: "Mona Sans Variable", system-ui, sans-serif;
+    font-size: 8pt;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media print {
+  html:has(.rv),
+  html:has(.rv) body {
+    background: #fff !important;
+  }
+
+  .rv {
+    page: resume;
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+
+  .rv-toolbar,
+  .rv-skip {
+    display: none !important;
+  }
+
+  .rv-main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .rv-paper {
+    max-width: none;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none !important;
+    animation: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rv-link {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .rv-job,
+  .rv-entry,
+  .rv-facts > div,
+  .rv-bullets li {
+    break-inside: avoid;
+  }
+
+  .rv-section-title,
+  .rv-row {
+    break-after: avoid;
+  }
+}

@@ -1,11 +1,38 @@
-import { profile } from '@/data/portfolioData';
+import { useRef } from 'react';
+import '@/styles/resume.css';
+import ResumePaper from './ResumePaper';
+import ResumeToolbar from './ResumeToolbar';
 
-// Placeholder: replaced by the résumé build.
 export default function ResumeView() {
+  const mainRef = useRef(null);
+
+  // The app routes on the URL hash, so following "#resume-content" would
+  // leave the résumé. Move focus by hand instead.
+  const skipToContent = (event) => {
+    event.preventDefault();
+    mainRef.current?.focus();
+  };
+
   return (
-    <main className="container-page py-16">
-      <a href="#top" className="link text-sm text-muted">Back to portfolio</a>
-      <h1 className="type-display mt-6 text-5xl">{profile.name}</h1>
-    </main>
+    <div className="rv min-h-svh bg-bg text-fg">
+      <a
+        href="#resume-content"
+        onClick={skipToContent}
+        className="rv-skip sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-fg focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-bg"
+      >
+        Skip to résumé
+      </a>
+
+      <ResumeToolbar />
+
+      <main
+        id="resume-content"
+        ref={mainRef}
+        tabIndex={-1}
+        className="rv-main rv-frame pb-16 pt-4 outline-none sm:pb-24 sm:pt-10"
+      >
+        <ResumePaper />
+      </main>
+    </div>
   );
 }
