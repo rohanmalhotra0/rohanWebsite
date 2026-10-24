@@ -10,23 +10,16 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   base: './',
   plugins: [tailwindcss(), react()],
-  assetsInclude: ['**/*.splinecode'],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    fs: {
-      allow: [path.resolve(__dirname, '..')],
-    },
-  },
   build: {
+    target: 'es2020',
     rollupOptions: {
       output: {
         manualChunks: {
-          spline: ['@splinetool/react-spline'],
-          chat: ['@chatscope/chat-ui-kit-react'],
           motion: ['motion'],
         },
       },
