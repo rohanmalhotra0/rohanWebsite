@@ -57,7 +57,9 @@ const isSummary = (value) =>
 /** Fresh cached summary, null if the last answer was "nothing to show", undefined on a miss. */
 export function readCache() {
   try {
-    const { savedAt, value } = JSON.parse(sessionStorage.getItem(CACHE_KEY));
+    const saved = sessionStorage.getItem(CACHE_KEY);
+    if (!saved) return undefined;
+    const { savedAt, value } = JSON.parse(saved);
     const age = Date.now() - savedAt;
     return age >= 0 && age < CACHE_TTL && isSummary(value) ? value : undefined;
   } catch {

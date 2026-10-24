@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { motion, useInView, useReducedMotion } from 'motion/react';
+import { motion, useInView } from 'motion/react';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { getDegreeProgress } from './degreeProgress';
 
@@ -14,20 +15,18 @@ const MotionDiv = motion.div;
 export default function DegreeProgress({ start, end, className }) {
   // Read the clock once per mount; the page doesn't need to tick.
   const [{ ratio, label }] = useState(() => getDegreeProgress(start, end));
-  const trackRef = useRef(null);
-  const inView = useInView(trackRef, { once: true, amount: 'all' });
-  const reduceMotion = useReducedMotion();
+  const ref = useRef(null);
+  // Start once the bar is a little way up the screen. (A threshold of 1 on a
+  // 2px element can miss at sub-pixel offsets, so use a root margin instead.)
+  const inView = useInView(ref, { once: true, margin: '0px 0px -12% 0px' });
+  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   // Near the start there's no room to hang the label off the fill end.
   const labelStyle = ratio >= 0.25 ? { right: `${(1 - ratio) * 100}%` } : { left: 0 };
 
   return (
-    <div className={cn('relative pb-8', className)}>
-      <div
-        ref={trackRef}
-        aria-hidden="true"
-        className="relative h-0.5 overflow-hidden rounded-full bg-line"
-      >
+    <div ref={ref} className={cn('relative pb-8', className)}>
+      <div aria-hidden="true" className="relative h-0.5 overflow-hidden rounded-full bg-line">
         <MotionDiv
           className="absolute inset-0 origin-left bg-accent"
           initial={reduceMotion ? false : { scaleX: 0 }}

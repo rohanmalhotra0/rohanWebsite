@@ -29,20 +29,20 @@
   --paper-rule: #e3e2dc;
   --paper-link: #cfcec7;
   --paper-accent: #ff5b14;
-  --paper-label: 104px;
-  --paper-gap: 20px;
+  --paper-label: 98px;
+  --paper-gap: 18px;
 
   width: 100%;
   max-width: 816px;
   margin-inline: auto;
-  padding: 48px 56px 56px;
+  padding: 48px 52px 56px;
   border-radius: 2px;
   background: #fff;
   color: var(--paper-text);
   color-scheme: light;
   font-family: var(--font-sans, "Mona Sans Variable", system-ui, sans-serif);
   font-size: 11.5px;
-  line-height: 1.46;
+  line-height: 1.44;
   font-kerning: normal;
   text-rendering: optimizeLegibility;
   box-shadow:
@@ -207,8 +207,13 @@
   font-weight: 520;
 }
 
+.rv-role-note {
+  color: var(--paper-text);
+  font-weight: 400;
+}
+
 .rv-job + .rv-job {
-  margin-top: 8px;
+  margin-top: 7px;
 }
 
 .rv-title-line {
@@ -445,7 +450,7 @@
 
 @page resume {
   size: letter;
-  margin: 48px 56px 56px;
+  margin: 48px 52px 56px;
 
   @bottom-left {
     content: "Rohan Malhotra";

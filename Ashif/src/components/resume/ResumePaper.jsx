@@ -91,12 +91,12 @@ function EducationSection() {
         <Row meta={education.location}>
           <p className="rv-role">
             {education.degree}, {education.minor}
+            <span className="rv-role-note">
+              {' · '}GPA {education.gpa} / {education.gpaScale}
+            </span>
           </p>
         </Row>
-        <p className="rv-text rv-gap">
-          <span className="rv-key">GPA</span> {education.gpa} /{' '}
-          {education.gpaScale}. {education.accelerated}
-        </p>
+        <p className="rv-text rv-gap">{education.accelerated}</p>
         <p className="rv-text">
           <span className="rv-key">Graduate course:</span>{' '}
           {education.graduateCourse.title}

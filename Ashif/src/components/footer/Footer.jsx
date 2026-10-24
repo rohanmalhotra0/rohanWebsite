@@ -8,9 +8,9 @@ const ELSEWHERE = [
   { label: 'Résumé', href: '#/resume' },
 ];
 
-// 44px rows for touch; a tighter list rhythm for mouse and trackpad.
+// 44px rows for touch; a tighter list rhythm for a mouse or trackpad on wide screens.
 const linkClass =
-  'group inline-flex min-h-11 items-center gap-1 text-[15px] text-muted transition-colors duration-150 hover:text-fg pointer-fine:min-h-8 pointer-fine:text-sm';
+  'group inline-flex min-h-11 items-center gap-1 text-[15px] text-muted transition-colors duration-150 hover:text-fg md:pointer-fine:min-h-8 md:pointer-fine:text-sm';
 
 const titleClass = 'text-[13px] font-medium text-subtle';
 
@@ -53,7 +53,7 @@ export default function Footer() {
             <h2 id="footer-sections" className={titleClass}>
               Sections
             </h2>
-            <ul className="mt-2 pointer-fine:mt-3">
+            <ul className="mt-2 md:pointer-fine:mt-3">
               {sections.map(({ id, label }) => (
                 <li key={id}>
                   <FooterLink href={`#${id}`}>{label}</FooterLink>
@@ -64,7 +64,7 @@ export default function Footer() {
 
           <div className="md:col-span-2">
             <h2 className={titleClass}>Elsewhere</h2>
-            <ul className="mt-2 pointer-fine:mt-3">
+            <ul className="mt-2 md:pointer-fine:mt-3">
               {ELSEWHERE.map(({ label, href, external }) => (
                 <li key={label}>
                   <FooterLink href={href} external={external}>
