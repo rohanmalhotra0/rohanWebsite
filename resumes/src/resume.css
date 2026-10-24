@@ -1,0 +1,38 @@
+:root { --fs: 10.5pt; --gap: 1; }
+@page { size: 8.5in 11in; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #fff; }
+body { font-family: Caladea, Cambria, "Times New Roman", serif; color: #111; }
+a { color: inherit; text-decoration: none; }
+
+.page { width: 8.5in; height: 11in; padding: 0.45in 0.55in; overflow: hidden; }
+.content { font-size: var(--fs); line-height: 1.2; }
+
+header { text-align: center; }
+.name { margin: 0; font-size: calc(var(--fs) * 2.1); font-weight: 700; letter-spacing: 0.03em; line-height: 1.1; }
+.contact { margin-top: calc(1.5pt * var(--gap)); font-size: calc(var(--fs) * 0.95); }
+.contact .sep { margin: 0 0.45em; color: #555; }
+.summary { margin: calc(5pt * var(--gap)) 0 0; }
+
+h2 {
+  margin: calc(7pt * var(--gap)) 0 calc(2.5pt * var(--gap));
+  padding-bottom: 1pt;
+  border-bottom: 0.75pt solid #111;
+  font-size: calc(var(--fs) * 1.05);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+
+.entry + .entry { margin-top: calc(3.5pt * var(--gap)); }
+.group + .group { margin-top: calc(2pt * var(--gap)); }
+.row { display: flex; justify-content: space-between; align-items: baseline; gap: 10pt; }
+.row .l { min-width: 0; }
+.row .r { flex-shrink: 0; white-space: nowrap; }
+
+ul { margin: 0; padding-left: 1.15em; }
+li { margin-top: calc(0.5pt * var(--gap)); padding-left: 0.1em; }
+
+.lines p { margin: calc(0.8pt * var(--gap)) 0 0; }
+.lines p:first-child { margin-top: 0; }
