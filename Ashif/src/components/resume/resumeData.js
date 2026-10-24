@@ -45,9 +45,15 @@ export const resumeProjects = projects
     ),
   }));
 
-export const contactLinks = [
-  { href: `mailto:${profile.email}`, label: profile.email },
-  { href: profile.website, label: displayUrl(profile.website) },
-  { href: profile.github, label: displayUrl(profile.github) },
-  { href: profile.linkedin, label: displayUrl(profile.linkedin) },
+/** Contact details in two lines; they sit beside the name and the headline. */
+export const contactLines = [
+  [
+    { label: profile.location },
+    { href: `mailto:${profile.email}`, label: profile.email },
+    { href: profile.website, label: displayUrl(profile.website) },
+  ],
+  [
+    { href: profile.github, label: displayUrl(profile.github) },
+    { href: profile.linkedin, label: displayUrl(profile.linkedin) },
+  ],
 ];

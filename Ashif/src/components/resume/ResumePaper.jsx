@@ -1,6 +1,6 @@
 import { education, profile, research, skillGroups } from '@/data/portfolioData';
 import {
-  contactLinks,
+  contactLines,
   displayUrl,
   experienceGroups,
   resumeProjects,
@@ -42,25 +42,35 @@ function Section({ id, title, children }) {
   );
 }
 
+/**
+ * The name and headline on the left; two contact lines on the right, each
+ * sharing a baseline with its neighbour (a grid with two baseline rows).
+ */
 function Header() {
   return (
     <header className="rv-head">
-      <div>
-        <h1 id="rv-name" className="rv-name type-display">
-          {profile.name}
-        </h1>
-        <p className="rv-headline">{profile.headline}</p>
-      </div>
-      <address className="rv-contact">
-        <ul>
-          <li>{profile.location}</li>
-          {contactLinks.map((link) => (
-            <li key={link.href}>
-              <PaperLink href={link.href}>{link.label}</PaperLink>
-            </li>
+      <h1 id="rv-name" className="rv-name type-display">
+        {profile.name}
+      </h1>
+      <p className="rv-headline">{profile.headline}</p>
+      {contactLines.map((line, index) => (
+        <p key={index} className="rv-contact">
+          {line.map((item, i) => (
+            <span key={item.label} className="rv-contact-item">
+              {i > 0 ? (
+                <span className="rv-contact-sep" aria-hidden="true">
+                  {' · '}
+                </span>
+              ) : null}
+              {item.href ? (
+                <PaperLink href={item.href}>{item.label}</PaperLink>
+              ) : (
+                item.label
+              )}
+            </span>
           ))}
-        </ul>
-      </address>
+        </p>
+      ))}
     </header>
   );
 }
@@ -83,25 +93,18 @@ function EducationSection() {
             {education.degree}, {education.minor}
           </p>
         </Row>
-        <dl className="rv-facts">
-          <div>
-            <dt>GPA</dt>
-            <dd>
-              <span className="rv-num">
-                {education.gpa} / {education.gpaScale}
-              </span>
-              . {education.accelerated}
-            </dd>
-          </div>
-          <div>
-            <dt>Graduate course</dt>
-            <dd>{education.graduateCourse.title}</dd>
-          </div>
-          <div>
-            <dt>Coursework</dt>
-            <dd>{education.coursework.join(', ')}</dd>
-          </div>
-        </dl>
+        <p className="rv-text rv-gap">
+          <span className="rv-key">GPA</span> {education.gpa} /{' '}
+          {education.gpaScale}. {education.accelerated}
+        </p>
+        <p className="rv-text">
+          <span className="rv-key">Graduate course:</span>{' '}
+          {education.graduateCourse.title}
+        </p>
+        <p className="rv-text">
+          <span className="rv-key">Coursework:</span>{' '}
+          {education.coursework.join(', ')}
+        </p>
       </div>
     </Section>
   );
