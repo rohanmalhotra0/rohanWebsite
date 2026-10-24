@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react';
 import { useMotionValue, useMotionValueEvent, useScroll, useSpring } from 'motion/react';
 
-// The rail fills down to this line (fraction of viewport height); nodes light up
-// over a short band just below it, as the fill reaches them.
+// The rail fills down to this line (fraction of viewport height). A node lights up
+// over a short band once the line passes its centre.
 const LINE = 0.62;
-const NODE_BAND = 0.06;
+const NODE_BAND = 0.05;
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value));
 
@@ -40,7 +40,7 @@ function useViewportProgress(ref, measure) {
 }
 
 const railMeasure = (rect, vh) => (vh * LINE - rect.top) / rect.height;
-const nodeMeasure = (rect, vh) => (vh * (LINE + NODE_BAND) - rect.top) / (vh * NODE_BAND);
+const nodeMeasure = (rect, vh) => (vh * LINE - rect.top - rect.height / 2) / (vh * NODE_BAND);
 
 /** How far the timeline has scrolled past the viewport line (springed so it glides). */
 export function useRailFill(ref) {

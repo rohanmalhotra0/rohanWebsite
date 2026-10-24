@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react';
+import { useId } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { Container, Section, SectionHeader } from '@/components/primitives/Section';
@@ -71,17 +71,13 @@ function SingleRole({ group, lit, spotlight }) {
 }
 
 function Timeline() {
-  const ref = useRef(null);
   const reduceMotion = useReducedMotion();
   const spotlight = useMediaQuery('(hover: hover) and (pointer: fine)');
   const lit = !reduceMotion;
 
   return (
-    <div
-      ref={ref}
-      className="relative [--node-y:10px] [--pad:20px] [--tile:40px] sm:[--node-y:14px] sm:[--pad:24px] sm:[--tile:48px]"
-    >
-      <Rail target={ref} progress={lit} />
+    <div className="relative [--node-y:10px] [--pad:20px] [--tile:44px] sm:[--node-y:14px] sm:[--pad:24px] sm:[--tile:56px]">
+      <Rail progress={lit} />
       <ol aria-label="Work history" className="space-y-10 sm:space-y-12">
         {groups.map((group) =>
           group.roles.length > 1 ? (

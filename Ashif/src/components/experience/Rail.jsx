@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { isFullBleedLogo } from './timeline';
+import { logoFit } from './timeline';
 import { useNodeLit, useRailFill } from './useRailProgress';
 
 const MotionDiv = motion.div;
@@ -15,11 +15,13 @@ const MotionSpan = motion.span;
  */
 
 /** Hairline rail with an accent fill that tracks scroll progress through the timeline. */
-export function Rail({ target, progress }) {
-  const fill = useRailFill(target);
+export function Rail({ progress }) {
+  const ref = useRef(null);
+  const fill = useRailFill(ref);
 
   return (
     <div
+      ref={ref}
       aria-hidden="true"
       className="pointer-events-none absolute bottom-0 left-[calc(var(--tile)/2)] top-[calc(var(--tile)/2)] w-px -translate-x-1/2 [mask-image:linear-gradient(to_bottom,#000_88%,transparent)]"
     >
@@ -60,12 +62,11 @@ export function RailDot({ lit, className }) {
 
 /**
  * Company logo on a white tile (logos ship on white or transparent backgrounds),
- * doubling as the rail node for that company. Full-bleed square logos fill the tile.
+ * doubling as the rail node for that company.
  */
 export function CompanyLogo({ company, src, alt, lit, className }) {
   const ref = useRef(null);
   const opacity = useNodeLit(ref);
-  const fullBleed = isFullBleedLogo(company);
 
   return (
     <span
@@ -86,15 +87,12 @@ export function CompanyLogo({ company, src, alt, lit, className }) {
         <img
           src={src}
           alt={alt}
-          width={48}
-          height={48}
+          width={56}
+          height={56}
           loading="lazy"
           decoding="async"
           draggable="false"
-          className={cn(
-            'size-full select-none',
-            fullBleed ? 'object-cover' : 'object-contain p-[13%]'
-          )}
+          className={cn('size-full select-none', logoFit(company))}
         />
       </span>
     </span>

@@ -3,10 +3,18 @@
 
 export const EASE = [0.16, 1, 0.3, 1];
 
-/** Logos that are full-bleed squares and should fill their tile edge to edge. */
-const FULL_BLEED_LOGOS = new Set(['Kalshi']);
+/*
+ * How each logo sits in its square tile, tuned to the whitespace baked into each
+ * file. Kalshi's is a full-bleed green square, so it fills the tile edge to edge.
+ */
+const LOGO_FIT = {
+  Kalshi: 'object-cover',
+  IBM: 'object-contain p-[11%]',
+  'Hume Center': 'object-contain p-[4%]',
+  'Y-Axis': 'object-contain p-[2%]',
+};
 
-export const isFullBleedLogo = (company) => FULL_BLEED_LOGOS.has(company);
+export const logoFit = (company) => LOGO_FIT[company] ?? 'object-contain p-[8%]';
 
 /**
  * Groups consecutive roles at the same company:

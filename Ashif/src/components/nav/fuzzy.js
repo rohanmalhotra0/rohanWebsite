@@ -20,11 +20,11 @@ const KEYWORD_WEIGHT = 0.6;
 
 const SEPARATOR = /[\s\-_/.:&(),'"’]/;
 
-/** Lowercase and strip accents one character at a time so indices still line up. */
+/** Lowercase and strip accents per UTF-16 unit so indices still line up. */
 function fold(text) {
   let out = '';
-  for (const char of text) {
-    out += char.normalize('NFD').charAt(0).toLowerCase();
+  for (let i = 0; i < text.length; i += 1) {
+    out += text[i].normalize('NFD').charAt(0).toLowerCase().charAt(0);
   }
   return out;
 }
@@ -48,9 +48,7 @@ export function fuzzyMatch(query, text) {
   const m = q.length;
   const n = t.length;
   if (!m) return { score: 0, indices: [] };
-  if (m > n || q.length !== query.length || t.length !== text.length) {
-    if (m > n) return null;
-  }
+  if (m > n) return null;
 
   // Cheap subsequence check before doing any real work.
   let k = 0;
@@ -152,10 +150,16 @@ export function scoreItem(query, title, keywords = []) {
     if (goodEnough(onTitle, token)) onTitle.indices.forEach((i) => highlight.add(i));
   }
 
-  // The whole query appearing verbatim in the title is the strongest signal.
-  const at = fold(title).indexOf(fold(query.trim()));
-  if (at === 0) total += 40;
-  else if (at > 0) total += 20;
+  // The whole query typed as the start of a word in the title ("hedg",
+  // "live kelly") is the strongest signal; mid-word substrings get nothing.
+  const haystack = fold(title);
+  const needle = fold(query.trim());
+  for (let at = haystack.indexOf(needle); at !== -1; at = haystack.indexOf(needle, at + 1)) {
+    if (isWordStart(title, at)) {
+      total += at === 0 ? 40 : 25;
+      break;
+    }
+  }
 
   return { score: total, indices: [...highlight].sort((a, b) => a - b) };
 }
