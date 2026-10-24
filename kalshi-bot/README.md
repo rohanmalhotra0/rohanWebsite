@@ -1,28 +1,45 @@
-# Kalshi favorite bot
+# Kalshi bot
 
-Buys outcomes that Kalshi prices at **90–96¢** and that close within 24 hours.
+**Test first, trade second.** `backtest.py` checks a strategy on Kalshi's
+settled markets. `bot.py` refuses to trade live unless that test shows
+a real edge after fees.
 
-**This is not guaranteed money.** Most trades win a few cents each.
-One loss costs about $9.50, which wipes out 15–20 wins.
+## The two strategies
 
-## Safety limits (top of `bot.py`)
+1. **Favorites:** buy contracts in price ranges that historically won more often
+   than their price implied. (Research on Kalshi data: cheap longshots lose
+   money; favorites do slightly better.)
+2. **Mentions** (e.g. "What will Trump say?"): look up how often each word
+   was said in past events. Buy YES if the price is far below that rate,
+   NO if far above.
 
-- Max $10 per market
-- Max $50 at risk in total
-- Keeps at least $40 as cash
-- One market per event
-- Stops on the first error
-
-## Run it
+## Steps
 
 ```bash
 pip install -r requirements.txt
+
+python backtest.py --find trump          # 1. find series tickers
+python backtest.py --series <TICKERS>    # 2. test them (no API key needed)
+python bot.py --mentions                 # 3. dry run: see what it would buy
+
 export KALSHI_API_KEY_ID="your-key-id"
 export KALSHI_PRIVATE_KEY_PATH="/path/to/kalshi-key.pem"
-
-python bot.py           # dry run: shows what it would buy, no API key needed
-python bot.py --check   # tests your key, shows balance
-python bot.py --live    # places real orders
+python bot.py --check                    # 4. test your key
+python bot.py --live --mentions          # 5. real orders (only if step 2 found an edge)
 ```
 
-Trades get logged to `trades.csv`. Never commit your `.pem` key file.
+Drop `--mentions` to use the favorites strategy.
+
+## How to read the backtest
+
+- **ROI**: profit per $1 bet, after fees.
+- **Worst-case ROI**: a cautious 95% lower bound. If it is below 0,
+  the "profit" could just be luck. The bot will not trade it.
+
+## Safety limits (top of `bot.py`)
+
+- $10 per favorite, $5 per mention, $15 per event, $50 total
+- Always keeps $40 as cash
+- Stops at the first error
+
+Not financial advice. Past results don't promise future ones. Never commit your `.pem` key.

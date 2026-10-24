@@ -1,188 +1,126 @@
-"""Kalshi "heavy favorite" bot.
+"""Kalshi bot. Run backtest.py first: live trading is refused unless the
+backtest found an edge.
 
-Strategy: buy the side (YES or NO) of markets that close soon and trade at
-90-96c, i.e. outcomes the market thinks are ~90-96% likely. Research on Kalshi
-data shows longshots are overpriced and heavy favorites slightly underpriced,
-so this side of the book has the best odds. The edge is thin: each win pays a
-few cents per contract, and one loss wipes out ~15-20 wins. It is NOT a
-guaranteed profit.
-
-Dry run by default. Pass --live to place real orders.
+  python bot.py                     # dry run: favorites strategy
+  python bot.py --mentions          # dry run: mention-word strategy
+  python bot.py --check             # test your API key, show balance
+  python bot.py --live [--mentions] # place real orders
 """
 import argparse
-import base64
 import csv
-import math
+import json
 import os
 import sys
 import time
-import uuid
+from collections import defaultdict
 from datetime import datetime, timezone
 
-import requests
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from kalshi import (Kalshi, fee, load_key, mention_side, num, price, word_estimate, word_of,
+                    MIN_HISTORY)
 
-BASE = "https://api.elections.kalshi.com"
-API = "/trade-api/v2"
+HERE = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(HERE, "trades.csv")
 
 # Risk limits (dollars). Tuned for a $100 account.
-MAX_PER_MARKET = 10.0   # most you can lose on one market
-MAX_TOTAL = 50.0        # most cash the bot will put at risk; rest stays as reserve
+MAX_PER_MARKET = 10.0   # favorites: most you can lose on one market
+MAX_PER_MENTION = 5.0   # mentions: smaller, these are riskier
+MAX_PER_EVENT = 15.0    # markets in one event win or lose together
+MAX_TOTAL = 50.0        # most cash the bot puts at risk
 MIN_CASH_LEFT = 40.0    # never trade the balance below this
-MIN_PRICE, MAX_PRICE = 0.90, 0.96
-MAX_SPREAD = 0.02
 MIN_VOLUME_24H = 500
-MAX_HOURS_TO_CLOSE = 24
-FEE_RATE = 0.07         # Kalshi taker fee: ceil(0.07 * C * P * (1-P)) to the cent
-LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "trades.csv")
+MAX_SPREAD = 0.02
+# Used only for dry runs before any backtest exists.
+DEFAULT_RANGE, DEFAULT_HOURS = (0.90, 0.96), 24
 
 
-# ---------- auth ----------
-
-def load_key():
-    key_id = os.environ.get("KALSHI_API_KEY_ID")
-    pem = os.environ.get("KALSHI_PRIVATE_KEY")
-    path = os.environ.get("KALSHI_PRIVATE_KEY_PATH")
-    if path:
-        with open(path, "rb") as f:
-            pem = f.read().decode()
-    if not key_id or not pem:
-        sys.exit("Set KALSHI_API_KEY_ID and KALSHI_PRIVATE_KEY (or KALSHI_PRIVATE_KEY_PATH).")
-    pem = pem.replace("\\n", "\n").strip()
-    return key_id, serialization.load_pem_private_key(pem.encode(), password=None)
+def load(name):
+    path = os.path.join(HERE, name)
+    if not os.path.exists(path):
+        return None
+    with open(path) as f:
+        return json.load(f)
 
 
-def sign(private_key, timestamp_ms, method, path):
-    msg = f"{timestamp_ms}{method}{path}".encode()
-    sig = private_key.sign(
-        msg,
-        padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.DIGEST_LENGTH),
-        hashes.SHA256(),
-    )
-    return base64.b64encode(sig).decode()
+def sized(m, side, p, max_cost):
+    count = int(max_cost // p)
+    cost = count * p + fee(count, p)
+    if count < 1 or count - cost <= 0:
+        return None
+    return {"ticker": m["ticker"], "event": m.get("event_ticker", m["ticker"]),
+            "title": m.get("title", ""), "word": word_of(m), "side": side, "price": p,
+            "count": count, "cost": cost, "profit": count - cost}
 
 
-class Kalshi:
-    def __init__(self, key_id=None, private_key=None):
-        self.key_id, self.private_key = key_id, private_key
-        self.s = requests.Session()
-
-    def _req(self, method, endpoint, params=None, body=None):
-        path = API + endpoint
-        headers = {}
-        if self.private_key:
-            ts = str(int(time.time() * 1000))
-            headers = {
-                "KALSHI-ACCESS-KEY": self.key_id,
-                "KALSHI-ACCESS-TIMESTAMP": ts,
-                "KALSHI-ACCESS-SIGNATURE": sign(self.private_key, ts, method, path),
-            }
-        r = self.s.request(method, BASE + path, params=params, json=body, headers=headers, timeout=20)
-        return r
-
-    def get(self, endpoint, params=None):
-        r = self._req("GET", endpoint, params=params)
-        r.raise_for_status()
-        return r.json()
-
-    def balance(self):
-        d = self.get("/portfolio/balance")
-        if "balance_dollars" in d:
-            return float(d["balance_dollars"])
-        return d["balance"] / 100
-
-    def held_tickers(self):
-        d = self.get("/portfolio/positions", {"limit": 1000})
-        held = set()
-        for p in d.get("market_positions", []):
-            if num(p, "position") != 0:
-                held.add(p["ticker"])
-        return held
-
-    def open_markets(self, max_hours):
-        now = int(time.time())
-        params = {"status": "open", "limit": 1000, "min_close_ts": now,
-                  "max_close_ts": now + int(max_hours * 3600), "mve_filter": "exclude"}
-        out, cursor = [], None
-        while True:
-            if cursor:
-                params["cursor"] = cursor
-            d = self.get("/markets", params)
-            out += d.get("markets", [])
-            cursor = d.get("cursor")
-            if not cursor:
-                return out
-
-    def buy(self, ticker, side, count, price):
-        """Immediate-or-cancel limit buy. Tries the fixed-point body first, then the
-        legacy integer body. A 400 means no order was created, and the shared
-        client_order_id stops a double fill either way."""
-        coid = str(uuid.uuid4())
-        base = {"ticker": ticker, "client_order_id": coid, "action": "buy", "side": side,
-                "time_in_force": "immediate_or_cancel"}
-        bodies = [
-            {**base, "count_fp": f"{count:.2f}", f"{side}_price_dollars": f"{price:.4f}"},
-            {**base, "count": count, "type": "limit", f"{side}_price": round(price * 100)},
-        ]
-        for body in bodies:
-            r = self._req("POST", "/portfolio/orders", body=body)
-            if r.status_code < 300:
-                return r.json().get("order", r.json())
-            if r.status_code != 400:
-                break
-        raise RuntimeError(f"Order rejected ({r.status_code}): {r.text[:300]}")
-
-
-# ---------- strategy ----------
-
-def num(d, field):
-    """Read a count field that may be fixed-point (`x_fp`) or a legacy integer."""
-    v = d.get(f"{field}_fp", d.get(field, 0))
-    return float(v or 0)
-
-
-def price(d, field):
-    """Read a price in dollars from `x_dollars` or legacy integer cents."""
-    if d.get(f"{field}_dollars") not in (None, ""):
-        return float(d[f"{field}_dollars"])
-    v = d.get(field)
-    return v / 100 if v else 0.0
-
-
-def fee(count, p):
-    return math.ceil(round(FEE_RATE * count * p * (1 - p) * 100, 6)) / 100
-
-
-def pick_trades(markets, held, budget):
-    candidates = []
-    for m in markets:
-        if m["ticker"] in held or num(m, "volume_24h") < MIN_VOLUME_24H:
-            continue
-        for side in ("yes", "no"):
-            ask, bid = price(m, f"{side}_ask"), price(m, f"{side}_bid")
-            if not (MIN_PRICE <= ask <= MAX_PRICE) or ask - bid > MAX_SPREAD:
+def favorites(client, held, edges):
+    """Buy the side whose price sits in a range the backtest found profitable."""
+    if edges:
+        ranges = [(e["lo"], e["hi"]) for e in edges["edges"]]
+        series, hours = edges["series"], edges["hours_before_close"]
+    else:
+        ranges, series, hours = [DEFAULT_RANGE], [None], DEFAULT_HOURS
+    now = int(time.time())
+    picks = []
+    for s in series:
+        extra = {"series_ticker": s} if s else {"mve_filter": "exclude"}
+        for m in client.markets(status="open", min_close_ts=now, max_close_ts=now + int(hours * 3600), **extra):
+            if m["ticker"] in held or num(m, "volume_24h") < MIN_VOLUME_24H:
                 continue
-            count = int(MAX_PER_MARKET // ask)
-            cost = count * ask + fee(count, ask)
-            profit = count - cost
-            if count < 1 or profit <= 0:
+            for side in ("yes", "no"):
+                ask, bid = price(m, f"{side}_ask"), price(m, f"{side}_bid")
+                if ask - bid <= MAX_SPREAD and any(lo <= ask < hi for lo, hi in ranges):
+                    pick = sized(m, side, ask, MAX_PER_MARKET)
+                    if pick:
+                        picks.append(pick)
+    # Highest price first = most likely to win.
+    return sorted(picks, key=lambda p: -p["price"])
+
+
+def mentions(client, held, words):
+    """Buy YES on words said far more often than the price implies, NO on the reverse."""
+    picks = []
+    for s in words["series"]:
+        bh, bn = words["base"].get(s, (0, 0))
+        for m in client.markets(series_ticker=s, status="open"):
+            hits, n = words["words"].get(f"{s}|{word_of(m)}", (0, 0))
+            if m["ticker"] in held or n < MIN_HISTORY:
                 continue
-            candidates.append({"ticker": m["ticker"], "event": m.get("event_ticker"),
-                               "title": m.get("title", ""), "side": side, "price": ask,
-                               "count": count, "cost": cost, "profit": profit,
-                               "close": m.get("close_time", "")})
-    # Highest price first = most likely to win. One market per event to avoid
-    # correlated losses.
-    candidates.sort(key=lambda c: -c["price"])
-    picks, events, spent = [], set(), 0.0
-    for c in candidates:
-        if c["event"] in events or spent + c["cost"] > budget:
+            est = word_estimate(hits, n, bh / bn if bn else 0.5)
+            choice = mention_side(est, price(m, "yes_ask"), price(m, "yes_bid"), words["margin"])
+            if choice:
+                pick = sized(m, *choice, MAX_PER_MENTION)
+                if pick:
+                    pick["edge"] = abs(est - (choice[1] if choice[0] == "yes" else 1 - choice[1]))
+                    picks.append(pick)
+    return sorted(picks, key=lambda p: -p["edge"])
+
+
+def within_budget(picks, budget, one_per_event):
+    out, per_event, spent = [], defaultdict(float), 0.0
+    for p in picks:
+        ev = p["event"]
+        if (one_per_event and per_event[ev]) or per_event[ev] + p["cost"] > MAX_PER_EVENT \
+                or spent + p["cost"] > budget:
             continue
-        picks.append(c)
-        events.add(c["event"])
-        spent += c["cost"]
-    return picks
+        out.append(p)
+        per_event[ev] += p["cost"]
+        spent += p["cost"]
+    return out
+
+
+def proven(args, edges, words):
+    """Live trading only with a backtest that found a real edge (or --force)."""
+    if args.force:
+        return True
+    if args.mentions:
+        if words and words.get("roi_lo") is not None and words["roi_lo"] > 0:
+            return True
+        print("Backtest did not prove the mention strategy makes money. Not trading.")
+    else:
+        if edges and edges["edges"]:
+            return True
+        print("Backtest found no profitable price range. Not trading.")
+    print("Run backtest.py first. Use --force to trade anyway (not recommended).")
+    return False
 
 
 def log(row):
@@ -195,6 +133,11 @@ def log(row):
 
 
 def run(args):
+    edges, words = load("edges.json"), load("words.json")
+    if args.mentions and not words:
+        sys.exit("No words.json yet. Run backtest.py on mention series first.")
+    if args.live and not proven(args, edges, words):
+        return
     if args.live or args.check:
         client = Kalshi(*load_key())
         cash = client.balance()
@@ -209,16 +152,17 @@ def run(args):
         print("Budget used up (cash reserve reached). Nothing to do.")
         return
 
-    picks = pick_trades(client.open_markets(MAX_HOURS_TO_CLOSE), held, budget)
+    found = mentions(client, held, words) if args.mentions else favorites(client, held, edges)
+    picks = within_budget(found, budget, one_per_event=not args.mentions)
     if not picks:
         print("No markets pass the filters right now. Try again later.")
         return
-    total_cost = sum(p["cost"] for p in picks)
-    print(f"{'LIVE' if args.live else 'DRY RUN'}: {len(picks)} trades, ${total_cost:.2f} at risk, "
+    print(f"{'LIVE' if args.live else 'DRY RUN'}: {len(picks)} trades, ${sum(p['cost'] for p in picks):.2f} at risk, "
           f"${sum(p['profit'] for p in picks):.2f} max profit if all win\n")
     for p in picks:
+        label = p["word"] if args.mentions else p["title"]
         line = (f"{p['side'].upper():3} {p['count']:>3} @ ${p['price']:.2f}  cost ${p['cost']:.2f}  "
-                f"win +${p['profit']:.2f}  {p['ticker']}  {p['title'][:60]}")
+                f"win +${p['profit']:.2f}  {p['ticker']}  {label[:50]}")
         if args.live:
             try:
                 order = client.buy(p["ticker"], p["side"], p["count"], p["price"])
@@ -237,6 +181,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--live", action="store_true", help="place real orders (default is dry run)")
     ap.add_argument("--check", action="store_true", help="only test your API key and show balance")
+    ap.add_argument("--mentions", action="store_true", help="use the mention-word strategy")
+    ap.add_argument("--force", action="store_true", help="trade live even without a proven edge")
     run(ap.parse_args())
 
 

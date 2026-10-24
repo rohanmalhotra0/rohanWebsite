@@ -3,3 +3,6 @@
 .env
 trades.csv
 __pycache__/
+data/
+edges.json
+words.json
