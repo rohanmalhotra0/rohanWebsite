@@ -1,0 +1,488 @@
+/* Résumé view (#/resume).
+   The page chrome follows the site theme; the paper is always white so it
+   reads, and prints, like a document. Sizes are in CSS px on an 816px
+   (8.5in) sheet, so the screen layout and the printed page match. */
+
+.rv {
+  --rv-sheet: 816px;
+}
+
+/* Faint dot grid on the "desk" behind the sheet. */
+.rv::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 720px;
+  pointer-events: none;
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 60% 100% at 50% 0%, #000 10%, transparent 70%);
+}
+
+/* ---------- The sheet ---------- */
+
+.rv-paper {
+  --ink: #0b0b0c;
+  --ink-2: #3a3a40;
+  --ink-3: #6b6b74;
+  --rule: #e4e4e0;
+  --lime: #c4f042;
+  --mono: var(--font-mono, "Geist Mono Variable", ui-monospace, monospace);
+
+  position: relative;
+  width: 100%;
+  max-width: var(--rv-sheet);
+  margin-inline: auto;
+  padding: 52px 60px 60px;
+  border-radius: 3px;
+  background: #fff;
+  color: var(--ink-2);
+  color-scheme: light;
+  font-size: 11.5px;
+  line-height: 1.5;
+  font-feature-settings: "ss01", "ss02", "kern";
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.06),
+    0 2px 4px rgb(0 0 0 / 0.3),
+    0 40px 80px -24px rgb(0 0 0 / 0.75);
+  animation: rv-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+[data-theme="light"] .rv-paper {
+  box-shadow:
+    0 0 0 1px rgb(10 10 12 / 0.06),
+    0 1px 2px rgb(10 10 12 / 0.06),
+    0 32px 64px -28px rgb(10 10 12 / 0.28);
+}
+
+@keyframes rv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.rv-paper ::selection {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+.rv-paper strong {
+  color: var(--ink);
+  font-weight: 550;
+}
+
+/* Links read as text on paper; a hairline underline appears on hover. */
+.rv-link {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.rv-link:hover {
+  text-decoration-color: currentColor;
+}
+
+.rv-paper :focus-visible {
+  outline: 2px solid #4d7c0f;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.rv-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--ink);
+}
+
+.rv-name {
+  color: var(--ink);
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+/* Lime square standing in for a period; echoes the "RM." mark. */
+.rv-dot {
+  display: inline-block;
+  width: 0.2em;
+  height: 0.2em;
+  margin-left: 0.08em;
+  border-radius: 0.035em;
+  background: var(--lime);
+  box-shadow: inset 0 0 0 0.5px rgb(10 10 12 / 0.18);
+}
+
+.rv-headline {
+  margin-top: 10px;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  letter-spacing: -0.01em;
+}
+
+.rv-contact {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.65;
+  text-align: right;
+  color: var(--ink-2);
+}
+
+/* ---------- Sections ---------- */
+
+.rv-section {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  column-gap: 20px;
+  padding-top: 14px;
+  margin-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.rv-head + .rv-section {
+  border-top: 0;
+  margin-top: 4px;
+}
+
+.rv-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding-top: 4px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  break-after: avoid;
+}
+
+.rv-label::before {
+  content: "";
+  flex: none;
+  width: 5px;
+  height: 5px;
+  margin-top: 4px;
+  border-radius: 1px;
+  background: var(--lime);
+  box-shadow: inset 0 0 0 0.5px rgb(10 10 12 / 0.2);
+}
+
+.rv-body > * + * {
+  margin-top: 12px;
+}
+
+/* ---------- Entries ---------- */
+
+.rv-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 16px;
+}
+
+.rv-meta {
+  flex: none;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.rv-org {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: -0.015em;
+}
+
+.rv-org-note {
+  margin-left: 8px;
+  color: var(--ink-3);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.rv-org-row {
+  break-after: avoid;
+}
+
+.rv-role {
+  color: var(--ink);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.rv-job + .rv-job {
+  margin-top: 8px;
+}
+
+.rv-title {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: -0.01em;
+}
+
+.rv-text {
+  text-wrap: pretty;
+}
+
+.rv-bullets {
+  margin-top: 3px;
+}
+
+.rv-bullets li {
+  position: relative;
+  padding-left: 13px;
+  text-wrap: pretty;
+}
+
+.rv-bullets li + li {
+  margin-top: 2px;
+}
+
+/* A short dash instead of a round bullet. */
+.rv-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 0.75em;
+  width: 6px;
+  height: 1px;
+  background: var(--ink-3);
+}
+
+.rv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  margin-top: 3px;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.01em;
+}
+
+.rv-tags .rv-link {
+  color: var(--ink);
+}
+
+.rv-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Key/value lines (education facts, skills). */
+.rv-facts {
+  margin-top: 4px;
+}
+
+.rv-facts > * {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  column-gap: 12px;
+}
+
+.rv-facts > * + * {
+  margin-top: 3px;
+}
+
+.rv-fact-key {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* Projects sit two-up. */
+.rv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+}
+
+.rv-body > .rv-grid + * {
+  margin-top: 12px;
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 639px) {
+  .rv-paper {
+    padding: 28px 20px 32px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .rv-head {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .rv-name {
+    font-size: 32px;
+  }
+
+  .rv-headline {
+    font-size: 15px;
+  }
+
+  .rv-contact {
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .rv-section {
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+    padding-top: 18px;
+    margin-top: 20px;
+  }
+
+  .rv-head + .rv-section {
+    margin-top: 6px;
+  }
+
+  .rv-label {
+    font-size: 10.5px;
+  }
+
+  .rv-body > * + * {
+    margin-top: 18px;
+  }
+
+  .rv-org {
+    font-size: 15.5px;
+    line-height: 1.4;
+  }
+
+  .rv-org-note {
+    display: block;
+    margin-left: 0;
+  }
+
+  .rv-role,
+  .rv-title {
+    font-size: 14.5px;
+    line-height: 1.45;
+  }
+
+  .rv-meta,
+  .rv-tags {
+    font-size: 11.5px;
+  }
+
+  .rv-row {
+    row-gap: 2px;
+  }
+
+  .rv-row .rv-meta {
+    white-space: normal;
+  }
+
+  .rv-bullets li + li {
+    margin-top: 6px;
+  }
+
+  .rv-facts > * {
+    grid-template-columns: 1fr;
+  }
+
+  .rv-facts > * + * {
+    margin-top: 8px;
+  }
+
+  .rv-grid {
+    grid-template-columns: 1fr;
+    row-gap: 18px;
+  }
+}
+
+/* ---------- Print: US Letter ---------- */
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.5in 0.6in;
+
+    /* Running footer (browsers without margin boxes simply skip it). */
+    @bottom-left {
+      content: "Rohan Malhotra \2014  rohanm.org";
+      color: #6b6b74;
+      font-family: "Geist Mono Variable", ui-monospace, monospace;
+      font-size: 7.5pt;
+      letter-spacing: 0.04em;
+    }
+
+    @bottom-right {
+      content: counter(page) " / " counter(pages);
+      color: #6b6b74;
+      font-family: "Geist Mono Variable", ui-monospace, monospace;
+      font-size: 7.5pt;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  html:has(.rv),
+  html:has(.rv) body {
+    background: #fff !important;
+    color-scheme: light;
+  }
+
+  /* Hide the film-grain overlay from index.css. */
+  html:has(.rv) body::after {
+    display: none !important;
+  }
+
+  .rv {
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+
+  .rv::before,
+  .rv-toolbar,
+  .rv-skip {
+    display: none !important;
+  }
+
+  .rv-main {
+    padding: 0 !important;
+  }
+
+  .rv-paper {
+    max-width: none;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none !important;
+    animation: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rv-paper a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .rv-entry,
+  .rv-job,
+  .rv-facts > * {
+    break-inside: avoid;
+  }
+}
