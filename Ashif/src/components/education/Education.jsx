@@ -1,6 +1,7 @@
 import Reveal from '@/components/primitives/Reveal';
 import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import { education, skillGroups } from '@/data/portfolioData';
+import { cn } from '@/lib/utils';
 import DegreeProgress from './DegreeProgress';
 
 // Labels and list items share one line height so baselines line up across columns.
@@ -56,13 +57,10 @@ export default function Education() {
             <p className="type-heading text-[1.75rem] leading-[1.1] text-muted sm:text-[2.25rem]">
               {minor}
             </p>
-            <p className="mt-5 text-[15px] leading-6 text-muted">
-              {dates}
-              <Dot />
-              {location}
-              <Dot />
-              GPA {gpa} / {gpaScale}
-            </p>
+            <MetaLine
+              className="mt-5"
+              items={[dates, location, `GPA ${gpa} / ${gpaScale}`].filter(Boolean)}
+            />
           </Row>
 
           {accelerated ? (
@@ -83,8 +81,8 @@ export default function Education() {
 
           {coursework?.length ? (
             <Row label={<h4 className={LABEL}>Coursework</h4>}>
-              {/* Two columns: they fall on the page grid and split CS from math. */}
-              <ul className={`columns-2 gap-x-8 ${LIST}`}>
+              {/* Two columns from sm up: they fall on the page grid and split CS from math. */}
+              <ul className={`gap-x-8 sm:columns-2 ${LIST}`}>
                 {coursework.map((course) => (
                   <li key={course} className="break-inside-avoid">
                     {course}
@@ -127,10 +125,23 @@ function Row({ label, children }) {
   );
 }
 
-function Dot() {
+/**
+ * "A · B · C" that wraps cleanly: items never break inside, and each item's
+ * leading dot hangs into a clipped gutter, so no line starts with a dot.
+ */
+function MetaLine({ items, className }) {
   return (
-    <span aria-hidden="true" className="px-2 text-line-strong">
-      ·
-    </span>
+    <div className={cn('overflow-hidden', className)}>
+      <ul className="-ml-5 flex flex-wrap text-[15px] leading-6 text-muted">
+        {items.map((item) => (
+          <li key={item} className="whitespace-nowrap">
+            <span aria-hidden="true" className="inline-block w-5 text-center text-line-strong">
+              ·
+            </span>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

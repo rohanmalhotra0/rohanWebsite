@@ -56,7 +56,7 @@ function Paper({ paper, index }) {
         </div>
 
         {paper.imageUrl ? (
-          <div className="order-first md:order-none md:col-span-5 lg:col-span-4 lg:col-start-9">
+          <div className="order-first md:order-none md:col-span-5 md:mt-1.5 lg:col-span-4 lg:col-start-9">
             <Thumbnail paper={paper} />
           </div>
         ) : null}

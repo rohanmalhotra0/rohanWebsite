@@ -41,8 +41,8 @@
   color: var(--paper-text);
   color-scheme: light;
   font-family: var(--font-sans, "Mona Sans Variable", system-ui, sans-serif);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 11.5px;
+  line-height: 1.46;
   font-kerning: normal;
   text-rendering: optimizeLegibility;
   box-shadow:
@@ -86,15 +86,19 @@
   }
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header ----------
+   Two baseline rows: the name shares a baseline with the first contact line,
+   the headline with the second. */
 
 .rv-head {
   position: relative;
-  display: flex;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: auto auto;
   justify-content: space-between;
-  gap: 24px;
-  padding-bottom: 18px;
+  align-items: baseline;
+  column-gap: 24px;
+  row-gap: 8px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--paper-ink);
 }
 
@@ -110,6 +114,7 @@
 }
 
 .rv-name {
+  grid-area: 1 / 1;
   color: var(--paper-ink);
   font-size: 34px;
   line-height: 1;
@@ -117,16 +122,22 @@
 }
 
 .rv-headline {
-  margin-top: 10px;
+  grid-area: 2 / 1;
   color: var(--paper-text);
   font-size: 13px;
   line-height: 18px;
 }
 
 .rv-contact {
+  grid-column: 2;
+  justify-self: end;
   font-size: 11.5px;
-  font-style: normal;
   line-height: 17px;
+  text-align: right;
+}
+
+.rv-contact-sep {
+  color: var(--paper-meta);
 }
 
 /* ---------- Sections: a hanging title column and a body column ---------- */
@@ -136,13 +147,13 @@
   grid-template-columns: var(--paper-label) minmax(0, 1fr);
   column-gap: var(--paper-gap);
   align-items: baseline;
-  margin-top: 16px;
-  padding-top: 13px;
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px solid var(--paper-rule);
 }
 
 .rv-head + .rv-section {
-  margin-top: 4px;
+  margin-top: 2px;
   border-top: 0;
 }
 
@@ -154,7 +165,7 @@
 }
 
 .rv-section-body > * + * {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 /* ---------- Entries ---------- */
@@ -167,12 +178,14 @@
   column-gap: 16px;
 }
 
+/* Dates and places. Mona Sans' tabular figures are monospace-style (slashed
+   zero, serifed one), so dates keep its default lining figures. Each date
+   sits alone at the right edge, so they still line up. */
 .rv-meta {
   flex: none;
   margin-left: auto;
   color: var(--paper-meta);
-  font-size: 11.5px;
-  font-variant-numeric: tabular-nums;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -228,8 +241,13 @@
   font-size: 11.5px;
 }
 
-.rv-num {
-  font-variant-numeric: tabular-nums;
+.rv-key {
+  color: var(--paper-ink);
+  font-weight: 520;
+}
+
+.rv-gap {
+  margin-top: 4px;
 }
 
 /* Bullets hang in the gutter so the text lines up with the role title. */
@@ -291,10 +309,15 @@
   }
 
   .rv-head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    padding-bottom: 20px;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+    padding-bottom: 18px;
+  }
+
+  .rv-name,
+  .rv-headline,
+  .rv-contact {
+    grid-area: auto;
   }
 
   .rv-name {
@@ -308,9 +331,28 @@
     line-height: 1.45;
   }
 
+  /* One item per line, each tall enough to tap. */
   .rv-contact {
+    display: flex;
+    flex-direction: column;
+    justify-self: stretch;
     font-size: 14px;
-    line-height: 1.75;
+    line-height: 20px;
+    text-align: left;
+  }
+
+  .rv-head > .rv-headline + .rv-contact {
+    margin-top: 10px;
+  }
+
+  .rv-contact-item {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+  }
+
+  .rv-contact-sep {
+    display: none;
   }
 
   .rv-section {
@@ -417,7 +459,6 @@
     color: #66665f;
     font-family: "Mona Sans Variable", system-ui, sans-serif;
     font-size: 8pt;
-    font-variant-numeric: tabular-nums;
   }
 }
 
