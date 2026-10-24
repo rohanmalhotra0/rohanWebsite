@@ -44,7 +44,7 @@ function CompanyRoles({ group }) {
           />
         </div>
       </div>
-      <ol className="mt-8 space-y-10 md:mt-10">
+      <ol className="mt-7 space-y-10 md:mt-8">
         {group.roles.map((role) => (
           <li key={role.index} className={ROW}>
             <RoleMeta
