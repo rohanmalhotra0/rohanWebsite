@@ -14,22 +14,14 @@ const dateOf = (job) => (/\d/.test(job.date || '') ? job.date : null);
 const placeOf = (job) =>
   job.location && job.location !== job.date ? job.location : null;
 
-/**
- * Consecutive roles at one company share a heading (IBM had two). A role
- * only repeats the location when it differs from the company's.
- */
-export const experienceGroups = workExperience.reduce((groups, job) => {
-  const last = groups[groups.length - 1];
-  const place = placeOf(job);
-  const role = { role: job.role, date: dateOf(job), highlights: job.highlights };
-
-  if (last && last.company === job.company) {
-    last.roles.push({ ...role, place: place === last.place ? null : place });
-  } else {
-    groups.push({ company: job.company, place, roles: [{ ...role, place: null }] });
-  }
-  return groups;
-}, []);
+/** One line per role: company, title and place on the left, dates on the right. */
+export const resumeRoles = workExperience.map((job) => ({
+  company: job.company,
+  role: job.role,
+  place: placeOf(job),
+  date: dateOf(job),
+  highlights: job.highlights,
+}));
 
 /**
  * Featured projects with one link each: the live site when there is one,

@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import Button from '@/components/primitives/Button';
 
 const EASE = [0.16, 1, 0.3, 1];
+const MotionImg = motion.img;
 const SWIPE_DISTANCE = 60; // px of finger travel that counts as a swipe
 const SWIPE_VELOCITY = 400; // px/s flick that counts even when short
 
@@ -91,7 +92,7 @@ export default function Lightbox({ photos, view, onNavigate, onClose }) {
             }}
           >
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
-              <motion.img
+              <MotionImg
                 key={photo.id}
                 src={photo.src}
                 alt={photo.alt}

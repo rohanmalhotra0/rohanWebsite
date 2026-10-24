@@ -48,6 +48,11 @@ const bullets = (items) => items.map((item) => `- ${item}`).join('\n');
 const paragraphs = (...parts) => parts.flat().filter(Boolean).join('\n\n');
 const article = (word) => (/^[aeiou]/i.test(word) ? 'an' : 'a');
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+/** Lowercase the first letter, but leave "I" and acronyms alone. */
+const lowerFirst = (text) =>
+  /^(I\b|[A-Z]{2})/.test(text) ? text : text.charAt(0).toLowerCase() + text.slice(1);
+const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+const countWord = (n) => NUMBER_WORDS[n] ?? String(n);
 const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /** "Casen: Consulting Casebook" -> "Casen". */
 const shortTitle = (title) => title.split(':')[0].trim();
@@ -65,10 +70,6 @@ function mdLink(label, url) {
 }
 
 const EMAIL_LINK = mdLink(profile.email, `mailto:${profile.email}`);
-
-/** Résumé bullets start with a past-tense verb; this makes them first person. */
-const firstPerson = (line) =>
-  /^[A-Z][a-z]/.test(line) ? `I ${line.charAt(0).toLowerCase()}${line.slice(1)}` : line;
 
 /** "May 2026" -> {month: 4, year: 2026}, or null. */
 function parseMonth(text) {
@@ -146,7 +147,7 @@ function describeRole(job) {
 function describeCompany(company, jobs) {
   if (jobs.length === 1) return describeRole(jobs[0]);
   return paragraphs(
-    `I had ${jobs.length} roles at ${inProse(company)}.`,
+    `I had ${countWord(jobs.length)} roles at ${inProse(company)}.`,
     jobs.map((job) => `**${job.role}**\n${withoutLead(job.summary, company)}`)
   );
 }
@@ -186,16 +187,16 @@ const hedgingPaper = research.find((paper) => /income risk/i.test(paper.title));
 const hedgingEngine = findProject('income-risk-hedging');
 const epmProjects = projects.filter((project) => /\bepm\b/i.test(project.title));
 
-const SCOPE = 'my internships at IBM, my Kalshi research, my projects, school, or skills';
-
 const ANSWERS = {
   ibm: () => {
-    if (!appDev || !robotics) return describeCompany('IBM', ibmJobs);
+    if (!appDev || !robotics || ibmJobs.length !== 2) return describeCompany('IBM', ibmJobs);
+    const sameCity = ibmJobs.every((job) => job.location === appDev.location);
+    const span = spanOf(ibmJobs);
     const modelResult = robotics.metric
       ? `The model reached ${robotics.metric.value} ${robotics.metric.label}.`
       : '';
     return paragraphs(
-      `I did two internships at IBM in ${appDev.location}${spanOf(ibmJobs)}.`,
+      `I did two internships at IBM${sameCity ? ` in ${appDev.location}${span ? ',' : ''}` : ''}${span}.`,
       `**${appDev.role}**\n${withoutLead(appDev.summary, 'IBM')} ${improvementSentence(appDev.metric)}`.trim(),
       `**${robotics.role}**\n${withoutLead(robotics.summary, 'IBM')} ${modelResult}`.trim(),
       'Ask about the EPM work or the Spot robot for more.'
@@ -239,12 +240,12 @@ const ANSWERS = {
           return `**${paper.title}.** ${paper.description} ${links.join(' · ')}`;
         })
       ),
-      hume ? `At ${inProse(hume.company)}, ${hume.summary.replace(/^I\b/, 'I')}` : ''
+      hume ? `At ${inProse(hume.company)}, ${lowerFirst(withoutLead(hume.summary, hume.company))}` : ''
     ),
 
   education: () =>
     paragraphs(
-      `I’m studying for ${article(education.degree)} ${education.degree.replace(/^(B\.[AS]\.)\s+/, '$1 in ')} with a ${education.minor} at ${profile.school}. I’m ${education.accelerated.charAt(0).toLowerCase()}${education.accelerated.slice(1)} My GPA is ${education.gpa}/${education.gpaScale}.`,
+      `I’m studying for ${article(education.degree)} ${education.degree.replace(/^(B\.[AS]\.)\s+/, '$1 in ')} with a ${education.minor} at ${profile.school}. I’m ${lowerFirst(education.accelerated)} My GPA is ${education.gpa}/${education.gpaScale}.`,
       `Coursework includes ${joinAnd(education.coursework.slice(0, 6))}, plus the graduate course ${education.graduateCourse.title}.`
     ),
 
@@ -257,7 +258,7 @@ const ANSWERS = {
   contact: () =>
     paragraphs(
       `You can email me at ${EMAIL_LINK}.`,
-      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}. My résumé is ${mdLink('here', '#/resume')}, or as a ${mdLink('PDF', profile.resumeUrl)}.`
+      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}. You can read my résumé ${mdLink('here', '#/resume')} or download the ${mdLink('PDF', profile.resumeUrl)}.`
     ),
 
   bestProject: () => {
@@ -311,8 +312,8 @@ const ANSWERS = {
       .map((project) => shortTitle(project.title))
       .filter((title) => !/\s/.test(title))
       .slice(0, 2);
-    const like = examples.length ? `, like ${joinAnd(examples)}` : '';
-    return `Hi. Ask me about ${SCOPE.replace(', or skills', '')}, or a project by name${like}.`;
+    const like = examples.length ? `, like ${examples.join(' or ')}` : '';
+    return `Hi. You can ask about my internships at IBM, my Kalshi research, school, or any project by name${like}.`;
   },
 
   thanks: () => `Anytime. If you want to talk more, email me at ${EMAIL_LINK}.`,
@@ -320,7 +321,7 @@ const ANSWERS = {
 
 const UNKNOWN_REPLY = paragraphs(
   'I don’t have anything about that in my résumé or project notes, so I won’t guess.',
-  `I can tell you about ${SCOPE}. For anything else, email me at ${EMAIL_LINK}.`
+  `I can tell you about my internships at IBM, my Kalshi research, my projects, school, or skills. For anything else, email me at ${EMAIL_LINK}.`
 );
 
 /* ------------------------------------------------------------------ */
@@ -617,7 +618,7 @@ export function findQuickAnswer(input) {
 }
 
 const FOLLOW_UP =
-  /^(?:(?:ok|okay|cool|nice|and|so)\s+)?(?:tell me more|more|say more|go on|keep going|continue|elaborate|expand(?: on that)?|more details?|any more details?|what else|anything else|details)(?:\s+(?:please|about (?:that|it)|on (?:that|it)))?$/;
+  /^(?:(?:ok|okay|cool|nice|and|so|sure|yes|yeah)\s+)?(?:(?:can|could) you\s+)?(?:tell me more|more|say more|go on|keep going|continue|elaborate|expand(?: on that)?|more details?|any more details?|what else|anything else|details)(?:\s+(?:please|about (?:that|it)|on (?:that|it)))?$/;
 
 /** "Tell me more" after a local answer, or null. `lastId` is that answer's id. */
 export function findFollowUp(input, lastId) {
@@ -628,7 +629,7 @@ export function findFollowUp(input, lastId) {
   }
   const project = lastId.startsWith('project:') && findProject(lastId.slice('project:'.length));
   if (project?.longDescription) {
-    return { id: lastId, answer: paragraphs(project.longDescription, projectLinks(project)) };
+    return { id: `${lastId}:more`, answer: paragraphs(project.longDescription, projectLinks(project)) };
   }
   return {
     id: 'follow-up',
@@ -725,8 +726,8 @@ function answerLocally(input, prior) {
   const quick = findQuickAnswer(input);
   if (quick) return { ...quick, source: 'profile' };
   if (API_URL) return null;
-  const lastTopic = prior.findLast((message) => message.role === 'assistant')?.topic;
-  const followUp = findFollowUp(input, lastTopic);
+  const lastReply = [...prior].reverse().find((message) => message.role === 'assistant');
+  const followUp = findFollowUp(input, lastReply?.topic);
   if (followUp) return { ...followUp, source: 'profile' };
   return { id: 'unknown', answer: UNKNOWN_REPLY, source: 'unknown' };
 }
@@ -852,7 +853,8 @@ export function useRohanGPTChat() {
   const retry = useCallback(() => {
     if (busyRef.current) return;
     const current = messagesRef.current;
-    const lastIndex = current.findLastIndex((message) => message.role === 'user');
+    let lastIndex = current.length - 1;
+    while (lastIndex >= 0 && current[lastIndex].role !== 'user') lastIndex -= 1;
     if (lastIndex < 0) return;
     respond(current[lastIndex].content, current.slice(0, lastIndex));
   }, [respond]);

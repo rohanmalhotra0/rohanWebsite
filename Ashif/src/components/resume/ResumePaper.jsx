@@ -2,9 +2,18 @@ import { education, profile, research, skillGroups } from '@/data/portfolioData'
 import {
   contactLines,
   displayUrl,
-  experienceGroups,
   resumeProjects,
+  resumeRoles,
 } from './resumeData';
+
+/** A middle dot between facts on one line; silent for screen readers. */
+function Sep() {
+  return (
+    <span className="rv-sep" aria-hidden="true">
+      {' · '}
+    </span>
+  );
+}
 
 /** Text link on paper. Web links open in a new tab; mailto stays put. */
 function PaperLink({ href, className = '', children }) {
@@ -113,23 +122,26 @@ function EducationSection() {
 function ExperienceSection() {
   return (
     <Section id="rv-experience" title="Experience">
-      {experienceGroups.map((group, index) => (
-        <div key={`${group.company}-${index}`} className="rv-entry">
-          <Row meta={group.place}>
-            <h3 className="rv-org">{group.company}</h3>
+      {resumeRoles.map((job) => (
+        <div key={`${job.company}-${job.role}`} className="rv-entry">
+          <Row meta={job.date}>
+            <h3 className="rv-role-line">
+              <span className="rv-org">{job.company}</span>
+              <Sep />
+              <span className="rv-role">{job.role}</span>
+              {job.place ? (
+                <>
+                  <Sep />
+                  <span className="rv-place">{job.place}</span>
+                </>
+              ) : null}
+            </h3>
           </Row>
-          {group.roles.map((job) => (
-            <div key={job.role} className="rv-job">
-              <Row meta={[job.place, job.date].filter(Boolean).join(' · ')}>
-                <p className="rv-role">{job.role}</p>
-              </Row>
-              <ul className="rv-bullets">
-                {job.highlights.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <ul className="rv-bullets">
+            {job.highlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </div>
       ))}
     </Section>

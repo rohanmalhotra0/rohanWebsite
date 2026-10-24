@@ -5,6 +5,7 @@ import { repoUrl, shortRepoName, timeAgo } from './githubActivity';
 import useGitHubActivity from './useGitHubActivity';
 
 const EASE = [0.16, 1, 0.3, 1];
+const MotionDiv = motion.div;
 const listFormat = new Intl.ListFormat('en', { type: 'conjunction' });
 const exactTime = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
@@ -43,7 +44,7 @@ function Activity({ activity, fadeIn }) {
     );
 
   return (
-    <motion.div
+    <MotionDiv
       initial={fadeIn && !reduceMotion ? { opacity: 0 } : false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: EASE }}
@@ -57,7 +58,7 @@ function Activity({ activity, fadeIn }) {
         </time>
         .{others.length ? <> Also active in {otherLinks}.</> : null}
       </p>
-    </motion.div>
+    </MotionDiv>
   );
 }
 
