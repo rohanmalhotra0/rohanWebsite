@@ -96,6 +96,19 @@ class Kalshi:
             pass
         return list(found.values())
 
+    def events(self, **params):
+        return self.paginate("/events", "events", {"limit": 200, **params})
+
+    def best_yes_bid(self, ticker):
+        """(price, size) of the best YES bid, from either orderbook format."""
+        d = self.get(f"/markets/{ticker}/orderbook")
+        book = d.get("orderbook_fp") or d.get("orderbook") or {}
+        if book.get("yes_dollars"):
+            levels = [(float(p), float(q)) for p, q in book["yes_dollars"]]
+        else:
+            levels = [(p / 100, float(q)) for p, q in book.get("yes") or []]
+        return max(levels, default=(0.0, 0.0))
+
     def series(self, category=None):
         return self.paginate("/series", "series", {"category": category} if category else {})
 

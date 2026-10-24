@@ -6,3 +6,4 @@ __pycache__/
 data/
 edges.json
 words.json
+arb_trades.csv

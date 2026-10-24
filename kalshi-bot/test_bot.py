@@ -1,5 +1,6 @@
 """Offline tests: python -m unittest test_bot"""
 import base64
+import os
 import random
 import unittest
 from types import SimpleNamespace
@@ -7,6 +8,7 @@ from types import SimpleNamespace
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
+import arb
 import backtest
 import bot
 import kalshi
@@ -114,6 +116,59 @@ class Tests(unittest.TestCase):
         picks = [{"event": "A", "cost": 9.6}, {"event": "A", "cost": 9.6}, {"event": "B", "cost": 9.6}]
         self.assertEqual(len(bot.within_budget(picks, 50, one_per_event=True)), 2)
         self.assertEqual(len(bot.within_budget(picks, 15, one_per_event=False)), 1)
+
+    def test_arb_profit_is_locked_in_for_every_outcome(self):
+        # YES bids sum to 1.12: buying NO everywhere must profit whoever wins.
+        legs = [("A", 0.55, 40), ("B", 0.35, 25), ("C", 0.15, 60), ("D", 0.07, 10)]
+        b = arb.no_basket(legs, budget=30)
+        self.assertIsNotNone(b)
+        c, chosen = b["count"], [t for t, _ in b["legs"]]
+        for winner in chosen + [None]:
+            payout = sum(c for t in chosen if t != winner)
+            self.assertAlmostEqual(payout - b["cost"], b["profit"] + (c if winner is None else 0))
+            self.assertGreater(payout - b["cost"], 0)
+        self.assertLessEqual(b["cost"], 30)
+
+    def test_arb_needs_bids_over_one_dollar(self):
+        self.assertIsNone(arb.no_basket([("A", 0.60, 50), ("B", 0.38, 50)], budget=30))
+        self.assertIsNone(arb.no_basket([("A", 0.60, 50)], budget=30))
+
+    def test_arb_fee_rounding_can_kill_tiny_arbs(self):
+        # Bids sum to 1.01, but 1-cent minimum fees on 3 legs eat it.
+        self.assertIsNone(arb.no_basket([("A", 0.50, 1), ("B", 0.30, 1), ("C", 0.21, 1)], budget=30))
+
+    def test_arb_scan_skips_events_that_are_not_mutually_exclusive(self):
+        class C:
+            def events(self, **p):
+                mk = lambda t, b: {"ticker": t, "yes_bid_dollars": str(b)}
+                return [{"event_ticker": "E1", "mutually_exclusive": False, "markets": [mk("A", .6), mk("B", .6)]},
+                        {"event_ticker": "E2", "mutually_exclusive": True, "markets": [mk("X", .6), mk("Y", .6)]}]
+
+            def best_yes_bid(self, t):
+                return 0.6, 20
+        found = arb.scan(C(), budget=30)
+        self.assertEqual([b["event"] for b in found], ["E2"])
+
+    def test_arb_stops_on_partial_fill(self):
+        class C:
+            calls = []
+
+            def buy(self, t, side, c, p):
+                self.calls.append(t)
+                return {"status": "canceled", "fill_count_fp": "0.00"} if t == "B" else {"status": "executed"}
+        arb.LOG_FILE = os.path.join(self._tmp(), "log.csv")
+        basket = {"event": "E", "count": 5, "legs": [("A", 0.6), ("B", 0.5), ("C", 0.2)]}
+        with self.assertRaises(RuntimeError) as e:
+            arb.execute(C(), basket)
+        self.assertEqual(C.calls, ["A", "B"])  # never buys C after B fails
+        self.assertIn("Already bought NO on: A", str(e.exception))
+
+    def test_orderbook_both_formats(self):
+        k = kalshi.Kalshi()
+        k.get = lambda path, params=None: {"orderbook_fp": {"yes_dollars": [["0.4100", "5.00"], ["0.4200", "9.00"]]}}
+        self.assertEqual(k.best_yes_bid("T"), (0.42, 9.0))
+        k.get = lambda path, params=None: {"orderbook": {"yes": [[40, 3], [43, 7]], "no": [[55, 2]]}}
+        self.assertEqual(k.best_yes_bid("T"), (0.43, 7.0))
 
     def _tmp(self):
         import tempfile
