@@ -7,8 +7,9 @@ const EASE = [0.16, 1, 0.3, 1];
 const MotionDiv = motion.div;
 
 /**
- * Thin bar from `start` to `end` (YYYY-MM-DD), measured against today.
- * The text label carries the meaning; the bar is a visual echo of it.
+ * Thin bar from `start` to `end` (YYYY-MM-DD), measured against today, with
+ * the reading set under the end of the fill. The text carries the meaning;
+ * the bar only echoes it, so it is hidden from assistive tech.
  */
 export default function DegreeProgress({ start, end, className }) {
   // Read the clock once per mount; the page doesn't need to tick.
@@ -17,12 +18,15 @@ export default function DegreeProgress({ start, end, className }) {
   const inView = useInView(trackRef, { once: true, amount: 'all' });
   const reduceMotion = useReducedMotion();
 
+  // Near the start there's no room to hang the label off the fill end.
+  const labelStyle = ratio >= 0.25 ? { right: `${(1 - ratio) * 100}%` } : { left: 0 };
+
   return (
-    <div className={cn('max-w-xl', className)}>
+    <div className={cn('relative pb-8', className)}>
       <div
         ref={trackRef}
         aria-hidden="true"
-        className="relative h-0.5 overflow-hidden rounded-full bg-line-strong/60"
+        className="relative h-0.5 overflow-hidden rounded-full bg-line"
       >
         <MotionDiv
           className="absolute inset-0 origin-left bg-fg"
@@ -31,7 +35,12 @@ export default function DegreeProgress({ start, end, className }) {
           transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
         />
       </div>
-      <p className="mt-3 text-sm tabular-nums text-subtle">{label}</p>
+      <p
+        className="absolute top-3 whitespace-nowrap text-sm leading-5 text-subtle"
+        style={labelStyle}
+      >
+        {label}
+      </p>
     </div>
   );
 }

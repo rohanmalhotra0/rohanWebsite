@@ -45,7 +45,8 @@ function Paper({ paper, index }) {
           </p>
           <TechList items={paper.tags} className="mt-4" />
           {paper.liveUrl || paper.externalUrl ? (
-            <div className="mt-4 flex flex-wrap gap-x-6">
+            // 44px tap targets; the negative margin keeps the visual rhythm.
+            <div className="-mb-3 mt-2 flex flex-wrap gap-x-6">
               {paper.liveUrl ? <PaperLink href={paper.liveUrl}>Read paper (PDF)</PaperLink> : null}
               {paper.externalUrl ? (
                 <PaperLink href={paper.externalUrl}>Published record</PaperLink>

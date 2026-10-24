@@ -5,7 +5,7 @@
  * Kalshi's logo is a full-bleed square, so it fills the tile.
  */
 const FRAMES = {
-  IBM: { width: 74, size: [500, 200] },
+  IBM: { width: 80, size: [500, 200] },
   Kalshi: { cover: true, size: [200, 200] },
   // The VT mark; the lockup's small type turns to noise at 40px.
   'Hume Center': { width: 72, crop: [55, 3, 84, 41], size: [196, 104] },

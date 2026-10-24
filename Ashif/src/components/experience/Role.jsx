@@ -17,7 +17,7 @@ export function RoleMeta({ date, location, className }) {
             {' · '}
           </span>
           {/* Nudged so its baseline meets the company line's. */}
-          <span className="md:mt-[3px] md:block">{location}</span>
+          <span className="md:mt-[2px] md:block">{location}</span>
         </>
       ) : null}
     </p>
@@ -28,7 +28,7 @@ export function RoleMeta({ date, location, className }) {
  * Logo tile beside a two-line title block. The tile is positioned out of flow
  * so the block's first baseline is the title's, which the meta column aligns to.
  */
-export function RoleHeader({ company, imageUrl, title, subtitle, as: Heading = 'h3' }) {
+export function RoleHeader({ company, imageUrl, title, subtitle }) {
   return (
     <header className="relative flex min-h-10 flex-col justify-center pl-[3.25rem]">
       <CompanyLogo
@@ -36,9 +36,9 @@ export function RoleHeader({ company, imageUrl, title, subtitle, as: Heading = '
         src={imageUrl}
         className="absolute left-0 top-1/2 -translate-y-1/2"
       />
-      <Heading className="type-heading text-balance text-xl leading-[1.625rem] text-fg sm:text-[1.375rem]">
+      <h3 className="type-heading text-balance text-xl leading-[1.625rem] text-fg sm:text-[1.375rem]">
         {title}
-      </Heading>
+      </h3>
       {subtitle ? <p className="text-[15px] leading-6 text-muted">{subtitle}</p> : null}
     </header>
   );

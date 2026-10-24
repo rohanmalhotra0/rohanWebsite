@@ -3,7 +3,8 @@ import { Container, Section, SectionHeader } from '@/components/primitives/Secti
 import { education, skillGroups } from '@/data/portfolioData';
 import DegreeProgress from './DegreeProgress';
 
-const LABEL = 'text-[15px] leading-6 text-subtle';
+// Labels and list items share one line height so baselines line up across columns.
+const LABEL = 'text-[15px] leading-7 text-subtle';
 const LIST = 'text-[15px] leading-7 text-fg';
 
 export default function Education() {
@@ -55,7 +56,7 @@ export default function Education() {
             <p className="type-heading text-[1.75rem] leading-[1.1] text-muted sm:text-[2.25rem]">
               {minor}
             </p>
-            <p className="mt-5 text-[15px] leading-6 text-muted tabular-nums">
+            <p className="mt-5 text-[15px] leading-6 text-muted">
               {dates}
               <Dot />
               {location}
@@ -67,7 +68,7 @@ export default function Education() {
           {accelerated ? (
             <Row label={<h4 className={LABEL}>Accelerated path</h4>}>
               <p className="max-w-xl text-pretty text-base leading-7 text-fg">{accelerated}</p>
-              <DegreeProgress start={start} end={end} className="mt-5" />
+              <DegreeProgress start={start} end={end} className="mt-6" />
             </Row>
           ) : null}
 
@@ -82,7 +83,8 @@ export default function Education() {
 
           {coursework?.length ? (
             <Row label={<h4 className={LABEL}>Coursework</h4>}>
-              <ul className={`columns-2 gap-x-8 sm:columns-3 ${LIST}`}>
+              {/* Two columns: they fall on the page grid and split CS from math. */}
+              <ul className={`columns-2 gap-x-8 ${LIST}`}>
                 {coursework.map((course) => (
                   <li key={course} className="break-inside-avoid">
                     {course}
@@ -112,12 +114,15 @@ export default function Education() {
   );
 }
 
-/** One line of the sheet: a label column on the left, the content on the right. */
+/**
+ * One line of the sheet: label on the left (4 of 12 columns), content on the
+ * right (8 of 12), so every sub-column below lands on the page grid.
+ */
 function Row({ label, children }) {
   return (
     <Reveal className="grid gap-4 border-b border-line py-8 lg:grid-cols-12 lg:gap-8 lg:py-10">
-      <div className="lg:col-span-3">{label}</div>
-      <div className="min-w-0 lg:col-span-9">{children}</div>
+      <div className="lg:col-span-4">{label}</div>
+      <div className="min-w-0 lg:col-span-8">{children}</div>
     </Reveal>
   );
 }

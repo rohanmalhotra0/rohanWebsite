@@ -19,14 +19,12 @@ export function getDegreeProgress(startIso, endIso, now = Date.now()) {
   const total = end - start;
   const ratio = total > 0 ? Math.min(1, Math.max(0, (now - start) / total)) : 1;
   const graduated = now >= end;
-  const endLabel = formatMonthYear(end);
+  const percent = Math.floor(ratio * 100);
 
   return {
     ratio,
-    percent: Math.floor(ratio * 100),
+    percent,
     graduated,
-    label: graduated
-      ? `Graduated ${endLabel}`
-      : `${Math.floor(ratio * 100)}% done · graduating ${endLabel}`,
+    label: graduated ? `Graduated ${formatMonthYear(end)}` : `${percent}% done`,
   };
 }
