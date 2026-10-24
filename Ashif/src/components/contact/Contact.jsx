@@ -110,7 +110,9 @@ export default function Contact() {
               </div>
 
               <ul className="relative border-t border-line">
-                {links.map(({ label, detail, href, icon: Icon, external }) => (
+                {links.map(({ label, detail, href, icon, external }) => {
+                  const Icon = icon;
+                  return (
                   <li key={label} className="border-b border-line">
                     <a
                       href={href}
@@ -137,7 +139,8 @@ export default function Contact() {
                       {external ? <span className="sr-only">(opens in a new tab)</span> : null}
                     </a>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </div>
 

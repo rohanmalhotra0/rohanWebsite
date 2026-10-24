@@ -130,11 +130,8 @@ const ANSWERS = {
       .map((project) => shortTitle(project.title))
       .filter((title) => !/\s/.test(title))
       .slice(0, 2);
-    return [
-      'Hey, I’m RohanGPT. I answer from Rohan’s verified profile, so ask about my work at IBM or Kalshi, my research, school, or a project by name',
-      examples.length ? ` (try ${examples.join(' or ')})` : '',
-      '.',
-    ].join('');
+    const tryThese = examples.length ? ` (try ${examples.join(' or ')})` : '';
+    return `Hey! Ask me about my work at IBM or Kalshi, my research, school, or a project by name${tryThese}. Everything I say here comes from my verified profile.`;
   },
 
   thanks: () =>

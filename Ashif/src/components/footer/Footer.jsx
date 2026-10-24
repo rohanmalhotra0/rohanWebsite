@@ -45,7 +45,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <nav aria-labelledby="footer-sections" className="lg:col-span-3 lg:col-start-7">
+          <nav aria-labelledby="footer-sections" className="lg:col-span-3 lg:col-start-6">
             <ColumnTitle>
               <span id="footer-sections">Sections</span>
             </ColumnTitle>
@@ -92,7 +92,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          <div className="col-span-2 flex lg:col-span-2 lg:justify-end">
+          <div className="col-span-2 flex lg:col-span-2 lg:col-start-11 lg:justify-end">
             <a
               href="#top"
               className="group inline-flex h-11 items-center gap-2 self-start rounded-full border border-line-strong px-4 text-sm font-medium text-fg transition-[background-color,transform] duration-200 ease-out hover:bg-surface-2 active:scale-[0.98]"
@@ -116,8 +116,11 @@ export default function Footer() {
 
       {/* Giant wordmark, sized to the container width and cut off by the bottom of the page. */}
       <div aria-hidden="true" className="container-page pointer-events-none select-none @container">
-        <p className="h-[0.74em] overflow-hidden whitespace-nowrap text-center text-[16.2cqw] font-semibold leading-[0.92] tracking-[-0.065em]">
-          <span className="text-gradient">{profile.name}</span>
+        {/* 14.9cqw ≈ the size at which the name exactly fills the container in Geist. */}
+        <p className="h-[0.74em] overflow-hidden whitespace-nowrap text-center text-[14.9cqw] font-semibold leading-[0.92] tracking-[-0.065em]">
+          <span className="bg-[linear-gradient(180deg,color-mix(in_oklab,var(--fg)_85%,transparent)_10%,color-mix(in_oklab,var(--fg)_4%,transparent)_92%)] bg-clip-text text-transparent">
+            {profile.name}
+          </span>
         </p>
       </div>
     </footer>

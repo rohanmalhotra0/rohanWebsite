@@ -83,7 +83,7 @@ function withCaret(content, ctx) {
   );
 }
 
-export default function Markdown({ blocks, limit = Infinity, typing = false, className }) {
+export default function Markdown({ blocks, limit = Infinity, typing = false, className, ...props }) {
   const ctx = { left: limit, typing, caretPlaced: false };
   const rendered = [];
 
@@ -133,5 +133,9 @@ export default function Markdown({ blocks, limit = Infinity, typing = false, cla
   // Typing has started but nothing is visible yet: show the caret alone.
   if (typing && !rendered.length) rendered.push(<Caret key="caret" />);
 
-  return <div className={cn('space-y-3', className)}>{rendered}</div>;
+  return (
+    <div className={cn('space-y-3', className)} {...props}>
+      {rendered}
+    </div>
+  );
 }
