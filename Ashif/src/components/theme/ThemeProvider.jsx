@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom';
 import { THEME_COLORS, THEME_STORAGE_KEY, ThemeContext } from '@/lib/theme';
 
 function readTheme() {
-  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
 }
 
 export default function ThemeProvider({ children }) {

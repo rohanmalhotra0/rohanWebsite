@@ -17,9 +17,11 @@ npm run build     # outputs Ashif/dist
 ## Stack
 
 - React 19 + Vite 7, Tailwind CSS v4, `motion` for UI animation.
-- Raw WebGL for the hero particle field. No 3D library; it loads after first
-  paint and pauses when off-screen.
-- Geist, Geist Mono, and Instrument Serif, self-hosted through Fontsource.
+- three.js for the hero: a procedurally modeled Spot-style robot that fetches a
+  toy wherever you click. It's code-split, loads after first paint behind a
+  static poster, and pauses when off-screen.
+- Hubot Sans (display), Mona Sans (text), and JetBrains Mono, self-hosted
+  through Fontsource. Light and dark themes; first visit follows the OS.
 
 ## Structure
 
@@ -29,10 +31,10 @@ Ashif/src
 ├── index.css                # design tokens (dark/light), utilities
 ├── data/portfolioData.js    # all content: profile, experience, projects, research…
 ├── components/
-│   ├── primitives/          # Section, SectionHeader, Reveal, Button, Tag
-│   ├── theme/               # ThemeProvider (dark default, circular reveal toggle)
+│   ├── primitives/          # Section, SectionHeader, Reveal, Button, TechList
+│   ├── theme/               # ThemeProvider (light/dark, circular reveal toggle)
 │   ├── nav/                 # floating navbar + ⌘K command palette
-│   ├── hero/                # WebGL particle hero
+│   ├── hero/                # three.js robot fetch demo
 │   ├── experience/  projects/  research/  about/  education/
 │   ├── rohangpt/            # chat UI
 │   ├── contact/  footer/

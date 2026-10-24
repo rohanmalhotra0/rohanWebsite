@@ -5,7 +5,7 @@ export default function Projects() {
   return (
     <Section id="projects">
       <Container>
-        <SectionHeader index="02" label="Projects" title={<>Things I&rsquo;ve <em>built</em></>} />
+        <SectionHeader title="Projects" />
       </Container>
     </Section>
   );

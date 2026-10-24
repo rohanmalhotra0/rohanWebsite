@@ -1,11 +1,12 @@
 import { cn } from '@/lib/utils';
 import Reveal from './Reveal';
 
+/** Page section. Sections are separated by a hairline rule, like a printed spec. */
 export function Section({ id, className, children, ...props }) {
   return (
     <section
       id={id}
-      className={cn('relative scroll-mt-20 py-24 sm:py-32', className)}
+      className={cn('relative scroll-mt-16 border-t border-line py-20 sm:py-28', className)}
       {...props}
     >
       {children}
@@ -17,46 +18,31 @@ export function Container({ className, children }) {
   return <div className={cn('container-page', className)}>{children}</div>;
 }
 
-/** Mono eyebrow like "01 —— EXPERIENCE". */
-export function Eyebrow({ index, label, className }) {
+/**
+ * Section header: a plain, wide heading on the left and an optional short
+ * description (or any `aside` content) on the right from md up.
+ */
+export function SectionHeader({ title, description, aside, className }) {
   return (
-    <p
+    <Reveal
       className={cn(
-        'flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-subtle',
+        'grid gap-5 md:grid-cols-12 md:items-end md:gap-8',
         className
       )}
     >
-      {index ? <span className="text-accent-strong">{index}</span> : null}
-      {index ? <span aria-hidden="true" className="h-px w-8 bg-line-strong" /> : null}
-      <span>{label}</span>
-    </p>
-  );
-}
-
-/**
- * Section header. Put <em> around a word in `title` for the serif-italic accent:
- * title={<>Things I&rsquo;ve <em>built</em></>}
- */
-export function SectionHeader({
-  index,
-  label,
-  title,
-  description,
-  className,
-  children,
-}) {
-  return (
-    <Reveal className={cn('max-w-3xl', className)}>
-      <Eyebrow index={index} label={label} />
-      <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.04em] text-fg sm:text-5xl lg:text-6xl">
+      <h2 className="type-heading text-[2.5rem] text-fg sm:text-6xl md:col-span-7">
         {title}
       </h2>
-      {description ? (
-        <p className="mt-5 max-w-2xl text-pretty text-base leading-7 text-muted sm:text-lg sm:leading-8">
-          {description}
-        </p>
+      {description || aside ? (
+        <div className="md:col-span-5 md:pb-1.5">
+          {description ? (
+            <p className="max-w-md text-pretty text-base leading-7 text-muted">
+              {description}
+            </p>
+          ) : null}
+          {aside}
+        </div>
       ) : null}
-      {children}
     </Reveal>
   );
 }

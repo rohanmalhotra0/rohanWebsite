@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -7,8 +7,8 @@
       name="description"
       content="Rohan Malhotra is an NYU Courant computer science student building applied AI, robotics, and quantitative systems, with work at IBM and Kalshi."
     />
-    <meta name="theme-color" content="#08090a" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#f3f2ee" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="canonical" href="https://rohanm.org/" />
 
     <meta property="og:type" content="website" />
@@ -38,20 +38,22 @@
 
     <title>Rohan Malhotra</title>
 
-    <!-- Apply the saved theme before first paint so there is no flash. -->
+    <!-- Apply the saved theme (or the OS preference) before first paint. -->
     <script>
       (function () {
-        var theme = 'dark';
+        var theme;
         try {
-          var saved = localStorage.getItem('rm-theme');
-          if (saved === 'light' || saved === 'dark') theme = saved;
+          theme = localStorage.getItem('rm-theme');
         } catch (e) {}
-        document.documentElement.dataset.theme = theme;
-        if (theme === 'light') {
-          document
-            .querySelector('meta[name="theme-color"]')
-            .setAttribute('content', '#f7f7f5');
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
         }
+        document.documentElement.dataset.theme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute('content', theme === 'dark' ? '#0e0e0d' : '#f3f2ee');
       })();
     </script>
 

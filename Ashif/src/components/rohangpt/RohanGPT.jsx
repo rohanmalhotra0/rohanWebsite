@@ -5,7 +5,7 @@ export default function RohanGPT() {
   return (
     <Section id="rohangpt">
       <Container>
-        <SectionHeader index="06" label="RohanGPT" title={<>Ask me <em>anything</em></>} />
+        <SectionHeader title="Ask about my work" />
       </Container>
     </Section>
   );

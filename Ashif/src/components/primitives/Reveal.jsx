@@ -4,13 +4,13 @@ const EASE = [0.16, 1, 0.3, 1];
 
 /**
  * Fades and lifts its children into view once, when scrolled to.
- * Stagger siblings with `delay={index * 0.06}`.
+ * Stagger siblings with `delay={index * 0.05}`.
  */
 export default function Reveal({
   as = 'div',
   delay = 0,
-  y = 18,
-  amount = 0.2,
+  y = 14,
+  amount = 0.15,
   className,
   children,
   ...rest
@@ -28,10 +28,10 @@ export default function Reveal({
 
   return (
     <Component
-      initial={{ opacity: 0, y, filter: 'blur(4px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount }}
-      transition={{ duration: 0.8, delay, ease: EASE }}
+      transition={{ duration: 0.6, delay, ease: EASE }}
       className={className}
       {...rest}
     >

@@ -3,10 +3,10 @@ import { profile } from '@/data/portfolioData';
 // Placeholder: replaced by the hero build.
 export default function Hero() {
   return (
-    <section id="top" className="relative flex min-h-svh items-end pb-24">
+    <section id="top" className="relative flex min-h-svh items-end pb-20">
       <div className="container-page">
-        <h1 className="text-7xl font-semibold tracking-[-0.05em]">{profile.name}</h1>
-        <p className="mt-4 text-lg text-muted">{profile.headline}</p>
+        <h1 className="type-display text-7xl">{profile.name}</h1>
+        <p className="mt-6 max-w-xl text-lg text-muted">{profile.summary}</p>
       </div>
     </section>
   );

@@ -596,13 +596,13 @@ export const skillGroups = [
 
 /** Page sections in order; drives the navbar, command palette, and footer. */
 export const sections = [
-  { id: 'experience', label: 'Experience', index: '01' },
-  { id: 'projects', label: 'Projects', index: '02' },
-  { id: 'research', label: 'Research', index: '03' },
-  { id: 'about', label: 'About', index: '04' },
-  { id: 'education', label: 'Education', index: '05' },
-  { id: 'rohangpt', label: 'RohanGPT', index: '06' },
-  { id: 'contact', label: 'Contact', index: '07' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'research', label: 'Research' },
+  { id: 'about', label: 'About' },
+  { id: 'education', label: 'Education' },
+  { id: 'rohangpt', label: 'Ask me' },
+  { id: 'contact', label: 'Contact' },
 ];
 
 /** Places I have worked or studied, for the hero "worked at" strip. */
