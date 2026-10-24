@@ -25,7 +25,7 @@ function Figures({ text }) {
 function ItemContent({ text }) {
   return (
     <>
-      <span aria-hidden="true" className="absolute left-0 text-line-strong">
+      <span aria-hidden="true" className="absolute left-0 text-subtle">
         –
       </span>
       <Figures text={text} />

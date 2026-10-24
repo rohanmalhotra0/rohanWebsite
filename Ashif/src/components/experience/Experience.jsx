@@ -53,7 +53,9 @@ function CompanyRoles({ group }) {
               className={META}
             />
             <div className={CONTENT}>
-              <h4 className="type-heading text-balance text-lg leading-7 text-fg">{role.role}</h4>
+              <h4 className="type-heading text-balance text-lg leading-[1.625rem] text-fg sm:text-xl">
+                {role.role}
+              </h4>
               <RoleBody role={role} expanded={role.index === 0} />
             </div>
           </li>

@@ -29,7 +29,7 @@ export default function DegreeProgress({ start, end, className }) {
         className="relative h-0.5 overflow-hidden rounded-full bg-line"
       >
         <MotionDiv
-          className="absolute inset-0 origin-left bg-fg"
+          className="absolute inset-0 origin-left bg-accent"
           initial={reduceMotion ? false : { scaleX: 0 }}
           animate={{ scaleX: inView || reduceMotion ? ratio : 0 }}
           transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
