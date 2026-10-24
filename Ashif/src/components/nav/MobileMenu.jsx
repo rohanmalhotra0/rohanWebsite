@@ -131,7 +131,7 @@ function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, o
         </div>
       </div>
 
-      <nav aria-label="Sections" className="container-page shrink-0 pt-6">
+      <nav aria-label="Sections" className="container-page shrink-0 pt-5">
         <ul className="border-t border-line">
           {sections.map((section, i) => {
             const isActive = active === section.id;
@@ -141,7 +141,7 @@ function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, o
                   href={`#${section.id}`}
                   onClick={onSectionClick(section.id)}
                   aria-current={isActive ? 'true' : undefined}
-                  className="type-heading flex min-h-16 items-center text-[2rem] text-fg transition-opacity active:opacity-60"
+                  className="type-heading flex min-h-14 items-center text-[1.75rem] text-fg transition-opacity active:opacity-60"
                 >
                   <span
                     className={cn(
@@ -160,12 +160,12 @@ function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, o
 
       <MotionDiv
         {...rise(sections.length)}
-        className="container-page mt-auto shrink-0 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-12"
+        className="container-page mt-auto shrink-0 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-8"
       >
         <Button href="#/resume" variant="secondary" size="lg" onClick={onLeave} className="w-full">
           Résumé
         </Button>
-        <ul className="mt-3 flex items-center justify-between">
+        <ul className="mt-2 flex items-center justify-between">
           {LINKS.map((link) => (
             <li key={link.label}>
               <a

@@ -52,9 +52,10 @@ export default function Contact() {
       <Container>
         <SectionHeader title="Contact" description={INTRO} />
         <div className="mt-12 grid gap-14 sm:mt-16 lg:grid-cols-12 lg:gap-8">
-          <Reveal className="lg:col-span-7">
-            <EmailLine />
-            <ContactLinks className="mt-8 max-w-sm sm:mt-10" />
+          {/* Subgrid, so the link list ends on a column line rather than at an arbitrary width. */}
+          <Reveal className="lg:col-span-7 lg:grid lg:grid-cols-subgrid lg:content-start">
+            <EmailLine className="lg:col-span-7" />
+            <ContactLinks className="mt-8 max-w-sm sm:mt-10 lg:col-span-4 lg:max-w-none" />
           </Reveal>
           <Reveal delay={0.08} className="max-w-xl lg:col-span-5 lg:col-start-8 lg:max-w-none">
             <ContactForm />

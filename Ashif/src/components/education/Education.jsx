@@ -35,15 +35,23 @@ export default function Education() {
           <Row
             label={
               <div className="flex items-center gap-4 lg:flex-col lg:items-start">
-                <img
-                  src={logoUrl}
-                  alt=""
-                  width="44"
-                  height="44"
-                  loading="lazy"
-                  decoding="async"
-                  className="size-11 shrink-0 rounded-lg ring-1 ring-line"
-                />
+                {/* Same paper tile as the Experience logos; NYU's mark is full-bleed, so it fills it. */}
+                <span className="relative isolate block size-10 shrink-0 overflow-hidden rounded-md bg-surface dark:bg-fg">
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    width="100"
+                    height="100"
+                    loading="lazy"
+                    decoding="async"
+                    draggable={false}
+                    className="size-full object-cover"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-fg/10 ring-inset"
+                  />
+                </span>
                 <div>
                   <h3 className="text-[15px] font-medium leading-6 text-fg">{school}</h3>
                   <p className="text-balance text-[15px] leading-6 text-muted">{college}</p>
@@ -59,19 +67,23 @@ export default function Education() {
             </p>
             <MetaLine
               className="mt-5"
-              items={[dates, location, `GPA ${gpa} / ${gpaScale}`].filter(Boolean)}
+              items={[
+                dates,
+                location,
+                gpa ? `GPA ${gpa}${gpaScale ? ` / ${gpaScale}` : ''}` : null,
+              ].filter(Boolean)}
             />
           </Row>
 
           {accelerated ? (
-            <Row label={<h4 className={LABEL}>Accelerated path</h4>}>
+            <Row delay={0.05} label={<h4 className={LABEL}>Accelerated path</h4>}>
               <p className="max-w-xl text-pretty text-base leading-7 text-fg">{accelerated}</p>
               <DegreeProgress start={start} end={end} className="mt-6" />
             </Row>
           ) : null}
 
           {graduateCourse ? (
-            <Row label={<h4 className={LABEL}>Graduate course</h4>}>
+            <Row delay={0.1} label={<h4 className={LABEL}>Graduate course</h4>}>
               <p className="text-base font-medium leading-7 text-fg">{graduateCourse.title}</p>
               <p className="mt-1 max-w-xl text-pretty text-[15px] leading-6 text-muted">
                 {graduateCourse.description}
@@ -80,7 +92,7 @@ export default function Education() {
           ) : null}
 
           {coursework?.length ? (
-            <Row label={<h4 className={LABEL}>Coursework</h4>}>
+            <Row delay={0.15} label={<h4 className={LABEL}>Coursework</h4>}>
               {/* Two columns from sm up: they fall on the page grid and split CS from math. */}
               <ul className={`gap-x-8 sm:columns-2 ${LIST}`}>
                 {coursework.map((course) => (
@@ -92,20 +104,22 @@ export default function Education() {
             </Row>
           ) : null}
 
-          <Row label={<h3 className={LABEL}>Tools</h3>}>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:grid-cols-4">
-              {skillGroups.map((group) => (
-                <div key={group.label}>
-                  <h4 className={LABEL}>{group.label}</h4>
-                  <ul className={`mt-2 ${LIST}`}>
-                    {group.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </Row>
+          {skillGroups?.length ? (
+            <Row delay={0.2} label={<h3 className={LABEL}>Tools</h3>}>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:grid-cols-4">
+                {skillGroups.map((group) => (
+                  <div key={group.label}>
+                    <h4 className={LABEL}>{group.label}</h4>
+                    <ul className={`mt-2 ${LIST}`}>
+                      {group.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </Row>
+          ) : null}
         </div>
       </Container>
     </Section>
@@ -116,9 +130,12 @@ export default function Education() {
  * One line of the sheet: label on the left (4 of 12 columns), content on the
  * right (8 of 12), so every sub-column below lands on the page grid.
  */
-function Row({ label, children }) {
+function Row({ label, delay = 0, children }) {
   return (
-    <Reveal className="grid gap-4 border-b border-line py-8 lg:grid-cols-12 lg:gap-8 lg:py-10">
+    <Reveal
+      delay={delay}
+      className="grid gap-4 border-b border-line py-8 lg:grid-cols-12 lg:gap-8 lg:py-10"
+    >
       <div className="lg:col-span-4">{label}</div>
       <div className="min-w-0 lg:col-span-8">{children}</div>
     </Reveal>

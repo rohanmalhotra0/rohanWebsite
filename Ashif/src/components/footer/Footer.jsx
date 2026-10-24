@@ -76,14 +76,17 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col items-start gap-1 border-t border-line pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 text-[13px] leading-5 text-subtle md:grid md:grid-cols-12 md:items-baseline md:gap-x-8">
+        {/* Same columns as above: "Back to top" lines up with the Elsewhere links. */}
+        <div className="grid grid-cols-2 items-baseline gap-x-8 border-t border-line pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 text-[13px] leading-5 text-subtle md:grid-cols-12 md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <p className="text-muted md:col-span-7">
             © {year} {profile.name}
           </p>
-          <p className="text-balance md:col-span-3">Built with React, three.js, and Tailwind.</p>
+          <p className="col-span-2 row-start-2 text-balance md:col-span-3 md:row-start-1">
+            Built with React, three.js, and Tailwind.
+          </p>
           <a
             href="#top"
-            className="-mb-3 inline-flex min-h-11 items-center text-muted transition-colors duration-150 hover:text-fg md:col-span-2 md:mb-0"
+            className="col-start-2 row-start-1 inline-flex min-h-11 items-center justify-self-start text-muted transition-colors duration-150 hover:text-fg md:col-span-2 md:col-start-auto"
           >
             Back to top
           </a>

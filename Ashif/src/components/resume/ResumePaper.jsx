@@ -6,15 +6,6 @@ import {
   resumeRoles,
 } from './resumeData';
 
-/** A middle dot between facts on one line; silent for screen readers. */
-function Sep() {
-  return (
-    <span className="rv-sep" aria-hidden="true">
-      {' · '}
-    </span>
-  );
-}
-
 /** Text link on paper. Web links open in a new tab; mailto stays put. */
 function PaperLink({ href, className = '', children }) {
   const newTab = !href.startsWith('mailto:');
@@ -27,6 +18,15 @@ function PaperLink({ href, className = '', children }) {
     >
       {children}
     </a>
+  );
+}
+
+/** A middle dot between facts on one line; silent for screen readers. */
+function Sep() {
+  return (
+    <span className="rv-sep" aria-hidden="true">
+      {' · '}
+    </span>
   );
 }
 
@@ -66,11 +66,7 @@ function Header() {
         <p key={index} className="rv-contact">
           {line.map((item, i) => (
             <span key={item.label} className="rv-contact-item">
-              {i > 0 ? (
-                <span className="rv-contact-sep" aria-hidden="true">
-                  {' · '}
-                </span>
-              ) : null}
+              {i > 0 ? <Sep /> : null}
               {item.href ? (
                 <PaperLink href={item.href}>{item.label}</PaperLink>
               ) : (
@@ -89,20 +85,19 @@ function EducationSection() {
     <Section id="rv-education" title="Education">
       <div className="rv-entry">
         <Row meta={education.dates}>
-          <h3 className="rv-org">
-            {education.school}
-            <span className="rv-org-note">
-              <span className="rv-org-sep">, </span>
+          <h3 className="rv-heading">
+            <span className="rv-strong">{education.school}</span>
+            <span className="rv-note rv-college">
+              <span className="rv-college-comma">, </span>
               {education.college}
             </span>
           </h3>
         </Row>
         <Row meta={education.location}>
-          <p className="rv-role">
+          <p className="rv-sub">
             {education.degree}, {education.minor}
-            <span className="rv-role-note">
-              {' · '}GPA {education.gpa} / {education.gpaScale}
-            </span>
+            <Sep />
+            GPA {education.gpa} / {education.gpaScale}
           </p>
         </Row>
         <p className="rv-text rv-gap">{education.accelerated}</p>
@@ -125,14 +120,14 @@ function ExperienceSection() {
       {resumeRoles.map((job) => (
         <div key={`${job.company}-${job.role}`} className="rv-entry">
           <Row meta={job.date}>
-            <h3 className="rv-role-line">
-              <span className="rv-org">{job.company}</span>
+            <h3 className="rv-heading">
+              <span className="rv-strong">{job.company}</span>
               <Sep />
-              <span className="rv-role">{job.role}</span>
+              {job.role}
               {job.place ? (
                 <>
                   <Sep />
-                  <span className="rv-place">{job.place}</span>
+                  <span className="rv-note">{job.place}</span>
                 </>
               ) : null}
             </h3>
@@ -154,14 +149,17 @@ function ProjectsSection() {
       {resumeProjects.map((project) => (
         <div key={project.slug} className="rv-entry">
           <Row meta={project.year}>
-            <p className="rv-title-line">
-              <span className="rv-title">{project.title}</span>
+            <div className="rv-heading">
+              <h3 className="rv-strong rv-inline">{project.title}</h3>
               {project.link ? (
-                <PaperLink href={project.link} className="rv-url">
-                  {displayUrl(project.link)}
-                </PaperLink>
+                <>
+                  <Sep />
+                  <PaperLink href={project.link} className="rv-note rv-url">
+                    {displayUrl(project.link)}
+                  </PaperLink>
+                </>
               ) : null}
-            </p>
+            </div>
           </Row>
           <p className="rv-text">{project.description}</p>
           {project.tags?.length ? (
@@ -179,7 +177,7 @@ function ResearchSection() {
       {research.map((paper) => (
         <div key={paper.title} className="rv-entry">
           <Row meta={paper.eyebrow}>
-            <h3 className="rv-title">
+            <h3 className="rv-heading rv-strong">
               {paper.liveUrl ? (
                 <PaperLink href={paper.liveUrl}>{paper.title}</PaperLink>
               ) : (
@@ -192,7 +190,7 @@ function ResearchSection() {
             {paper.externalUrl ? (
               <>
                 {' '}
-                <PaperLink href={paper.externalUrl} className="rv-url">
+                <PaperLink href={paper.externalUrl} className="rv-note rv-url">
                   {displayUrl(paper.externalUrl)}
                 </PaperLink>
               </>

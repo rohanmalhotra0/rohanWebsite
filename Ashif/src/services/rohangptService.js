@@ -280,6 +280,9 @@ const ANSWERS = {
     );
   },
 
+  projectCount: () =>
+    `There are ${projects.length} projects on this site, and ${countWord(featuredProjects.length)} are featured: ${joinAnd(featuredProjects.map((project) => `**${shortTitle(project.title)}**`))}. They’re all in the ${mdLink('Projects', '#projects')} section.`,
+
   experience: () =>
     paragraphs(
       'These are the roles on my résumé:',
@@ -294,7 +297,7 @@ const ANSWERS = {
 
   intro: () =>
     paragraphs(
-      profile.summary,
+      profile.summary.replace(/^I’m an? /, `I’m ${profile.name}, a `),
       `I’m based in ${profile.location}, and I graduate in ${profile.graduation}.`
     ),
 
@@ -403,12 +406,12 @@ const TOPICS = [
   }),
   entry({
     id: 'research',
-    terms: ['research', 'paper', 'papers', 'publication*', 'published', 'publish', 'reddit', 'wallstreetbets', 'sentiment', 'kelly', 'capital allocation', 'cubesat'],
+    terms: ['research', 'paper', 'papers', 'publication*', 'published', 'publish', 'reddit', 'wallstreetbets', 'sentiment', 'kelly', 'capital allocation'],
     answer: ANSWERS.research,
   }),
   entry({
     id: 'education',
-    terms: ['nyu', 'courant', 'new york university', 'education', 'school', 'college', 'university', 'course', 'courses', 'coursework', 'class', 'classes', 'gpa', 'grades', 'graduat*', 'degree', 'major', 'minor', 'student', 'study', 'studying'],
+    terms: ['nyu', 'courant', 'new york university', 'education', 'school', 'college', 'university', 'courses', 'coursework', 'class', 'classes', 'gpa', 'grades', 'graduat*', 'degree', 'major', 'minor', 'student', 'study', 'studying'],
     answer: ANSWERS.education,
   }),
   entry({
@@ -431,7 +434,7 @@ const TOPICS = [
 const COMPANY_ANSWERS = { IBM: ANSWERS.ibm };
 const COMPANY_ALIASES = {
   IBM: ['international business machines'],
-  'Hume Center': ['hume', 'virginia tech', 'contentcube', 'satellite', 'aerospace', 'low earth orbit'],
+  'Hume Center': ['hume', 'virginia tech', 'contentcube', 'cubesat', 'satellite', 'aerospace', 'low earth orbit'],
   'Y-Axis': ['yaxis'],
 };
 const STOP_WORDS = new Set(['the', 'and', 'of', 'center', 'software', 'inc']);
@@ -548,8 +551,13 @@ const OVERVIEWS = [
   ...groupEntries,
   entry({
     id: 'best-project',
-    terms: ['best project*', 'which project*', 'favorite project*', 'favourite project*', 'top project*', 'featured', 'look at first', 'start with', 'proudest', 'coolest', 'projects', 'side project*', 'portfolio', 'how many project*'],
+    terms: ['best project*', 'which project*', 'favorite project*', 'favourite project*', 'top project*', 'featured', 'look at first', 'start with', 'proudest', 'coolest', 'projects', 'side project*', 'portfolio'],
     answer: ANSWERS.bestProject,
+  }),
+  entry({
+    id: 'project-count',
+    terms: ['how many project*', 'number of projects', 'how many things'],
+    answer: ANSWERS.projectCount,
   }),
   entry({
     id: 'experience',

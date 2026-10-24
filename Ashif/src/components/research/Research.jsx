@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Reveal from '@/components/primitives/Reveal';
 import { Container, Section, SectionHeader } from '@/components/primitives/Section';
@@ -24,7 +25,7 @@ export default function Research() {
 }
 
 function Paper({ paper, index }) {
-  const titleId = `research-${index + 1}`;
+  const titleId = useId();
 
   return (
     <Reveal as="li" delay={index * 0.05} className="border-b border-line">
@@ -89,23 +90,29 @@ function PaperLink({ href, title, children }) {
   );
 }
 
+const FRAME = 'block overflow-hidden rounded-lg border border-line bg-surface';
+// White paper is dimmed a touch in dark mode so it doesn't glare.
+const PAGE =
+  'aspect-video w-full object-cover object-top md:aspect-[3/2] dark:brightness-[0.85]';
+
 /** The first page of the paper. A mouse shortcut to the PDF; the text link is the accessible one. */
 function Thumbnail({ paper }) {
-  const image = (
-    <img
-      src={paper.imageUrl}
-      alt={paper.imageAlt ?? ''}
-      width="600"
-      height="400"
-      loading="lazy"
-      decoding="async"
-      className="aspect-video w-full object-cover object-top transition-[filter] duration-200 md:aspect-[3/2] dark:brightness-[0.85] dark:group-hover/thumb:brightness-100"
-    />
-  );
+  const imageProps = {
+    src: paper.imageUrl,
+    alt: paper.imageAlt ?? '',
+    width: 600,
+    height: 400,
+    loading: 'lazy',
+    decoding: 'async',
+  };
 
-  const frame = 'group/thumb block overflow-hidden rounded-lg border border-line bg-surface';
-
-  if (!paper.liveUrl) return <div className={frame}>{image}</div>;
+  if (!paper.liveUrl) {
+    return (
+      <div className={FRAME}>
+        <img {...imageProps} className={PAGE} />
+      </div>
+    );
+  }
 
   return (
     <a
@@ -114,9 +121,12 @@ function Thumbnail({ paper }) {
       rel="noreferrer"
       tabIndex={-1}
       aria-hidden="true"
-      className={`${frame} transition-colors duration-200 hover:border-line-strong`}
+      className={`group/thumb ${FRAME} transition-colors duration-200 hover:border-line-strong`}
     >
-      {image}
+      <img
+        {...imageProps}
+        className={`${PAGE} transition-[filter] duration-200 dark:group-hover/thumb:brightness-100`}
+      />
     </a>
   );
 }
