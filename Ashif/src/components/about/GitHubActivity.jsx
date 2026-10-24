@@ -47,7 +47,7 @@ function Activity({ activity, fadeIn }) {
       initial={fadeIn && !reduceMotion ? { opacity: 0 } : false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: EASE }}
-      className="text-[15px] leading-6"
+      className="pt-10 text-[15px] leading-6"
     >
       <p className="text-[13px] leading-5 text-subtle">On GitHub</p>
       <p className="mt-1 text-pretty break-words text-muted">

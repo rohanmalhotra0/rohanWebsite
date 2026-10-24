@@ -5,9 +5,8 @@ import { EASE, VISIBLE_HIGHLIGHTS, splitFigures } from './timeline';
 
 const MotionLi = motion.li;
 
-// Each item carries its own top spacing so the height animation includes it.
 // From md up the dash hangs in the gutter and the text lines up with the summary.
-const ITEM = 'relative pl-4 pt-2 md:-ml-4';
+const ITEM = 'md:-ml-4';
 
 /** Highlight text with standalone figures (898, 99.5%, 500,000) set in ink. */
 function Figures({ text }) {
@@ -22,14 +21,15 @@ function Figures({ text }) {
   );
 }
 
+// Spacing sits on this inner box so an item animating its height has no padding.
 function ItemContent({ text }) {
   return (
-    <>
+    <div className="relative pl-4 pt-2">
       <span aria-hidden="true" className="absolute left-0 text-subtle">
         –
       </span>
       <Figures text={text} />
-    </>
+    </div>
   );
 }
 
@@ -50,7 +50,7 @@ export default function Highlights({ items, expanded = false, className }) {
   const rest = collapsible ? items.slice(VISIBLE_HIGHLIGHTS) : [];
   const transition = reduceMotion
     ? { duration: 0 }
-    : { height: { duration: 0.4, ease: EASE }, opacity: { duration: 0.25, ease: 'easeOut' } };
+    : { height: { duration: 0.35, ease: EASE }, opacity: { duration: 0.2, ease: 'easeOut' } };
 
   return (
     <div className={className}>

@@ -47,9 +47,15 @@ function Paper({ paper, index }) {
           {paper.liveUrl || paper.externalUrl ? (
             // 44px tap targets; the negative margin keeps the visual rhythm.
             <div className="-mb-3 mt-2 flex flex-wrap gap-x-6">
-              {paper.liveUrl ? <PaperLink href={paper.liveUrl}>Read paper (PDF)</PaperLink> : null}
+              {paper.liveUrl ? (
+                <PaperLink href={paper.liveUrl} title={paper.title}>
+                  Read paper (PDF)
+                </PaperLink>
+              ) : null}
               {paper.externalUrl ? (
-                <PaperLink href={paper.externalUrl}>Published record</PaperLink>
+                <PaperLink href={paper.externalUrl} title={paper.title}>
+                  Published record
+                </PaperLink>
               ) : null}
             </div>
           ) : null}
@@ -65,7 +71,8 @@ function Paper({ paper, index }) {
   );
 }
 
-function PaperLink({ href, children }) {
+/** The title goes into the accessible name so a list of links still says which paper. */
+function PaperLink({ href, title, children }) {
   return (
     <a
       href={href}
@@ -75,7 +82,9 @@ function PaperLink({ href, children }) {
     >
       {children}
       <ArrowUpRight aria-hidden="true" className="size-4 shrink-0 text-subtle" />
-      <span className="sr-only">(opens in a new tab)</span>
+      <span className="sr-only">
+        : {title} (opens in a new tab)
+      </span>
     </a>
   );
 }
