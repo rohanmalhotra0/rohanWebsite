@@ -54,41 +54,46 @@ const isSummary = (value) =>
     Array.isArray(value.others) &&
     value.others.every((repo) => typeof repo === 'string' && REPO_NAME.test(repo)));
 
+// Same record kept in memory, for when sessionStorage is blocked.
+let remembered = null;
+
 /** Fresh cached summary, null if the last answer was "nothing to show", undefined on a miss. */
 export function readCache() {
+  let saved = remembered;
   try {
-    const saved = sessionStorage.getItem(CACHE_KEY);
-    if (!saved) return undefined;
-    const { savedAt, value } = JSON.parse(saved);
-    const age = Date.now() - savedAt;
-    return age >= 0 && age < CACHE_TTL && isSummary(value) ? value : undefined;
+    const stored = sessionStorage.getItem(CACHE_KEY);
+    if (stored) saved = JSON.parse(stored);
   } catch {
-    return undefined;
+    // Storage blocked or unreadable: fall back to memory.
   }
+  const age = Date.now() - saved?.savedAt;
+  return age >= 0 && age < CACHE_TTL && isSummary(saved.value) ? saved.value : undefined;
 }
 
 function writeCache(value) {
+  remembered = { savedAt: Date.now(), value };
   try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt: Date.now(), value }));
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(remembered));
   } catch {
-    // Storage blocked or full: the next visit just asks again.
+    // Storage blocked or full: memory still covers this page load.
   }
 }
 
 async function request() {
   if (navigator.onLine === false) return null;
+  let value = null;
   try {
     const response = await fetch(ENDPOINT, {
       headers: { Accept: 'application/vnd.github+json' },
     });
-    // Remember failures too (403/429 mean rate limited) so reloads don't keep asking.
-    const value = response.ok ? summarize(await response.json()) : null;
-    writeCache(value);
-    return value;
+    if (response.ok) value = summarize(await response.json());
   } catch {
-    // Offline or blocked: show nothing and try again on the next visit.
-    return null;
+    // Network error, blocked request or bad JSON: nothing to show.
   }
+  // Every outcome is remembered for the session's 10 minutes, failures included
+  // (a 403 means rate limited), so reloads never ask again.
+  writeCache(value);
+  return value;
 }
 
 let pending = null;

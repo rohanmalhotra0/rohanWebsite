@@ -465,6 +465,13 @@
   size: letter;
   margin: 48px 48px 56px;
 
+  /* Margin boxes of our own take precedence over the browser's date, title
+     and URL lines, which a résumé doesn't want. The empty one keeps the top
+     margin clean. */
+  @top-right {
+    content: "";
+  }
+
   @bottom-left {
     content: "Rohan Malhotra";
     color: #66665f;
