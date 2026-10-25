@@ -54,7 +54,7 @@ export function useNewYorkTime() {
       .map(({ type, value }) => {
         if (type === 'dayPeriod') return value.toLowerCase();
         // Keep "7:16 pm" on one line.
-        if (type === 'literal' && /^\s+$/.test(value)) return ' ';
+        if (type === 'literal' && /^\s+$/.test(value)) return '\u00a0';
         return value;
       })
       .join('');

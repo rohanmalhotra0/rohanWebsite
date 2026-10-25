@@ -12,7 +12,7 @@ const [portrait] = photos;
 const bodyText = 'max-w-[62ch] text-pretty text-base leading-7 text-muted sm:text-[17px] sm:leading-[1.7]';
 
 // Keep one-letter words ("I", "a") from dangling at the end of a line.
-const tie = (text) => text.replace(/\b([aI]) /g, '$1 ');
+const tie = (text) => text.replace(/\b([aI]) /g, '$1\u00a0');
 
 export default function About() {
   return (
