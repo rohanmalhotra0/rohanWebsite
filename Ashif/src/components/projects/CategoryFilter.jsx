@@ -1,7 +1,6 @@
 import { useId, useRef } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
-import CategoryDot from './CategoryDot';
 import { EASE } from './projectData';
 
 const MotionSpan = motion.span;
@@ -64,7 +63,6 @@ export default function CategoryFilter({ options, value, onChange, className }) 
                     checked ? 'text-fg' : 'text-muted hover:text-fg'
                   )}
                 >
-                  {option.value === 'all' ? null : <CategoryDot category={option.value} />}
                   {option.label}
                   <span
                     className={cn('text-[13px] tabular-nums', checked ? 'text-muted' : 'text-subtle')}

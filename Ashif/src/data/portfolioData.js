@@ -1,9 +1,6 @@
-// Pages live at /, /projects/, /about/ and so on, so public files are
-// addressed from the site root.
-const BASE = import.meta.env.BASE_URL || '/';
-
-// The Dev Club IBM video of the Spot demo (IBM role and Spot case study).
-const SPOT_VIDEO = { id: 'ba-QHNwbSI4', title: 'Spot dog-toy detection', source: 'Dev Club IBM' };
+// The prerendered HTML has to match the client build, whose base is './'
+// (Vite always reports '/' while rendering on the server).
+const BASE = import.meta.env.SSR ? './' : import.meta.env.BASE_URL || '/';
 
 export const assetUrl = (path) =>
   `${BASE}${String(path || '').replace(/^\/+/, '')}`;
@@ -24,9 +21,6 @@ export const profile = {
     'I’m a math and computer science double major at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
   school: 'NYU Courant',
   graduation: 'May 2027',
-  /** The About page's lede, in its color-block header. */
-  aboutLede:
-    'I learn by building. If I get curious about prediction markets, I make a hedging model. If I want to understand computer vision, I train a robot to find a toy. This site is basically the trail of whatever I was trying to figure out next.',
 };
 
 
@@ -111,9 +105,8 @@ export const workExperience = [
       'Integrated banking APIs through Oracle Integration Cloud, creating JSON pipelines into ERP Financials and EPM while migrating Excel workflows to Oracle Cloud.',
       'Fine-tuned Qwen-Coder-32B on Oracle EPM implementation assets, raising form, business-rule, and report creation accuracy from 36.7% to 95.0%.',
       'Built an on-prem assistant that turns plain-language requests into reviewable EPM JSON, using RAG, MCP tools, confidence scoring, EPM Automate, and Oracle EPM APIs.',
-      'Led the intern capstone, NEXUS, integrating IBM Granite models with text-to-speech and speech-to-text, and submitted it a week early.',
     ],
-    tags: ['Oracle EPM', 'OIC', 'XGBoost', 'RAG', 'MCP', 'Qwen', 'IBM Granite'],
+    tags: ['Oracle EPM', 'OIC', 'XGBoost', 'RAG', 'MCP', 'Qwen'],
   },
   {
     company: 'IBM',
@@ -127,8 +120,6 @@ export const workExperience = [
     logoClassName: 'h-[68px] w-auto max-w-[72%]',
     summary:
       'I trained the vision system for a Boston Dynamics Spot demo and connected real-time detection to the robot.',
-    video: SPOT_VIDEO,
-    link: { href: '/projects/spot-vision/', label: 'How the Spot demo worked' },
     highlights: [
       'Trained YOLO11 models on 898 manually labeled images, reaching about 99.4% precision, 99.4% recall, and 99.5% mAP@50.',
       'Connected real-time inference to the Spot SDK with Python, OpenCV, gRPC, multithreading, and lock-free inference queues.',
@@ -223,8 +214,6 @@ export const research = [
     imageUrl: assetUrl('img/research/income-hedging.webp'),
     imageAlt: 'First page of the paper',
     liveUrl: assetUrl('papers/hedging-income-risk-prediction-markets.pdf'),
-    // An interactive version on its own page.
-    explainer: { href: '/research/hedge-your-paycheck/', label: 'Try it: Hedge your paycheck' },
     tags: ['Prediction Markets', 'Poisson Process', 'Monte Carlo'],
   },
   {
@@ -350,50 +339,6 @@ export const projects = [
     repoUrl: 'https://github.com/rohanmalhotra0',
     tags: ['YOLO11', 'OpenCV', 'Spot SDK', 'gRPC'],
     featured: true,
-    // A page of its own at /projects/spot-vision/. Facts from the résumé and
-    // my internship log.
-    caseStudy: {
-      context: 'Robotics Engineer Intern at IBM · Jun – Aug 2026',
-      video: SPOT_VIDEO,
-      stats: [
-        { value: '898', label: 'hand-labeled images' },
-        { value: '99.4%', label: 'precision' },
-        { value: '99.4%', label: 'recall' },
-        { value: '99.5%', label: 'mAP@50' },
-      ],
-      steps: [
-        {
-          title: 'Label',
-          headline: '898 photos, boxed by hand',
-          text: 'I boxed the dog toy by hand in 898 images with LabelImg, saved as Pascal VOC XML.',
-        },
-        {
-          title: 'Train',
-          headline: 'The model learns the box',
-          text: 'I converted the labels to YOLO format and trained YOLO11 models on them.',
-        },
-        {
-          title: 'Evaluate',
-          headline: 'Is that really the toy?',
-          text: 'I tested the models on precision, recall, mAP@50, and mAP@50-95, and tracked errors while fine-tuning. Live, it stayed above 70% confidence while telling the toy apart from similar pink objects.',
-        },
-        {
-          title: 'Connect',
-          headline: 'From model to robot',
-          text: 'I connected real-time inference to the robot through the Spot SDK and a gRPC connection, using a multithreaded pipeline with a lock-free inference queue.',
-        },
-        {
-          title: 'Fetch',
-          headline: 'Go get it',
-          text: 'Spot finds the toy and retrieves it on its own, with a victory dance when the detection is over 70% confident.',
-        },
-      ],
-      safety:
-        'I added movement controls, an emergency kill-switch, and safety logic that powers Spot down when it can’t see the toy.',
-      outcome:
-        'I presented it live at IBM DevCon and to IBM’s interns, and open-sourced the model weights, training pipeline, and deployment docs. IBM sales and client-success teams adopted the demo.',
-      stack: ['YOLO11', 'Python', 'OpenCV', 'LabelImg', 'Spot SDK', 'gRPC'],
-    },
   },
   {
     title: 'Income Risk Hedging Engine',
@@ -604,9 +549,6 @@ export const projects = [
   },
 ];
 
-/** Projects on the home page, by slug, in order: one each for robotics, AI, and quant. */
-export const selectedWork = ['spot-vision', 'epm-wizard', 'refrax'];
-
 export const skillGroups = [
   {
     label: 'Languages',
@@ -624,6 +566,17 @@ export const skillGroups = [
     label: 'Financial systems',
     items: ['Oracle EPM Cloud', 'OIC', 'EPM Automate', 'Monte Carlo', 'Excel Macros'],
   },
+];
+
+/** Page sections in order; drives the navbar, command palette, and footer. */
+export const sections = [
+  { id: 'experience', label: 'Experience' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'research', label: 'Research' },
+  { id: 'about', label: 'About' },
+  { id: 'education', label: 'Education' },
+  { id: 'rohangpt', label: 'Chat' },
+  { id: 'contact', label: 'Contact' },
 ];
 
 /** Places I have worked or studied, for the hero "worked at" strip. */

@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useReducedMotion } from 'motion/react';
 import Reveal from '@/components/primitives/Reveal';
+import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import { FOCUS_CHAT, takePendingChat } from '@/lib/events';
-import { cn } from '@/lib/utils';
+import { FOCUS_CHAT } from '@/lib/events';
 import { useRohanGPTChat } from '@/services/rohangptService';
 import bringIntoView from './bringIntoView';
 import ChatPanel from './ChatPanel';
 import SuggestionList from './SuggestionList';
 
+const DESCRIPTION =
+  'This chat answers from my résumé and project notes. If something isn’t in them, it says so.';
 const SUGGESTIONS_TITLE_ID = 'rohangpt-suggestions-title';
 
-/** Suggested questions beside the conversation (desktop), or inside it (phones). */
-export default function RohanGPT({ className }) {
+export default function RohanGPT() {
   const chat = useRohanGPTChat();
   const { sendMessage } = chat;
   const panelRef = useRef(null);
@@ -29,18 +30,7 @@ export default function RohanGPT({ className }) {
     [finePointer, reduceMotion, sendMessage]
   );
 
-  // A question asked on another page (the palette, the home page) arrives
-  // with the page change. Picked up a frame after mounting, once the page
-  // change has settled (and only once under StrictMode's double effects).
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      const pending = takePendingChat();
-      if (pending) ask(pending.prompt, { focusInput: finePointer || !pending.prompt });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [ask, finePointer]);
-
-  // On this page, the palette opens the chat with focusChat(prompt?).
+  // The hero, navbar, and command palette open the chat with focusChat(prompt?).
   useEffect(() => {
     let frame = 0;
     const onFocusChat = (event) => {
@@ -61,23 +51,32 @@ export default function RohanGPT({ className }) {
   }, [ask, finePointer]);
 
   return (
-    <div className={cn('grid gap-8 lg:grid-cols-12', className)}>
-      <Reveal className="hidden lg:col-span-4 lg:block">
-        <h2 id={SUGGESTIONS_TITLE_ID} className="flex h-12 items-center text-[13px] text-subtle">
-          Suggested questions
-        </h2>
-        <SuggestionList labelledBy={SUGGESTIONS_TITLE_ID} onAsk={ask} />
-      </Reveal>
+    <Section id="rohangpt">
+      <Container>
+        <SectionHeader title="Ask about my work" description={DESCRIPTION} />
 
-      <Reveal delay={0.06} className="lg:col-span-8">
-        <ChatPanel
-          chat={chat}
-          inputRef={inputRef}
-          panelRef={panelRef}
-          onAsk={ask}
-          finePointer={finePointer}
-        />
-      </Reveal>
-    </div>
+        <div className="mt-12 grid gap-8 sm:mt-16 lg:grid-cols-12">
+          <Reveal className="hidden lg:col-span-4 lg:block">
+            <h3
+              id={SUGGESTIONS_TITLE_ID}
+              className="flex h-12 items-center text-[13px] text-subtle"
+            >
+              Suggested questions
+            </h3>
+            <SuggestionList labelledBy={SUGGESTIONS_TITLE_ID} onAsk={ask} />
+          </Reveal>
+
+          <Reveal delay={0.06} className="lg:col-span-8">
+            <ChatPanel
+              chat={chat}
+              inputRef={inputRef}
+              panelRef={panelRef}
+              onAsk={ask}
+              finePointer={finePointer}
+            />
+          </Reveal>
+        </div>
+      </Container>
+    </Section>
   );
 }

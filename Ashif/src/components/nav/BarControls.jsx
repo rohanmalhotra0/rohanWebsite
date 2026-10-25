@@ -4,11 +4,11 @@ import { cn } from '@/lib/utils';
 import { PALETTE_SHORTCUT_ARIA } from './platform';
 import { ICON_BUTTON } from './styles';
 
-/** The name, linking to the home page. */
+/** The name, linking back to the top of the page. */
 export function Wordmark({ onClick, className }) {
   return (
     <a
-      href="/"
+      href="#top"
       onClick={onClick}
       className={cn(
         'type-heading inline-flex h-11 shrink-0 items-center whitespace-nowrap text-[15px] text-fg',

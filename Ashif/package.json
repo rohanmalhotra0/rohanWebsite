@@ -7,10 +7,7 @@
     "dev": "vite",
     "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "contrast": "node scripts/check-contrast.mjs",
-    "posters": "node scripts/render-posters.mjs",
-    "og": "node scripts/render-og.mjs"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@fontsource-variable/hubot-sans": "^5.3.0",

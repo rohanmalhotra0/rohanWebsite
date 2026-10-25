@@ -52,9 +52,9 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
         {TYPEWRITER_CSS}
       </style>
 
-      <h2 id={TITLE_ID} className="sr-only">
+      <h3 id={TITLE_ID} className="sr-only">
         Conversation
-      </h2>
+      </h3>
 
       <div
         ref={scrollRef}
