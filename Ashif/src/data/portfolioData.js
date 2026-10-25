@@ -10,6 +10,8 @@ export const profile = {
   website: 'https://rohanm.org',
   github: 'https://github.com/rohanmalhotra0',
   linkedin: 'https://www.linkedin.com/in/rohanamal',
+  /** This site's source (public). */
+  siteRepo: 'https://github.com/rohanmalhotra0/rohanWebsite',
   resumeUrl: assetUrl('Rohan_Malhotra_Resume.pdf'),
   headline: 'Applied AI, quantitative systems, and robotics.',
   /** Hero line: leads with the IBM robotics and Kalshi work, in past tense. */
