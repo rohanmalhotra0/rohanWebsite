@@ -96,8 +96,8 @@ export function createToy(geometry, material) {
       p.y = TOY_REST;
       if (v.y < -0.45) {
         v.y *= -0.42;
-        v.x *= 0.55;
-        v.z *= 0.55;
+        v.x *= 0.3;
+        v.z *= 0.3;
         toy.spin.multiplyScalar(0.45);
       } else {
         v.y = 0;
@@ -117,7 +117,7 @@ export function createToy(geometry, material) {
     }
 
     if (toy.state === 'rolling') {
-      const k = Math.exp(-6 * h);
+      const k = Math.exp(-10 * h);
       v.x *= k;
       v.z *= k;
       toy.spin.multiplyScalar(Math.exp(-8 * h));

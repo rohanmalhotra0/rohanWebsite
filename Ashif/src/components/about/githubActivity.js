@@ -6,7 +6,7 @@ export const GITHUB_LOGIN = profile.github.split('/').filter(Boolean).pop();
 const ENDPOINT = `https://api.github.com/users/${GITHUB_LOGIN}/events/public?per_page=30`;
 const CACHE_KEY = 'rm:github-activity';
 const CACHE_TTL = 10 * MINUTE;
-const MAX_OTHERS = 3;
+const MAX_OTHERS = 2;
 const REPO_NAME = /^[\w.-]+\/[\w.-]+$/;
 
 // Events that say nothing about work in the repo itself.

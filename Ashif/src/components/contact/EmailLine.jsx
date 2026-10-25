@@ -40,7 +40,7 @@ export default function EmailLine({ className }) {
         >
           <span
             aria-hidden="true"
-            className="col-start-1 row-start-1 size-9 rounded-lg border border-line-strong transition-colors duration-150 group-hover:bg-fg/[0.05] group-focus-visible:outline-2 group-focus-visible:outline-offset-3 group-focus-visible:outline-accent sm:size-11"
+            className="col-start-1 row-start-1 size-9 rounded-lg border border-line-strong transition-colors duration-150 group-hover:bg-fg/[0.05] group-focus-visible:outline-2 group-focus-visible:outline-offset-3 group-focus-visible:outline-accent-strong sm:size-11"
           />
           <Copy
             aria-hidden="true"

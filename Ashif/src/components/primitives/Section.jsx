@@ -6,7 +6,7 @@ export function Section({ id, className, children, ...props }) {
   return (
     <section
       id={id}
-      className={cn('relative scroll-mt-16 border-t border-line py-20 sm:py-28', className)}
+      className={cn('relative border-t border-line py-20 sm:py-28', className)}
       {...props}
     >
       {children}

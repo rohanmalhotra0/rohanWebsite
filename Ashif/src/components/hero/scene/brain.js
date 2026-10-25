@@ -257,10 +257,14 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
         toy.fadeOut();
       }
       toy = toy === toys[0] ? toys[1] : toys[0];
+      // Lob it from the viewer's side, landing a little short so the bounce
+      // carries it onto the spot that was clicked.
       const v = viewer();
       const len = Math.hypot(v.x - point.x, v.z - point.z) || 1;
-      start.set(point.x + ((v.x - point.x) / len) * 1.2, 1.25, point.z + ((v.z - point.z) / len) * 1.2);
-      goal.set(point.x, TOY_REST, point.z);
+      const ux = (v.x - point.x) / len;
+      const uz = (v.z - point.z) / len;
+      start.set(point.x + ux * 1.2, 1.25, point.z + uz * 1.2);
+      goal.set(point.x + ux * 0.22, TOY_REST, point.z + uz * 0.22);
       toy.throwTo(start, goal, 0.72);
       go('track', MESSAGES.track);
     },

@@ -228,7 +228,7 @@ export function createController({ root, body, legs, arm }) {
     if (armCtl.mode === 'stow') Object.assign(qt, STOW);
     else if (armCtl.mode === 'gaze') aimGaze(qt);
     else if (armCtl.mode === 'reach') aimWrist(qt);
-    else if (armCtl.mode === 'carry') pose(qt, 0, 0.27, 0.1, -0.78);
+    else if (armCtl.mode === 'carry') pose(qt, 0, 0.24, 0.12, -0.74);
     else {
       // Wave: arm up toward the gaze target, gripper swinging and snapping.
       const k = armCtl.clock;

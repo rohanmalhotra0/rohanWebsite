@@ -10,8 +10,9 @@ const listFormat = new Intl.ListFormat('en', { type: 'conjunction' });
 const exactTime = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 /**
- * Latest public GitHub activity in a sentence. Renders an empty box until there
- * is something to say, and stays empty on errors, rate limits, or no pushes.
+ * Latest public GitHub activity in a sentence. The box (sized by the caller)
+ * stays empty until there is something to say, and on errors, rate limits, or
+ * no pushes.
  */
 export default function GitHubActivity({ className }) {
   const ref = useRef(null);
@@ -48,7 +49,7 @@ function Activity({ activity, fadeIn }) {
       initial={fadeIn && !reduceMotion ? { opacity: 0 } : false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: EASE }}
-      className="pt-10 text-[15px] leading-6"
+      className="text-[15px] leading-6"
     >
       <p className="text-[13px] leading-5 text-subtle">On GitHub</p>
       <p className="mt-1 text-pretty break-words text-muted">

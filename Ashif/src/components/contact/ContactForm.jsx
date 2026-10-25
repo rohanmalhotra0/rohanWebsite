@@ -18,10 +18,10 @@ const IS_MAC =
   typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const inputClass = cn(
-  'block w-full rounded-lg border border-line-strong bg-surface px-3.5 text-base text-fg',
+  'block w-full rounded-lg border border-input bg-surface px-3.5 text-base text-fg',
   'transition-[border-color,box-shadow] duration-150 ease-out placeholder:text-subtle',
   // accent-strong keeps the focused border at 3:1+ on paper; the soft ring carries the brand orange.
-  'hover:border-fg/30 focus-visible:outline-hidden focus:border-accent-strong focus:ring-3 focus:ring-accent/25',
+  'hover:border-fg/60 focus-visible:outline-hidden focus:border-accent-strong focus:ring-3 focus:ring-accent/25',
   'aria-[invalid=true]:border-accent-strong',
   // Keep browser autofill from painting its own background over the theme.
   'autofill:inset-shadow-[0_0_0_100px_var(--surface)] autofill:[-webkit-text-fill-color:var(--fg)]'

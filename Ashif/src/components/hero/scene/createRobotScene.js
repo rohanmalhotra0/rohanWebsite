@@ -99,6 +99,7 @@ export function createRobotScene({
     home: HOME,
     viewer: () => camera.position,
     onChange(next, message) {
+      lastEvent = performance.now();
       status = STATUS[next];
       onStatus?.(status);
       if (message) onAnnounce?.(message);
@@ -152,6 +153,7 @@ export function createRobotScene({
 
   const ndc = new Vector2();
   const raycaster = new Raycaster();
+  raycaster.layers.enable(1);
   const floorPlane = new Plane(UP, 0);
   const wallNormal = new Vector3(Math.sin(VIEW.az), 0, Math.cos(VIEW.az));
   const wallPlane = new Plane(wallNormal, -wallNormal.dot(TARGET));
@@ -172,10 +174,13 @@ export function createRobotScene({
     return Math.abs(probe.x) < 0.86 && probe.y > -0.82 && probe.y < 0.78;
   }
 
-  function hitsRobot(ray) {
+  // Cheap box test for the hover cursor; clicks confirm against the meshes.
+  function nearRobot(ray) {
     inverse.copy(rig.root.matrixWorld).invert();
     return localRay.copy(ray).applyMatrix4(inverse).intersectsBox(ROBOT_BOX);
   }
+
+  const hitsRobot = () => nearRobot(raycaster.ray) && raycaster.intersectObject(rig.root, true).length > 0;
 
   /** Keep a throw on the visible floor and off the robot's footprint. */
   function clampTarget(p) {
@@ -255,8 +260,10 @@ export function createRobotScene({
     if (!d || d.id !== e.pointerId) return;
     if (!input.dragging && performance.now() - d.t < 600) {
       setNdc(e.clientX, e.clientY);
-      if (hitsRobot(raycaster.ray)) brain.poke();
-      else if (raycaster.ray.intersectPlane(floorPlane, hit)) throwTo(hit.clone());
+      if (hitsRobot()) {
+        brain.poke();
+        if (!running) frame(0);
+      } else if (raycaster.ray.intersectPlane(floorPlane, hit)) throwTo(hit.clone());
     }
     input.down = null;
     input.dragging = false;
@@ -293,7 +300,7 @@ export function createRobotScene({
 
       const inside = Math.abs(ndc.x) <= 1 && Math.abs(ndc.y) <= 1;
       if (inside && !input.dragging) {
-        const overRobot = hitsRobot(ray);
+        const overRobot = nearRobot(ray);
         floorHover = !overRobot && ray.intersectPlane(floorPlane, hit) !== null && inBounds(hit) && onScreen(hit);
         if (floorHover) hoverGoal.copy(hit);
         canvas.style.cursor = overRobot || floorHover ? 'pointer' : '';
@@ -394,6 +401,8 @@ export function createRobotScene({
   let lost = false;
   let disposed = false;
   let first = true;
+  let manual = false;
+  let lastEvent = 0;
   const perf = { time: 0, frames: 0, age: 0 };
 
   function frame(dt) {
@@ -407,9 +416,14 @@ export function createRobotScene({
 
   function tick(now) {
     raf = requestAnimationFrame(tick);
+    // Nothing happening: 30 fps is plenty for breathing and sway.
+    const calm =
+      brain.state === 'idle' && hoverAlpha < 0.01 && now - Math.max(input.moved, lastEvent) > 4000;
+    if (calm && last && now - last < 30) return;
     const dt = last ? Math.min((now - last) / 1000, 1 / 20) : 0;
     last = now;
     frame(dt);
+    if (calm) return;
     // Drop resolution a step at a time if frames are consistently slow.
     perf.time += dt;
     perf.frames++;
@@ -425,7 +439,8 @@ export function createRobotScene({
   }
 
   function sync() {
-    const should = ready && visible && !document.hidden && !lost && !disposed;
+    const should =
+      ready && visible && !document.hidden && !lost && !disposed && !(import.meta.env.DEV && manual);
     if (should && !running) {
       running = true;
       last = 0;
@@ -552,8 +567,24 @@ export function createRobotScene({
     },
   };
 
-  // Test hook for the Playwright checks; stripped from production builds.
-  if (import.meta.env.DEV) canvas.robot = { ctl, brain, toys, camera, orbit, feed, throwTo, renderer, scene };
+  // Test hook for the Playwright checks (deterministic stepping); stripped
+  // from production builds.
+  if (import.meta.env.DEV) {
+    canvas.robot = {
+      ctl, brain, toys, camera, feed, renderer, throwTo,
+      pause() {
+        manual = true;
+        sync();
+      },
+      advance(seconds, dt = 1 / 60) {
+        for (let t = dt; t <= seconds + 1e-6; t += dt) step(dt);
+      },
+      render() {
+        feedClock = FEED_INTERVAL;
+        draw(1 / 60);
+      },
+    };
+  }
 
   return api;
 }

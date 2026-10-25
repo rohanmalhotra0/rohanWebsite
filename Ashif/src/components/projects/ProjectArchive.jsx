@@ -49,7 +49,10 @@ const ROW = {
   exit: (change) => ({ opacity: 0, transition: { duration: change === 'collapse' ? 0 : 0.12 } }),
 };
 
+// `ref` comes from AnimatePresence's popLayout, which takes leaving rows out of
+// the flow so the rows that stay can move up at once.
 const ArchiveRow = memo(function ArchiveRow({
+  ref,
   project,
   order,
   filterKey,
@@ -61,6 +64,7 @@ const ArchiveRow = memo(function ArchiveRow({
 
   return (
     <MotionDiv
+      ref={ref}
       role="row"
       layout={reduceMotion ? false : 'position'}
       // Only re-measure when the filter changes, not when rows are added below.

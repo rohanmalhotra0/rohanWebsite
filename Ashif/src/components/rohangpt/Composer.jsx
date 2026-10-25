@@ -42,7 +42,7 @@ export default function Composer({ inputRef, busy, onSend, error, onRetry }) {
         submit();
       }}
     >
-      <div className="flex items-end gap-2 rounded-lg border border-line bg-bg py-1.5 pl-3.5 pr-1.5 transition-colors duration-150 has-[textarea:focus]:border-accent">
+      <div className="flex items-end gap-2 rounded-lg border border-input bg-bg py-1.5 pl-3.5 pr-1.5 transition-colors duration-150 has-[textarea:focus]:border-accent-strong">
         <label htmlFor={INPUT_ID} className="sr-only">
           Your question
         </label>

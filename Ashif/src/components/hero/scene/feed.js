@@ -39,8 +39,8 @@ void main() {
 
 // Mono tint per theme: ink on paper in light mode, cool graphite in dark.
 const TINTS = {
-  light: { dark: 0x23211d, light: 0xf7f5ef, back: 0x8f8c84 },
-  dark: { dark: 0x0a0b0a, light: 0xd3d6ce, back: 0x3c3d3a },
+  light: { dark: 0x23211d, light: 0xf7f5ef, back: 0xc4c1b8 },
+  dark: { dark: 0x0a0b0a, light: 0xd3d6ce, back: 0x2e2f2c },
 };
 
 const _box = new Box3();

@@ -35,6 +35,7 @@
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-accent-strong: var(--accent-strong);
+  --color-input: var(--input);
 }
 
 /* Light: warm paper, ink, safety orange. */
@@ -52,6 +53,8 @@
   --accent: #ff5b14;
   --accent-ink: #141414;
   --accent-strong: #b83a0a;
+  /* Form-field borders: 3:1 against the page (WCAG 1.4.11). */
+  --input: #8c8c86;
 }
 
 /* Dark: graphite, not pure black. */
@@ -68,6 +71,7 @@
   --accent: #ff6a2b;
   --accent-ink: #141414;
   --accent-strong: #ff7a3d;
+  --input: #636360;
 }
 
 @layer base {
@@ -77,10 +81,19 @@
     border-color: var(--line);
   }
 
+  /* Anchor jumps land just under the fixed navbar: 56px below lg, 64px at
+     lg and up (plus the iOS safe area). Sections don't add their own
+     scroll-margin, so the two never stack. */
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: calc(3.5rem + env(safe-area-inset-top));
     -webkit-text-size-adjust: 100%;
+  }
+
+  @media (min-width: 64rem) {
+    html {
+      scroll-padding-top: calc(4rem + env(safe-area-inset-top));
+    }
   }
 
   body {
@@ -108,8 +121,9 @@
     cursor: pointer;
   }
 
+  /* accent-strong keeps the ring above 3:1 on paper as well as graphite. */
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--accent-strong);
     outline-offset: 3px;
     border-radius: 4px;
   }

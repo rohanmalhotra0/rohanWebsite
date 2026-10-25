@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { useReducedMotion } from 'motion/react';
 import { projects } from '@/data/portfolioData';
 import { featuredProjects, findProject, projectHash, slugFromHash } from './projectData';
-import { findTrigger, revealCard, revealElement } from './viewerDom';
+import { findTrigger, revealElement, revealProject } from './viewerDom';
 
 const stripHash = () => window.location.pathname + window.location.search;
 
@@ -43,8 +43,7 @@ export function useProjectViewer() {
 
     if (origin === 'link') {
       // Put the page where this project lives, behind the viewer, so closing lands there.
-      if (project.featured) revealCard(project.slug);
-      else revealElement(document.getElementById('projects-archive'));
+      if (!revealProject(project)) revealElement(document.getElementById('projects-archive'));
     } else {
       // Scroll restoration is stored per history entry. Turn it off on the
       // entry we leave, so stepping back to it on close doesn't scroll the page
@@ -90,14 +89,17 @@ export function useProjectViewer() {
   const close = useCallback((fromHistory = false) => {
     const current = viewerRef.current;
     if (!current) return;
-    const { slug, featured } = current.list[current.index];
+    const project = current.list[current.index];
 
-    // Bring the card into view first so the image has somewhere visible to land.
-    if (current.paired) revealCard(slug);
-    returnFocusRef.current =
-      current.origin === 'archive'
-        ? openerRef.current
-        : (findTrigger(featured ? 'card' : 'row', slug) ?? openerRef.current);
+    // Archive opens return to the row the reader came from. Others land where
+    // the current project lives, so a flying image has a visible card to reach.
+    if (current.origin === 'archive') {
+      returnFocusRef.current = openerRef.current;
+    } else {
+      revealProject(project);
+      returnFocusRef.current =
+        findTrigger(project.featured ? 'card' : 'row', project.slug) ?? openerRef.current;
+    }
 
     if (!fromHistory) {
       if (pushedRef.current) {

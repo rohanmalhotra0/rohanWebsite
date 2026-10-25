@@ -76,7 +76,7 @@ void main() {
 
   // A thin taped rectangle marking the robot's home spot.
   vec2 q = mat2(uHome.z, -uHome.w, uHome.w, uHome.z) * rel;
-  float tape = fill(abs(box(q, vec2(0.0), vec2(0.42, 0.7))) - 0.006);
+  float tape = fill(abs(box(q, vec2(0.0), vec2(0.33, 0.6))) - 0.006);
 
   // Soft contact shadow: body footprint, feet and toy.
   float c = cos(uBody.z);
@@ -95,7 +95,7 @@ void main() {
   float ring = abs(length(vXZ - uHover.xy) - 0.085);
   float hover = fill(ring - 0.004) * uHover.z;
 
-  vec4 col = vec4(uInk, 0.16 * fade * feed);
+  vec4 col = vec4(uInk, 0.3 * fade * feed);
   col = over(col, uInk, lines * fade * uAlpha.x * (1.0 + feed * 3.0));
   col = over(col, uTape, tape * fade * min(uAlpha.y * (1.0 + feed * 2.5), 1.0));
   col = over(col, vec3(0.0), shade * uAlpha.z);

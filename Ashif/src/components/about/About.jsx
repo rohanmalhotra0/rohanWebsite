@@ -66,14 +66,15 @@ export default function About() {
                 'Right now I’m finishing my last year at NYU and trying not to turn every random idea into another side project.'
               )}
             </p>
-            {/* Desktop: pinned to the bottom of the column, level with the line under the
-                portrait, in space that is reserved, so it can appear (or not) without
-                moving anything. Narrower screens: it follows the text, in free space. */}
-            <GitHubActivity className="lg:mt-auto lg:flex lg:min-h-34 lg:flex-col lg:justify-end" />
+            {/* A fixed slot (label + three lines), the same size whether the fetch
+                succeeds, fails or never runs, so nothing around it ever moves. Desktop:
+                pinned to the bottom of the column, level with the line under the portrait;
+                a longer sentence grows upward into the free space instead of down. */}
+            <GitHubActivity className="box-content h-24 pt-8 sm:pt-10 lg:mt-auto lg:flex lg:flex-col lg:justify-end" />
           </Reveal>
         </div>
 
-        <Reveal className="mt-16 sm:mt-20 lg:mt-24">
+        <Reveal className="mt-14 sm:mt-20 lg:mt-24">
           <Gallery />
         </Reveal>
       </Container>
