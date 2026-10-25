@@ -198,6 +198,15 @@
   mix-blend-mode: normal;
 }
 
+/* Printing the portfolio: content that never scrolled into view would
+   otherwise print blank. */
+@media print {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
