@@ -411,5 +411,6 @@
   --spot-dark: #4a4c52;
   --toy: #ff69b0;
   --on-bright: #141414;
-  --stop: #e5483b;
+  /* White E-STOP text needs 4.5:1. */
+  --stop: #da3829;
 }

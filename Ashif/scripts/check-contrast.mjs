@@ -1,6 +1,7 @@
 // Checks every palette in src/styles/palettes.css against WCAG 2.1 contrast:
 // 4.5:1 for text, 3:1 for form borders, focus rings, thin marks, and the
-// category colors. `npm run contrast`; exits 1 if any pair falls short.
+// category colors, plus the Spot story's labels, which use colors set per
+// theme for every palette. `npm run contrast`; exits 1 if any pair falls short.
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,6 +38,12 @@ const PAIRS = [
   ['c3', 'bg', 3],
   ['c4', 'bg', 3],
   ['c5', 'bg', 3],
+  // The Spot story (components/projects/spot): ink on the pink toy and the
+  // yellow robot tiles, the E-STOP label, and the kill-switch's edge.
+  ['on-bright', 'toy', 4.5],
+  ['on-bright', 'spot', 4.5],
+  ['white', 'stop', 4.5],
+  ['stop', 'surface', 3],
 ];
 
 const hex = (value) => {
@@ -61,12 +68,31 @@ const ratio = (a, b) => {
 // color-mix(in srgb, a p%, b) on sRGB channels, as the browser does.
 const mix = (a, b, p) => a.map((v, i) => Math.round(v * p + b[i] * (1 - p)));
 
-const blocks = [...css.matchAll(/((?:[^{}]*?))\{([^{}]*)\}/g)]
-  .map(([, selector, body]) => ({
-    name: (selector.match(/data-palette="(\w+)"\]\[data-theme="(\w+)"/) || []).slice(1).join('/'),
+const parsed = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]*?)\{([^{}]*)\}/g)].map(
+  ([, selector, body]) => ({
+    selector: selector.trim(),
     tokens: Object.fromEntries([...body.matchAll(/--([\w-]+):\s*(#[0-9a-fA-F]{3,6})/g)].map((m) => [m[1], m[2]])),
-  }))
-  .filter((block) => block.name);
+  })
+);
+// Colors set per theme for every palette (the Spot story's objects).
+const themeTokens = (theme) =>
+  Object.assign(
+    {},
+    ...parsed.filter(({ selector }) => selector.split(/,\s*/).includes(`[data-theme="${theme}"]`)).map((block) => block.tokens)
+  );
+// One entry per palette and theme, merging every rule that targets it.
+const byName = new Map();
+for (const { selector, tokens } of parsed) {
+  const [, palette, theme] =
+    selector
+      .split(/,\s*/)
+      .map((part) => part.match(/^\[data-palette="(\w+)"\]\[data-theme="(\w+)"\]$/))
+      .find(Boolean) || [];
+  if (!palette) continue;
+  const name = `${palette}/${theme}`;
+  byName.set(name, { ...(byName.get(name) ?? themeTokens(theme)), ...tokens });
+}
+const blocks = [...byName].map(([name, tokens]) => ({ name, tokens }));
 
 let failures = 0;
 for (const { name, tokens } of blocks) {
@@ -76,7 +102,7 @@ for (const { name, tokens } of blocks) {
       const block = base.replace('on-', '');
       return mix(hex(tokens[base]), hex(tokens[block]), Number(weight) / 100);
     }
-    const value = tokens[token] ?? (token === 'mark' ? tokens.accent : undefined);
+    const value = token === 'white' ? '#ffffff' : (tokens[token] ?? (token === 'mark' ? tokens.accent : undefined));
     if (!value) throw new Error(`${name}: --${token} is missing`);
     return hex(value);
   };

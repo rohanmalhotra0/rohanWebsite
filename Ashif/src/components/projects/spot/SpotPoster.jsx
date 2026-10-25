@@ -31,7 +31,7 @@ export default function SpotPoster() {
         {/* No bracket bottom left: the card's title sits there. */}
         <path d="M616 308V336H588" />
       </g>
-      <circle cx="43" cy="43" r="5.5" fill="var(--accent)" />
+      <circle cx="43" cy="43" r="5.5" fill="var(--mark)" />
       <text x="55" y="49" fontSize="17" fontWeight="700" fill="var(--fg)" style={mono}>
         LIVE
       </text>
@@ -45,7 +45,7 @@ export default function SpotPoster() {
         <circle cx="-16" cy="-6" r="1.8" fill="#fff" opacity="0.5" />
       </g>
       {EDGES.map((edge, i) => (
-        <path key={i} d={edgePath(edge)} fill="none" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round" />
+        <path key={i} d={edgePath(edge)} fill="none" stroke="var(--mark)" strokeWidth="4" strokeLinecap="round" />
       ))}
       <g transform={`translate(${BOX.x0 - 2} ${BOX.y0 - 29})`}>
         <rect width="112" height="27" rx="3" fill="var(--accent)" />
