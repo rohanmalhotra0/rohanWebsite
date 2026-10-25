@@ -22,7 +22,7 @@ export function lockScroll() {
 export const findTrigger = (kind, slug) =>
   document.querySelector(`[data-project-trigger="${kind}:${slug}"]`);
 
-// Leaves room for the fixed navbar when deciding what counts as visible.
+// Clears the fixed navbar (56px, 64px from lg) with a little room to spare.
 const TOP_INSET = 80;
 
 /** Scrolls `element` fully into view (centered when it has to move), instantly. */

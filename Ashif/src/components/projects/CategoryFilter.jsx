@@ -63,7 +63,7 @@ export default function CategoryFilter({ options, value, onChange, className }) 
                   {option.label}
                   <span
                     className={cn(
-                      'text-[13px] font-normal tabular-nums',
+                      'text-[13px] tabular-nums',
                       option.count ? 'text-subtle' : 'text-subtle/50'
                     )}
                   >
