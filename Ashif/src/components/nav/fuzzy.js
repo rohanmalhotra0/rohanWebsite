@@ -18,7 +18,7 @@ const PENALTY_LEADING_MAX = 3;
 const PENALTY_MIDWORD_START = 12;
 // Below this average per character the alignment is mostly noise
 // (scattered letters across a long title), so we drop it.
-const MIN_SCORE_PER_CHAR = 13;
+const MIN_SCORE_PER_CHAR = 14;
 // Matches on tags/keywords count, but rank below matches on the title.
 const KEYWORD_WEIGHT = 0.6;
 

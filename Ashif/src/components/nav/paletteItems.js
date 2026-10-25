@@ -45,7 +45,7 @@ const SECTION_KEYWORDS = {
   research: ['papers', 'publications'],
   about: ['bio', 'me', 'photos'],
   education: ['school', 'university', 'courses', 'gpa', education.school, education.college],
-  rohangpt: ['chat', 'ai', 'ask', 'assistant', 'rohangpt'],
+  rohangpt: ['chat', 'ai', 'ask', 'assistant', 'RohanGPT'],
   contact: ['email', 'message', 'get in touch'],
 };
 

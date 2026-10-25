@@ -173,7 +173,7 @@ function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, o
                 target={link.external ? '_blank' : undefined}
                 rel={link.external ? 'noreferrer' : undefined}
                 onClick={onClose}
-                className="inline-flex h-11 items-center gap-1 px-1 text-[15px] text-muted transition-colors hover:text-fg active:text-fg"
+                className="inline-flex h-11 items-center gap-1 text-[15px] text-muted transition-colors hover:text-fg active:text-fg"
               >
                 {link.label}
                 {link.external ? (
