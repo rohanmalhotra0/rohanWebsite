@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight, X } from 'lucide-react';
 import { profile, sections } from '@/data/portfolioData';
 import Button from '@/components/primitives/Button';
 import { cn } from '@/lib/utils';
 import { SearchButton, Wordmark } from './BarControls';
 import ThemeToggle from './ThemeToggle';
-import { useFocusTrap, useModalFocus, useScrollLock } from './hooks';
+import { useFocusTrap, useModalFocus, useReducedMotion, useScrollLock } from './hooks';
 import { isPlainClick } from './navigation';
 import { BAR_ROW, ICON_BUTTON } from './styles';
 

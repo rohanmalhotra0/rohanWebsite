@@ -5,29 +5,13 @@ import { Container, Section, SectionHeader } from '@/components/primitives/Secti
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { FOCUS_CHAT } from '@/lib/events';
 import { useRohanGPTChat } from '@/services/rohangptService';
+import bringIntoView from './bringIntoView';
 import ChatPanel from './ChatPanel';
 import SuggestionList from './SuggestionList';
 
 const DESCRIPTION =
   'Answers come from my résumé and project notes. If it doesn’t know something, it says so.';
 const SUGGESTIONS_TITLE_ID = 'rohangpt-suggestions-title';
-// Room for the fixed navbar; matches the page's scroll-padding-top.
-const NAV_CLEARANCE = 80;
-const EDGE = 24;
-
-/** Scroll the page so the panel is fully visible, with the heading too if it fits. */
-function bringIntoView(panel, smooth) {
-  if (!panel) return;
-  const rect = panel.getBoundingClientRect();
-  const viewport = window.innerHeight;
-  if (rect.top >= NAV_CLEARANCE && rect.bottom <= viewport) return;
-
-  const heading = panel.closest('section')?.querySelector('h2');
-  const headingTop = heading ? heading.getBoundingClientRect().top : rect.top;
-  const fits = rect.bottom - headingTop + 2 * EDGE <= viewport - NAV_CLEARANCE;
-  const delta = fits ? headingTop - NAV_CLEARANCE - EDGE : rect.bottom + EDGE - viewport;
-  window.scrollTo({ top: window.scrollY + delta, behavior: smooth ? 'smooth' : 'auto' });
-}
 
 export default function RohanGPT() {
   const chat = useRohanGPTChat();

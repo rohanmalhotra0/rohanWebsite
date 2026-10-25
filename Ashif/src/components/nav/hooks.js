@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import { OPEN_PALETTE } from '@/lib/events';
+
+/**
+ * Live prefers-reduced-motion. Used instead of motion's own hook and
+ * MotionConfig, which read the setting once and log a dev warning.
+ */
+export const useReducedMotion = () => useMediaQuery('(prefers-reduced-motion: reduce)');
 
 /** True once the page has scrolled more than `threshold` px. rAF-throttled. */
 export function useScrolled(threshold = 4) {

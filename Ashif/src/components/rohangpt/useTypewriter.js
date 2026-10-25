@@ -15,7 +15,7 @@ const HIGHLIGHT = 'rohangpt-unrevealed';
 const MS_PER_CHAR = 4;
 const MIN_MS = 240;
 // Long replies type faster, so none takes longer than this.
-const MAX_MS = 800;
+const MAX_MS = 720;
 
 export const TYPEWRITER_CSS = `
 ::highlight(${HIGHLIGHT}) { color: transparent; }

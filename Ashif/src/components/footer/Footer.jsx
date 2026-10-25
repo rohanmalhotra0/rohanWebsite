@@ -76,17 +76,18 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Same columns as above: "Back to top" lines up with the Elsewhere links. */}
+        {/* Same columns as above: "Back to top" lines up with the Elsewhere links.
+            Every cell is placed explicitly; row-locked auto items would jump the queue. */}
         <div className="grid grid-cols-2 items-baseline gap-x-8 border-t border-line pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3 text-[13px] leading-5 text-subtle md:grid-cols-12 md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <p className="text-muted md:col-span-7">
+          <p className="col-start-1 row-start-1 text-muted md:col-span-7 md:col-start-1">
             © {year} {profile.name}
           </p>
-          <p className="col-span-2 row-start-2 text-balance md:col-span-3 md:row-start-1">
+          <p className="col-span-2 col-start-1 row-start-2 text-balance md:col-span-3 md:col-start-8 md:row-start-1">
             Built with React, three.js, and Tailwind.
           </p>
           <a
             href="#top"
-            className="col-start-2 row-start-1 inline-flex min-h-11 items-center justify-self-start text-muted transition-colors duration-150 hover:text-fg md:col-span-2 md:col-start-auto"
+            className="col-start-2 row-start-1 inline-flex min-h-11 items-center justify-self-start text-muted transition-colors duration-150 hover:text-fg md:col-span-2 md:col-start-11"
           >
             Back to top
           </a>

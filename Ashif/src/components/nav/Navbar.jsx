@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MotionConfig, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { sections } from '@/data/portfolioData';
 import Button from '@/components/primitives/Button';
 import useMediaQuery from '@/hooks/useMediaQuery';
@@ -8,13 +8,13 @@ import { MenuIcon, SearchButton, Wordmark } from './BarControls';
 import CommandPalette from './CommandPalette';
 import MobileMenu from './MobileMenu';
 import ThemeToggle from './ThemeToggle';
-import { usePaletteHotkeys, useScrolled, useScrollSpy } from './hooks';
+import { usePaletteHotkeys, useReducedMotion, useScrolled, useScrollSpy } from './hooks';
 import { goToSection, isPlainClick } from './navigation';
 import { BAR_ROW, ICON_BUTTON } from './styles';
 
 const MotionSpan = motion.span;
 const SECTION_IDS = sections.map((section) => section.id);
-const MARKER_EASE = [0.16, 1, 0.3, 1];
+const MARKER_SLIDE = { duration: 0.35, ease: [0.16, 1, 0.3, 1] };
 
 export default function Navbar() {
   const scrolled = useScrolled();
@@ -23,6 +23,7 @@ export default function Navbar() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 64rem)');
   const menuButtonRef = useRef(null);
+  const reduceMotion = useReducedMotion();
 
   // Opening the palette always closes the menu, whatever opened it.
   const setPalette = useCallback((next) => {
@@ -60,7 +61,7 @@ export default function Navbar() {
   const markerOn = active ?? last;
 
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       <header className="fixed left-0 right-[var(--scroll-lock-gap,0px)] top-0 z-50">
         <div
           className={cn(
@@ -96,7 +97,7 @@ export default function Navbar() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: isActive ? 1 : 0 }}
                           transition={{
-                            layout: { duration: 0.35, ease: MARKER_EASE },
+                            layout: reduceMotion ? { duration: 0 } : MARKER_SLIDE,
                             opacity: { duration: 0.2 },
                           }}
                         />
@@ -116,7 +117,12 @@ export default function Navbar() {
                 }}
               />
               <ThemeToggle className={ICON_BUTTON} />
-              <Button href="#/resume" variant="secondary" size="sm" className="ml-2 hidden lg:inline-flex pointer-coarse:h-11">
+              <Button
+                href="#/resume"
+                variant="secondary"
+                size="sm"
+                className="ml-2 hidden lg:inline-flex pointer-coarse:h-11"
+              >
                 Résumé
               </Button>
               <button
@@ -145,6 +151,6 @@ export default function Navbar() {
         triggerRef={menuButtonRef}
       />
       <CommandPalette open={paletteOpen} onClose={closePalette} onNavigate={navigateTo} />
-    </MotionConfig>
+    </>
   );
 }

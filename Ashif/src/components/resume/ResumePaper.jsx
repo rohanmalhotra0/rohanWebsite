@@ -129,7 +129,7 @@ function ExperienceSection() {
               {job.place ? (
                 <>
                   <Sep />
-                  <span className="rv-note">{job.place}</span>
+                  <span className="rv-note rv-nowrap">{job.place}</span>
                 </>
               ) : null}
             </h3>

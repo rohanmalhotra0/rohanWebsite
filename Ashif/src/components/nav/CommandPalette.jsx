@@ -1,11 +1,17 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight, Check, Search, X } from 'lucide-react';
 import { Kbd } from '@/components/primitives/Tag';
 import { focusChat } from '@/lib/events';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
-import { useFocusTrap, useModalFocus, useScrollLock, useVisualViewportHeight } from './hooks';
+import {
+  useFocusTrap,
+  useModalFocus,
+  useReducedMotion,
+  useScrollLock,
+  useVisualViewportHeight,
+} from './hooks';
 import { centerOf, copyText, downloadFile, openExternal } from './navigation';
 import { getPaletteItems, searchPalette } from './paletteItems';
 

@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from './hooks';
 import { centerOf } from './navigation';
 
 const MotionSpan = motion.span;
@@ -10,12 +11,15 @@ const SHOWN = { opacity: 1, rotate: 0, scale: 1 };
 
 /**
  * Light/dark toggle. The icon shows what a press does (a moon in the light
- * theme); the two icons swap with a short turn. Under reduced motion only
- * the cross-fade remains (see MotionConfig in Navbar).
+ * theme); the two icons swap with a short turn, or a plain cross-fade under
+ * reduced motion.
  */
 export default function ThemeToggle({ className }) {
   const { theme, toggleTheme } = useTheme();
+  const reduceMotion = useReducedMotion();
   const isDark = theme === 'dark';
+  const hidden = (turn) =>
+    reduceMotion ? { opacity: 0, rotate: 0, scale: 1 } : { opacity: 0, rotate: turn, scale: 0.5 };
 
   return (
     <button
@@ -31,7 +35,7 @@ export default function ThemeToggle({ className }) {
       <MotionSpan
         className="absolute"
         initial={false}
-        animate={isDark ? SHOWN : { opacity: 0, rotate: 90, scale: 0.5 }}
+        animate={isDark ? SHOWN : hidden(90)}
         transition={SWAP}
       >
         <Sun className="size-[18px]" strokeWidth={1.75} aria-hidden="true" />
@@ -39,7 +43,7 @@ export default function ThemeToggle({ className }) {
       <MotionSpan
         className="absolute"
         initial={false}
-        animate={isDark ? { opacity: 0, rotate: -90, scale: 0.5 } : SHOWN}
+        animate={isDark ? hidden(-90) : SHOWN}
         transition={SWAP}
       >
         <Moon className="size-[18px]" strokeWidth={1.75} aria-hidden="true" />

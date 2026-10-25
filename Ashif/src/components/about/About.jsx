@@ -69,7 +69,7 @@ export default function About() {
             {/* Desktop: pinned to the bottom of the column, level with the line under the
                 portrait, in space that is reserved, so it can appear (or not) without
                 moving anything. Narrower screens: it follows the text, in free space. */}
-            <GitHubActivity className="lg:mt-auto lg:flex lg:min-h-28 lg:flex-col lg:justify-end" />
+            <GitHubActivity className="lg:mt-auto lg:flex lg:min-h-34 lg:flex-col lg:justify-end" />
           </Reveal>
         </div>
 
