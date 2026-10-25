@@ -11,9 +11,10 @@ const LIVE_LABEL =
 const STILL_LABEL = 'A four-legged robot with an arm, standing on a lab floor.';
 // Small button on desktop, a full 44 px target on touch layouts.
 const TAP = 'max-lg:h-11 max-lg:px-4';
-// The poster fills the stage width on phones and about 55vw from lg up; an
-// 800px copy covers 1x screens and most phones below 2x. Keep in sync with
-// the preload in index.html.
+// The poster is about 55vw from lg up. On phones the frame crops it, so it is
+// drawn up to ~116vw wide, but saying 100vw keeps the 800px copy for screens
+// below 2x: a few percent of upscaling on a picture the live scene replaces,
+// for less than half the bytes. Keep in sync with the preload in index.html.
 const POSTER_SIZES = '(min-width: 1024px) 55vw, 100vw';
 const posterSrcSet = (theme) =>
   `${assetUrl(`img/hero/robot-${theme}-800.webp`)} 800w, ${assetUrl(`img/hero/robot-${theme}.webp`)} 1600w`;
@@ -37,7 +38,10 @@ export default function RobotStage({ className }) {
         className
       )}
     >
-      <div className="relative h-[40svh] max-h-[440px] min-h-[280px] [container-type:size] lg:absolute lg:inset-0 lg:h-auto lg:max-h-none lg:min-h-0">
+      {/* --fit-w/--fit-h: how much of the reference square stays in view
+          (read by the scene too). Desktop keeps the whole width; phones crop
+          a little more so the robot is bigger on a short stage. */}
+      <div className="relative h-[40svh] max-h-[440px] min-h-[280px] [--fit-h:0.72] [--fit-w:1] [container-type:size] max-lg:[--fit-h:0.64] max-lg:[--fit-w:0.86] lg:absolute lg:inset-0 lg:h-auto lg:max-h-none lg:min-h-0">
         <div role="img" aria-label={live ? LIVE_LABEL : STILL_LABEL} className="absolute inset-0">
           {posterFailed ? null : (
             <img
@@ -52,11 +56,12 @@ export default function RobotStage({ className }) {
               draggable={false}
               onError={() => setPosterFailed(true)}
               // The poster is the scene's first frame, sized like the camera
-              // frames it (square, cropped at most 28% on wide stages). It
-              // stays opaque under the canvas while that fades in, then drops
-              // out, so the swap never ghosts.
+              // frames it: a square that keeps --fit-w of its width and
+              // --fit-h of its height in view. It stays opaque under the
+              // canvas while that fades in, then drops out, so the swap never
+              // ghosts.
               className={cn(
-                'absolute left-1/2 top-1/2 size-[min(100cqw,138.9cqh)] max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-0',
+                'absolute left-1/2 top-1/2 size-[min(calc(100cqw/var(--fit-w)),calc(100cqh/var(--fit-h)))] max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-0',
                 live && 'opacity-0 delay-300'
               )}
             />
