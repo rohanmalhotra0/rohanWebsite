@@ -20,6 +20,6 @@ export function readPalette() {
     accent: read('accent'),
     robot: read('robot'),
     // Only set where the accent wouldn't show on the floor.
-    toy: style.getPropertyValue('--toy').trim() || read('accent'),
+    toy: style.getPropertyValue('--robot-toy').trim() || read('accent'),
   };
 }

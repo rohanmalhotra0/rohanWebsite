@@ -171,7 +171,7 @@
   --c5: #3f7d20;
   --robot: #ffc400;
   /* A yellow toy would vanish on the cream floor; safety orange stands out. */
-  --toy: #ff6a1f;
+  --robot-toy: #ff6a1f;
 }
 
 [data-palette="spot"][data-theme="dark"] {
@@ -392,4 +392,24 @@
   --c4: #8ea2ff;
   --c5: #c79bff;
   --robot: #22b8a8;
+}
+
+/* The Spot story's objects (components/projects/spot): the robot's yellow
+   and dark parts, the pink toy, ink for text on either, and the kill-switch
+   red. They're the real things' colors, so they don't follow the palette. */
+:root,
+[data-theme="light"] {
+  --spot: #f6b423;
+  --spot-dark: #27282c;
+  --toy: #f2559f;
+  --on-bright: #141414;
+  --stop: #d92d20;
+}
+
+[data-theme="dark"] {
+  --spot: #f2ad1d;
+  --spot-dark: #4a4c52;
+  --toy: #ff69b0;
+  --on-bright: #141414;
+  --stop: #e5483b;
 }

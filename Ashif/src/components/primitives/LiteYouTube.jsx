@@ -11,8 +11,9 @@ import { cn } from '@/lib/utils';
  * The prerendered card is a plain link to the video, so it still works with
  * JavaScript off; once the page hydrates it becomes the play button. The
  * player takes the card's box, so nothing shifts, and focus moves into it.
+ * `poster` replaces the card's graph paper with a picture of its own.
  */
-export default function LiteYouTube({ id, title, source, className }) {
+export default function LiteYouTube({ id, title, source, poster, className }) {
   const hydrated = useHydrated();
   const [playing, setPlaying] = useState(false);
   const frameRef = useRef(null);
@@ -22,15 +23,18 @@ export default function LiteYouTube({ id, title, source, className }) {
   }, [playing]);
 
   const fullTitle = source ? `${source}: ${title}` : title;
-  const spokenTitle = source ? `${source}, ${title}` : title;
 
-  const card = (
+  // The visible title and source are the control's name, with what it does
+  // said around them, so the name contains the words on screen.
+  const card = (lead, tail) => (
     <>
-      {/* Graph paper, like the hero's taped field. */}
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 opacity-70 [background-image:linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] [background-position:-1px_-1px] [background-size:2rem_2rem]"
-      />
+      {poster ?? (
+        // Graph paper, like the hero's taped field.
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 opacity-70 [background-image:linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] [background-position:-1px_-1px] [background-size:2rem_2rem]"
+        />
+      )}
       <span
         aria-hidden="true"
         className="absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-fg text-bg shadow-[0_6px_20px_-6px_rgb(0_0_0/0.35)] transition-transform duration-200 ease-out group-hover:scale-105 sm:size-16"
@@ -38,12 +42,14 @@ export default function LiteYouTube({ id, title, source, className }) {
         <Play fill="currentColor" strokeWidth={1.5} className="ml-0.5 size-5 sm:size-6" />
       </span>
       <span className="relative block">
+        <span className="sr-only">{lead} </span>
         <span className="type-heading block text-balance text-lg leading-6 text-fg sm:text-xl">
           {title}
         </span>
         <span className="mt-1 block text-sm leading-5 text-subtle">
           {source ? `${source} · YouTube` : 'YouTube'}
         </span>
+        {tail ? <span className="sr-only"> {tail}</span> : null}
       </span>
     </>
   );
@@ -70,23 +76,17 @@ export default function LiteYouTube({ id, title, source, className }) {
             className="absolute inset-0 size-full"
           />
         ) : hydrated ? (
-          <button
-            type="button"
-            aria-label={`Play video: ${spokenTitle}`}
-            onClick={() => setPlaying(true)}
-            className={cn(cardClass, 'cursor-pointer')}
-          >
-            {card}
+          <button type="button" onClick={() => setPlaying(true)} className={cn(cardClass, 'cursor-pointer')}>
+            {card('Play video:')}
           </button>
         ) : (
           <a
             href={`https://www.youtube.com/watch?v=${id}`}
             target="_blank"
             rel="noreferrer"
-            aria-label={`Watch on YouTube: ${spokenTitle} (opens in a new tab)`}
             className={cardClass}
           >
-            {card}
+            {card('Watch on YouTube:', '(opens in a new tab)')}
           </a>
         )}
       </div>

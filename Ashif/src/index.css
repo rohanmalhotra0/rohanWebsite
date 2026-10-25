@@ -82,6 +82,11 @@
   --color-c3: var(--c3);
   --color-c4: var(--c4);
   --color-c5: var(--c5);
+  --color-spot: var(--spot);
+  --color-spot-dark: var(--spot-dark);
+  --color-toy: var(--toy);
+  --color-on-bright: var(--on-bright);
+  --color-stop: var(--stop);
 }
 
 @layer base {
@@ -308,6 +313,76 @@ html[data-vt="page"]::view-transition-new(root) {
     opacity: 1;
     transform: scaleX(0.85);
   }
+}
+
+/* The Spot story (components/projects/spot). Pipeline steps: done, the
+   one playing, and the ones to come; the connectors fill as the story moves
+   and frames flow along the filled part. */
+.spot-node {
+  color: var(--subtle);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.spot-node-dot {
+  background: var(--line-strong);
+}
+.spot-node[data-state="done"] {
+  color: var(--fg);
+}
+.spot-node[data-state="done"] .spot-node-dot {
+  background: var(--accent);
+}
+.spot-node[data-state="active"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.spot-node[data-state="active"] .spot-node-dot {
+  background: var(--accent-ink);
+}
+.spot-bar {
+  position: relative;
+  height: 3px;
+  background: var(--line-strong);
+}
+.spot-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(90deg, var(--accent) 0 7px, transparent 7px 10px);
+  clip-path: inset(0 calc((1 - var(--fill)) * 100%) 0 0);
+  animation: spot-dash 0.5s linear infinite;
+}
+@keyframes spot-dash {
+  to {
+    background-position: 10px 0;
+  }
+}
+.spot-packets {
+  animation: spot-flow 0.8s linear infinite;
+}
+@keyframes spot-flow {
+  to {
+    stroke-dashoffset: -22.1;
+  }
+}
+[data-live="false"] .spot-bar::before,
+[data-live="false"] .spot-packets {
+  animation-play-state: paused;
+}
+/* Corner brackets, like a detection box, in the current text colour. */
+.spot-brackets {
+  background:
+    linear-gradient(currentColor 0 0) top left / 16px 2px,
+    linear-gradient(currentColor 0 0) top left / 2px 16px,
+    linear-gradient(currentColor 0 0) top right / 16px 2px,
+    linear-gradient(currentColor 0 0) top right / 2px 16px,
+    linear-gradient(currentColor 0 0) bottom left / 16px 2px,
+    linear-gradient(currentColor 0 0) bottom left / 2px 16px,
+    linear-gradient(currentColor 0 0) bottom right / 16px 2px,
+    linear-gradient(currentColor 0 0) bottom right / 2px 16px;
+  background-repeat: no-repeat;
 }
 
 /* The prerendered hero poster gets its theme's src from an inline script
