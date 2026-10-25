@@ -43,10 +43,11 @@ function frame(sc) {
   const pen = sc.draw > 0 && sc.draw < 1;
   const edgeIndex = Math.min(3, Math.floor(sc.draw * 4));
   const penAt = edgePoint(edges[edgeIndex], Math.min(1, sc.draw * 4 - edgeIndex));
+  // --mark, not --accent: thin lines on the stage need 3:1 in every palette.
   const boxStroke =
     sc.morph >= 1
-      ? 'var(--accent)'
-      : `color-mix(in oklab, var(--accent) ${Math.round(sc.morph * 100)}%, var(--fg))`;
+      ? 'var(--mark)'
+      : `color-mix(in oklab, var(--mark) ${Math.round(sc.morph * 100)}%, var(--fg))`;
   const boxOpacity = sc.boxOn ? sc.toyShown : 0;
 
   const back = { x: sc.spotX - 30, y: sc.spotY - 26 };
@@ -101,7 +102,7 @@ function frame(sc) {
     meter: { opacity: f1(sc.meter) },
     meterFill: {
       width: f1(Math.max(0, sc.conf) * meterW),
-      style: { fill: above ? 'var(--accent)' : 'var(--subtle)' },
+      style: { fill: above ? 'var(--mark)' : 'var(--subtle)' },
     },
     meterMark: { style: { fill: above ? 'var(--fg)' : 'var(--subtle)' } },
     meterValue: { text: `${Math.round(sc.conf * 100)}%` },
@@ -110,7 +111,7 @@ function frame(sc) {
     grpc: { opacity: f1(sc.grpc) },
     shadow: { cx: f1(sc.spotX), rx: f1(78 + sc.power * 6), opacity: f1(0.09 + sc.power * 0.03) },
     body: { transform: `translate(${f1(sc.spotX)} ${f1(sc.spotY)}) rotate(${f1(sc.pitch)})` },
-    lens: { style: { fill: sc.power > 0.5 ? 'var(--accent)' : 'var(--subtle)' } },
+    lens: { style: { fill: sc.power > 0.5 ? 'var(--mark)' : 'var(--subtle)' } },
     ...Object.fromEntries(
       legs.flatMap((l, i) => [
         [`thigh${i}`, l.thigh],
@@ -255,7 +256,7 @@ function SpotStage({ initial, ref }) {
         {text('hudPhotos')}
       </text>
       <g {...at('hudLive')}>
-        <circle cx="29" cy="28" r="6.5" fill="var(--accent)" />
+        <circle cx="29" cy="28" r="6.5" fill="var(--mark)" />
         <text x="43" y="35" fontSize="20" fontWeight="700" fill="var(--fg)" style={mono}>
           LIVE
         </text>
@@ -275,7 +276,7 @@ function SpotStage({ initial, ref }) {
         {...at('packets')}
         className="spot-packets"
         fill="none"
-        stroke="var(--accent)"
+        stroke="var(--mark)"
         strokeWidth="5"
         strokeLinecap="round"
         strokeDasharray="0.1 22"
@@ -331,7 +332,7 @@ function SpotStage({ initial, ref }) {
       </g>
       {nearLeg(0)}
       {nearLeg(1)}
-      <circle {...at('wakeRing')} fill="none" stroke="var(--accent)" strokeWidth="2.5" />
+      <circle {...at('wakeRing')} fill="none" stroke="var(--mark)" strokeWidth="2.5" />
 
       {/* The toy, then the box drawn round it. */}
       <g {...at('toy')}>
@@ -399,7 +400,8 @@ function SpotStage({ initial, ref }) {
         <text {...at('meterValue')} x={METER.x1} y={METER.y - 9} fontSize="19" fontWeight="700" textAnchor="end" fill="var(--fg)" style={mono}>
           {text('meterValue')}
         </text>
-        <rect x={METER.x0} y={METER.y} width={METER.x1 - METER.x0} height={METER.h} rx={METER.h / 2} fill="var(--line)" />
+        {/* An outlined track, so the fill sits on the stage (3:1 in every palette). */}
+        <rect x={METER.x0} y={METER.y} width={METER.x1 - METER.x0} height={METER.h} rx={METER.h / 2} fill="none" stroke="var(--line-strong)" strokeWidth="1.5" />
         <rect {...at('meterFill')} x={METER.x0} y={METER.y} height={METER.h} rx={METER.h / 2} />
         <g {...at('meterMark')}>
           <rect x={METER_MARK - 1} y={METER.y - 4} width="2" height={METER.h + 8} />
@@ -407,7 +409,7 @@ function SpotStage({ initial, ref }) {
             70%
           </text>
         </g>
-        <circle {...at('crossRing')} cx={METER_MARK} cy={METER.y + METER.h / 2} fill="none" stroke="var(--accent)" strokeWidth="2.5" />
+        <circle {...at('crossRing')} cx={METER_MARK} cy={METER.y + METER.h / 2} fill="none" stroke="var(--mark)" strokeWidth="2.5" />
       </g>
 
       {/* The kill-switch, pressed. */}

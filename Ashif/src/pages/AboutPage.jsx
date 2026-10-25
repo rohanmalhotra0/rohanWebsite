@@ -1,8 +1,10 @@
 import About from '@/components/about/About';
 import PhotoDeck from '@/components/about/PhotoDeck';
-import { Container, Section, SectionHeader } from '@/components/primitives/Section';
+import { Container, PageHeader, Section, SectionHeader } from '@/components/primitives/Section';
 import Reveal from '@/components/primitives/Reveal';
-import { photos } from '@/data/portfolioData';
+import { photos, profile } from '@/data/portfolioData';
+import { tie } from '@/lib/text';
+import { routeById } from '@/routes';
 
 // photos[0] is the portrait, shown at the top of the page.
 const deck = photos.slice(1);
@@ -10,6 +12,7 @@ const deck = photos.slice(1);
 export default function AboutPage() {
   return (
     <>
+      <PageHeader route={routeById('about')} description={tie(profile.aboutLede)} />
       <About />
       <Section id="photos" className="mt-20 sm:mt-28">
         <Container>

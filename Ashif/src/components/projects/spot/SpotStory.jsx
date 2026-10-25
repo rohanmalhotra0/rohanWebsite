@@ -283,7 +283,7 @@ export default function SpotStory({ steps, safety }) {
           >
             <div ref={(el) => void (textRefs.current[i] = el)}>
               <p className="flex items-center gap-2 font-mono text-[13px] text-subtle">
-                <span className="rounded-full bg-surface-2 px-2 py-0.5 text-fg transition-colors duration-200 group-data-[active=true]:bg-accent group-data-[active=true]:text-accent-ink">
+                <span className="rounded-full bg-surface-2 px-2 py-0.5 text-fg transition-colors duration-200 group-data-[active=true]:bg-accent group-data-[active=true]:text-accent-ink group-data-[active=true]:shadow-[inset_0_0_0_1.5px_var(--mark)]">
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 {step.title}

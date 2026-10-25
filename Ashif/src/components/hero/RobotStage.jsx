@@ -14,17 +14,20 @@ const TAP = 'max-lg:h-11 max-lg:px-4';
 // The poster is about 55vw from lg up. On phones the frame crops it, so it is
 // drawn up to ~116vw wide, but saying 100vw keeps the 800px copy for screens
 // below 2x: a few percent of upscaling on a picture the live scene replaces,
-// for less than half the bytes. Keep in sync with the preload in index.html.
+// for less than half the bytes. One still per palette and theme
+// (scripts/render-posters.mjs), so it matches the scene's colors. Keep in
+// sync with the preload in index.html.
 const POSTER_SIZES = '(min-width: 1024px) 55vw, 100vw';
-const posterSrcSet = (theme) =>
-  `${assetUrl(`img/hero/robot-${theme}-800.webp`)} 800w, ${assetUrl(`img/hero/robot-${theme}.webp`)} 1600w`;
+const posterName = (palette, theme) => `img/hero/robot-${palette}-${theme}`;
+const posterSrcSet = (name) => `${assetUrl(`${name}-800.webp`)} 800w, ${assetUrl(`${name}.webp`)} 1600w`;
 
 /**
  * The robot stage: a poster still that paints immediately, cross-faded to
  * the live three.js scene once its chunk has loaded and drawn a frame.
  */
 export default function RobotStage({ className }) {
-  const { theme } = useTheme();
+  const { theme, palette } = useTheme();
+  const poster = posterName(palette, theme);
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
   const stage = useRobotScene({ reducedMotion: reduced });
   const [posterFailed, setPosterFailed] = useState(false);
@@ -46,8 +49,8 @@ export default function RobotStage({ className }) {
           {posterFailed ? null : (
             <img
               ref={stage.posterRef}
-              src={assetUrl(`img/hero/robot-${theme}.webp`)}
-              srcSet={posterSrcSet(theme)}
+              src={assetUrl(`${poster}.webp`)}
+              srcSet={posterSrcSet(poster)}
               sizes={POSTER_SIZES}
               alt=""
               width={1600}

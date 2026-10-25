@@ -24,6 +24,9 @@ export const profile = {
     'I’m a math and computer science double major at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
   school: 'NYU Courant',
   graduation: 'May 2027',
+  /** The About page's lede, in its color-block header. */
+  aboutLede:
+    'I learn by building. If I get curious about prediction markets, I make a hedging model. If I want to understand computer vision, I train a robot to find a toy. This site is basically the trail of whatever I was trying to figure out next.',
 };
 
 
