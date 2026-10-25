@@ -546,39 +546,30 @@ img[data-hero-poster]:not([src]) {
 }
 .stamp-art {
   height: 100%;
-  background: var(--surface-2) no-repeat 52% 34% / 240%;
+  overflow: hidden;
+  background: var(--surface-2);
 }
-/* The lab posters from the home page (scripts/posters), one per palette and
-   theme. Only the one that matches is fetched. */
-[data-palette="spot"][data-theme="light"] .stamp-art {
-  background-image: url("/img/hero/robot-spot-light-800.webp");
+/* Cropped in on the robot: cover the box, then zoom about the robot. */
+.stamp-art img {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 52% 34%;
+  scale: 1.94;
+  transform-origin: 52% 34%;
 }
-[data-palette="spot"][data-theme="dark"] .stamp-art {
-  background-image: url("/img/hero/robot-spot-dark-800.webp");
-}
-[data-palette="terminal"][data-theme="light"] .stamp-art {
-  background-image: url("/img/hero/robot-terminal-light-800.webp");
-}
-[data-palette="terminal"][data-theme="dark"] .stamp-art {
-  background-image: url("/img/hero/robot-terminal-dark-800.webp");
-}
-[data-palette="courant"][data-theme="light"] .stamp-art {
-  background-image: url("/img/hero/robot-courant-light-800.webp");
-}
-[data-palette="courant"][data-theme="dark"] .stamp-art {
-  background-image: url("/img/hero/robot-courant-dark-800.webp");
-}
-[data-palette="market"][data-theme="light"] .stamp-art {
-  background-image: url("/img/hero/robot-market-light-800.webp");
-}
-[data-palette="market"][data-theme="dark"] .stamp-art {
-  background-image: url("/img/hero/robot-market-dark-800.webp");
-}
-[data-palette="paper"][data-theme="light"] .stamp-art {
-  background-image: url("/img/hero/robot-paper-light-800.webp");
-}
-[data-palette="paper"][data-theme="dark"] .stamp-art {
-  background-image: url("/img/hero/robot-paper-dark-800.webp");
+[data-palette="spot"][data-theme="light"] .stamp-art img[data-poster="spot-light"],
+[data-palette="spot"][data-theme="dark"] .stamp-art img[data-poster="spot-dark"],
+[data-palette="terminal"][data-theme="light"] .stamp-art img[data-poster="terminal-light"],
+[data-palette="terminal"][data-theme="dark"] .stamp-art img[data-poster="terminal-dark"],
+[data-palette="courant"][data-theme="light"] .stamp-art img[data-poster="courant-light"],
+[data-palette="courant"][data-theme="dark"] .stamp-art img[data-poster="courant-dark"],
+[data-palette="market"][data-theme="light"] .stamp-art img[data-poster="market-light"],
+[data-palette="market"][data-theme="dark"] .stamp-art img[data-poster="market-dark"],
+[data-palette="paper"][data-theme="light"] .stamp-art img[data-poster="paper-light"],
+[data-palette="paper"][data-theme="dark"] .stamp-art img[data-poster="paper-dark"] {
+  display: block;
 }
 
 /* The postmark lands on the stamp like a rubber stamp: big and turned, then
