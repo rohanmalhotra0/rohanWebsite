@@ -21,11 +21,63 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
   const wide = layout !== 'grid';
   const flipped = layout === 'end';
 
+  const caption = (
+    <>
+      <h3
+        className={cn(
+          'type-heading text-balance text-fg',
+          wide ? 'text-2xl sm:text-3xl lg:text-[2.5rem] lg:leading-[1.05]' : 'mt-5 text-2xl sm:mt-6'
+        )}
+      >
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          data-project-trigger={`card:${project.slug}`}
+          onClick={(event) =>
+            onOpen(index, {
+              opener: event.currentTarget,
+              // A mouse click (not Enter) on a hover device: the image is zoomed.
+              fromHover: event.detail > 0 && canHover(),
+            })
+          }
+          className="text-left decoration-fg/30 decoration-2 underline-offset-[0.14em] outline-none after:absolute after:inset-0 after:content-[''] group-hover:underline"
+        >
+          {project.title}
+        </button>
+      </h3>
+      <p
+        className={cn(
+          'mt-3 max-w-xl text-pretty leading-relaxed text-muted',
+          wide ? 'text-base' : 'text-[15px] sm:text-base'
+        )}
+      >
+        {project.description}
+      </p>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+        <p className="text-sm text-subtle">{projectMeta(project)}</p>
+        <ProjectLinks project={project} className="relative z-10" />
+      </div>
+    </>
+  );
+
   return (
-    <li className={wide ? 'md:col-span-2 lg:col-span-12' : 'lg:col-span-6'}>
+    <li
+      className={
+        wide
+          ? 'md:col-span-2 lg:col-span-12'
+          : // Image, title, description and meta are rows of a subgrid, so
+            // captions of different lengths still line up across the pair.
+            'md:row-span-4 md:grid md:grid-rows-subgrid md:gap-y-0 lg:col-span-6'
+      }
+    >
       <article
         data-project-card={project.slug}
-        className={cn('group relative', wide && 'lg:grid lg:grid-cols-12 lg:gap-x-8')}
+        className={cn(
+          'group relative',
+          wide
+            ? 'lg:grid lg:grid-cols-12 lg:gap-x-8'
+            : 'md:row-span-4 md:grid md:grid-rows-subgrid md:gap-y-0'
+        )}
       >
         <div
           data-project-media
@@ -55,48 +107,18 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
           </MotionDiv>
         </div>
 
-        <div
-          className={cn(
-            'mt-5 sm:mt-6',
-            wide && 'lg:col-span-4 lg:mt-0 lg:self-end',
-            flipped && 'lg:col-start-1 lg:row-start-1'
-          )}
-        >
-          <h3
+        {wide ? (
+          <div
             className={cn(
-              'type-heading text-balance text-fg',
-              wide ? 'text-2xl sm:text-3xl lg:text-[2.5rem] lg:leading-[1.05]' : 'text-2xl'
+              'mt-5 sm:mt-6 lg:col-span-4 lg:mt-0 lg:self-end',
+              flipped && 'lg:col-start-1 lg:row-start-1'
             )}
           >
-            <button
-              type="button"
-              aria-haspopup="dialog"
-              data-project-trigger={`card:${project.slug}`}
-              onClick={(event) =>
-                onOpen(index, {
-                  opener: event.currentTarget,
-                  // A mouse click (not Enter) on a hover device: the image is zoomed.
-                  fromHover: event.detail > 0 && canHover(),
-                })
-              }
-              className="text-left decoration-fg/30 decoration-2 underline-offset-[0.14em] outline-none after:absolute after:inset-0 after:content-[''] group-hover:underline"
-            >
-              {project.title}
-            </button>
-          </h3>
-          <p
-            className={cn(
-              'mt-3 max-w-xl text-pretty leading-relaxed text-muted',
-              wide ? 'text-base' : 'text-[15px] sm:text-base'
-            )}
-          >
-            {project.description}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
-            <p className="text-sm text-subtle">{projectMeta(project)}</p>
-            <ProjectLinks project={project} className="relative z-10" />
+            {caption}
           </div>
-        </div>
+        ) : (
+          caption
+        )}
       </article>
     </li>
   );

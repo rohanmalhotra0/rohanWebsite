@@ -325,11 +325,16 @@ function buildArm(materials) {
   return { base, shoulder, elbow, wrist, roll, fingers, grasp, eye };
 }
 
-export function buildRobot(materials) {
+/**
+ * Builds the rig in three slices (body, legs, arm), yielding in between so
+ * the caller can hand the main thread back to the page. Returns the rig.
+ */
+export function* buildRobot(materials) {
   const root = new Group();
   const body = buildBody(materials);
   body.position.y = DIMS.height;
   root.add(body);
+  yield;
 
   const geometry = legGeometry();
   const legs = LEGS.map((def) => {
@@ -337,6 +342,7 @@ export function buildRobot(materials) {
     body.add(leg.root);
     return leg;
   });
+  yield;
 
   const arm = buildArm(materials);
   body.add(arm.base);

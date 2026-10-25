@@ -178,6 +178,14 @@ export function createStage(renderer, scene, { mobile, home }) {
     uniforms,
     bake,
 
+    /** Smaller shadow maps for slower devices (no shader recompiles). */
+    setShadowSize(px) {
+      if (key.shadow.mapSize.x === px) return;
+      key.shadow.mapSize.set(px, px);
+      key.shadow.map?.dispose();
+      key.shadow.map = null;
+    },
+
     setPalette(palette) {
       const L = LIGHTING[palette.theme];
       hemi.color.set(0xffffff);
