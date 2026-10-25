@@ -11,8 +11,9 @@ const INTRO =
 const LINKS = [
   { label: 'LinkedIn', href: profile.linkedin, external: true },
   { label: 'GitHub', href: profile.github, external: true },
+  // The pair reads as "the page" and "the file".
   { label: 'Résumé', href: '#/resume' },
-  { label: 'Download PDF', href: profile.resumeUrl, download: true },
+  { label: 'Download résumé (PDF)', href: profile.resumeUrl, download: true },
 ];
 
 function ContactLinks({ className }) {
@@ -51,13 +52,14 @@ export default function Contact() {
     <Section id="contact">
       <Container>
         <SectionHeader title="Contact" description={INTRO} />
-        <div className="mt-12 grid gap-14 sm:mt-16 lg:grid-cols-12 lg:gap-8">
-          {/* Subgrid, so the link list ends on a column line rather than at an arbitrary width. */}
-          <Reveal className="lg:col-span-7 lg:grid lg:grid-cols-subgrid lg:content-start">
-            <EmailLine className="lg:col-span-7" />
-            <ContactLinks className="mt-8 max-w-sm sm:mt-10 lg:col-span-4 lg:max-w-none" />
+        {/* Everything ends on a column line. md: stacked, the list stops at column 7 (one gutter
+            before the description) and the form spans the full grid. lg: form from column 8. */}
+        <div className="mt-12 grid gap-14 sm:mt-16 md:grid-cols-12 md:gap-x-8">
+          <Reveal className="md:col-span-12 md:grid md:grid-cols-subgrid md:content-start lg:col-span-7">
+            <EmailLine className="md:col-span-12 lg:col-span-7" />
+            <ContactLinks className="mt-8 sm:mt-10 md:col-span-7 lg:col-span-4" />
           </Reveal>
-          <Reveal delay={0.08} className="max-w-xl lg:col-span-5 lg:col-start-8 lg:max-w-none">
+          <Reveal delay={0.08} className="md:col-span-12 lg:col-span-5 lg:col-start-8">
             <ContactForm />
           </Reveal>
         </div>

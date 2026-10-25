@@ -2,6 +2,18 @@ import { profile } from '@/data/portfolioData';
 
 export const FIELDS = ['name', 'email', 'message'];
 
+export const FIELD_LABELS = { name: 'Name', email: 'Email', message: 'Message' };
+
+export const SEND_FAILED = 'The message didn’t go through. Try again, or send it by email.';
+
+/** Form-level summary for the live region, e.g. "Please check your name and email." */
+export function invalidSummary(names) {
+  const words = names.map((name) => FIELD_LABELS[name].toLowerCase());
+  const list =
+    words.length < 3 ? words.join(' and ') : `${words.slice(0, -1).join(', ')}, and ${words.at(-1)}`;
+  return `Please check your ${list}.`;
+}
+
 // type="email" accepts "a@b"; also require a dot in the domain.
 export const EMAIL_PATTERN = '[^@\\s]+@[^@\\s]+\\.[^@\\s]+';
 
