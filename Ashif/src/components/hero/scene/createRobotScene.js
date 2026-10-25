@@ -31,26 +31,40 @@ const BOUNDS = { minX: -1.7, maxX: 1.7, minZ: -1.25, maxZ: 1.4 };
 // Where the gripper camera looks on frame one (and in the poster).
 const FIRST_LOOK = new Vector3(-0.95, 0.1, 1.15);
 const ROBOT_BOX = new Box3(new Vector3(-0.26, 0, -0.52), new Vector3(0.26, 0.9, 0.66));
-const FEED_INTERVAL = 1 / 30;
 const UP = new Vector3(0, 1, 0);
 
+// Quality steps for slower GPUs: render scale, shadow map size, camera rate.
+// None of them recompile shaders.
+const QUALITY = [
+  { ratio: 1, min: 1, shadow: 2048, feed: 1 / 30 },
+  { ratio: 0.75, min: 1, shadow: 1024, feed: 1 / 20 },
+  { ratio: 0.5, min: 0.75, shadow: 512, feed: 1 / 12 },
+];
+
+const yieldToPage = () => new Promise((resolve) => setTimeout(resolve, 0));
+
 /**
- * Mounts the robot stage into `host`. Returns null when WebGL is unavailable.
- * `overlay` holds React refs to the DOM layered over the canvas (camera inset
- * frame, detection box and label, HUD line, controls), read when needed.
- * In poster mode it renders one still frame and exposes `capture()`.
+ * Mounts the robot stage into `host` and boots it in small steps so the page
+ * stays responsive. Returns null when a WebGL 2 renderer can't be created.
+ *
+ * `overlay` holds React refs to the DOM over the canvas (camera inset frame,
+ * detection box and label, HUD line, controls). `onSlow` fires when the
+ * device can't keep up even at the lowest quality (unless `forced`). In
+ * poster mode it renders one still frame and exposes `capture()`.
  */
 export function createRobotScene({
   host,
   overlay = {},
-  palette,
+  palette: initialPalette,
   mobile = false,
   poster = false,
+  forced = false,
   onReady,
   onStatus,
   onAnnounce,
   onInteract,
   onLost,
+  onSlow,
 }) {
   const el = (key) => overlay[key]?.current;
   const canvas = document.createElement('canvas');
@@ -75,39 +89,35 @@ export function createRobotScene({
   host.appendChild(canvas);
 
   const scene = new Scene();
-  const materials = createMaterials();
-  const rig = buildRobot(materials);
-  scene.add(rig.root);
-  const ctl = createController(rig);
-  const stage = createStage(renderer, scene, { mobile, home: HOME });
-
-  const toyMaterial = new MeshStandardMaterial({ roughness: 0.5 });
-  const toyGeometry = boneGeometry();
-  const toys = [createToy(toyGeometry, toyMaterial), createToy(toyGeometry, toyMaterial)];
-  for (const t of toys) scene.add(t.mesh);
-
   const camera = new PerspectiveCamera(VIEW.fov, 1, 0.1, 40);
   // Layer 1 holds the gripper and a held toy: drawn in the main view and in
   // shadows, but invisible to the robot's own palm camera.
   camera.layers.enable(1);
+  const materials = createMaterials();
+  const toyMaterial = new MeshStandardMaterial({ roughness: 0.5 });
+  const toyGeometry = boneGeometry();
+  const toys = [createToy(toyGeometry, toyMaterial), createToy(toyGeometry, toyMaterial)];
+  for (const t of toys) scene.add(t.mesh);
   const feed = poster ? null : createFeed(renderer);
-  if (feed) rig.arm.eye.add(feed.camera);
 
+  // Built during boot.
+  let rig = null;
+  let ctl = null;
+  let brain = null;
+  let stage = null;
+
+  let palette = initialPalette;
   let status = 'idle';
-  const brain = createBrain({
-    ctl,
-    rig,
-    toys,
-    scene,
-    home: HOME,
-    viewer: () => camera.position,
-    onChange(next, message) {
-      lastEvent = performance.now();
-      status = STATUS[next];
-      onStatus?.(status);
-      if (message) onAnnounce?.(message);
-    },
-  });
+  let ready = false;
+  let running = false;
+  let visible = true;
+  let lost = false;
+  let disposed = false;
+  let first = true;
+  let manual = false;
+  let lastEvent = 0;
+  let raf = 0;
+  let last = 0;
 
   // Camera rig ------------------------------------------------------------
 
@@ -125,9 +135,12 @@ export function createRobotScene({
     camera.updateMatrixWorld();
   }
 
+  const baseRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
+  let quality = 0;
+  let pixelRatio = baseRatio;
+  let feedInterval = QUALITY[0].feed;
   let width = 0;
   let height = 0;
-  let pixelRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
 
   function resize() {
     const w = host.clientWidth;
@@ -150,7 +163,16 @@ export function createRobotScene({
       const c = canvas.getBoundingClientRect();
       feed.setRect(f.left - c.left, f.top - c.top, f.width, f.height, pixelRatio);
     }
-    if (ready && !running) frame(0);
+    if (ready && !running && !lost) frame(0);
+  }
+
+  function setQuality(level) {
+    quality = level;
+    const q = QUALITY[level];
+    pixelRatio = Math.max(q.min, baseRatio * q.ratio);
+    feedInterval = q.feed;
+    stage.setShadowSize(Math.min(q.shadow, mobile ? 1024 : 2048));
+    resize();
   }
 
   // Floor targets ----------------------------------------------------------
@@ -184,7 +206,9 @@ export function createRobotScene({
     const c = canvas.getBoundingClientRect();
     for (const key of ['frame', 'controls']) {
       const r = el(key)?.getBoundingClientRect();
-      if (r && x > r.left - c.left - 32 && x < r.right - c.left + 32 && y > r.top - c.top - 32 && y < r.bottom - c.top + 32) return false;
+      if (r && x > r.left - c.left - 32 && x < r.right - c.left + 32 && y > r.top - c.top - 32 && y < r.bottom - c.top + 32) {
+        return false;
+      }
     }
     return true;
   }
@@ -217,12 +241,14 @@ export function createRobotScene({
   }
 
   function throwTo(p) {
+    if (!ready) return;
     brain.throwTo(clampTarget(p));
     onInteract?.();
-    if (!running) frame(0);
+    if (!running && !lost) frame(0);
   }
 
   function throwRandom() {
+    if (!ready) return;
     const s = ctl.state;
     const p = new Vector3();
     for (let i = 0; i < 30; i++) {
@@ -246,7 +272,15 @@ export function createRobotScene({
 
   function onPointerDown(e) {
     if (e.button !== 0) return;
-    input.down = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), type: e.pointerType, az: orbit.goalAz, el: orbit.goalEl };
+    input.down = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      t: performance.now(),
+      type: e.pointerType,
+      az: orbit.goalAz,
+      el: orbit.goalEl,
+    };
     if (e.pointerType === 'mouse') canvas.setPointerCapture(e.pointerId);
   }
 
@@ -277,8 +311,10 @@ export function createRobotScene({
       setNdc(e.clientX, e.clientY);
       if (hitsRobot()) {
         brain.poke();
-        if (!running) frame(0);
-      } else if (raycaster.ray.intersectPlane(floorPlane, hit)) throwTo(hit.clone());
+        if (!running && !lost) frame(0);
+      } else if (raycaster.ray.intersectPlane(floorPlane, hit)) {
+        throwTo(hit.clone());
+      }
     }
     input.down = null;
     input.dragging = false;
@@ -331,7 +367,7 @@ export function createRobotScene({
 
   const detection = { x: 0, y: 0, w: 0, h: 0 };
   const toyWorld = new Vector3();
-  let feedClock = FEED_INTERVAL;
+  let feedClock = Infinity;
   let feedFrames = 0;
   let fpsClock = 0;
   let fps = 30;
@@ -392,12 +428,12 @@ export function createRobotScene({
     if (feed) {
       feedClock += dt;
       fpsClock += dt;
-      if (feedClock >= FEED_INTERVAL) {
-        feedClock %= FEED_INTERVAL;
+      if (feedClock >= feedInterval) {
+        feedClock = feedClock === Infinity ? 0 : feedClock % feedInterval;
         feedFrames++;
         stage.setView(width, height, false);
         feed.capture(scene);
-        updateOverlay(FEED_INTERVAL);
+        updateOverlay(feedInterval);
       }
       if (fpsClock >= 1) {
         fps = Math.min(30, Math.round(feedFrames / fpsClock));
@@ -410,20 +446,6 @@ export function createRobotScene({
     feed?.draw(width, height);
   }
 
-  // Loop, visibility and adaptive resolution --------------------------------
-
-  let raf = 0;
-  let last = 0;
-  let ready = false;
-  let running = false;
-  let visible = true;
-  let lost = false;
-  let disposed = false;
-  let first = true;
-  let manual = false;
-  let lastEvent = 0;
-  const perf = { time: 0, frames: 0, age: 0 };
-
   function frame(dt) {
     step(dt);
     draw(dt);
@@ -433,28 +455,37 @@ export function createRobotScene({
     }
   }
 
+  // Loop, visibility and adaptive quality ----------------------------------
+
+  const perf = { skip: 8, samples: [] };
+
+  // Median frame interval over 30 frames: step quality down above ~30 fps
+  // budget, and give up (poster + "Run demo") if it is hopeless.
+  function measure(ms) {
+    if (perf.skip > 0) {
+      perf.skip--;
+      return;
+    }
+    perf.samples.push(ms);
+    if (perf.samples.length < 30) return;
+    perf.samples.sort((a, b) => a - b);
+    const median = perf.samples[15];
+    perf.samples.length = 0;
+    perf.skip = 6;
+    if (median > 100 && !forced) onSlow?.();
+    else if (median > 34 && quality < QUALITY.length - 1) setQuality(quality + 1);
+  }
+
   function tick(now) {
     raf = requestAnimationFrame(tick);
     // Nothing happening: 30 fps is plenty for breathing and sway.
     const calm =
       brain.state === 'idle' && hoverAlpha < 0.01 && now - Math.max(input.moved, lastEvent) > 4000;
     if (calm && last && now - last < 30) return;
-    const dt = last ? Math.min((now - last) / 1000, 1 / 20) : 0;
+    const ms = last ? now - last : 0;
     last = now;
-    frame(dt);
-    if (calm) return;
-    // Drop resolution a step at a time if frames are consistently slow.
-    perf.time += dt;
-    perf.frames++;
-    perf.age += dt;
-    if (perf.time > 2) {
-      if (perf.age > 3 && perf.time / perf.frames > 1 / 40 && pixelRatio > 1) {
-        pixelRatio = Math.max(1, pixelRatio - 0.25);
-        resize();
-      }
-      perf.time = 0;
-      perf.frames = 0;
-    }
+    frame(Math.min(ms / 1000, 1 / 20));
+    if (ms && !calm) measure(ms);
   }
 
   function sync() {
@@ -463,6 +494,7 @@ export function createRobotScene({
     if (should && !running) {
       running = true;
       last = 0;
+      perf.skip = Math.max(perf.skip, 3);
       raf = requestAnimationFrame(tick);
     } else if (!should && running) {
       running = false;
@@ -471,34 +503,144 @@ export function createRobotScene({
   }
 
   function applyPalette(p) {
-    stage.setPalette(p);
+    stage?.setPalette(p);
     feed?.setPalette(p);
     toyMaterial.color.set(p.accent);
   }
 
-  // Setup -------------------------------------------------------------------
+  // Boot ------------------------------------------------------------------
 
-  ctl.reset(HOME.x, HOME.z, HOME.yaw, FIRST_LOOK);
-  applyPalette(palette);
-  resize();
-  placeCamera();
-  scene.updateMatrixWorld();
+  /**
+   * Compile every shader the scene will use before the first visible frame.
+   * With KHR_parallel_shader_compile that happens off the main thread;
+   * otherwise draw the (still hidden) canvas one material at a time, for the
+   * screen and for the camera's offscreen target, yielding in between.
+   */
+  async function warmUp() {
+    if (renderer.extensions.has('KHR_parallel_shader_compile')) {
+      const jobs = [renderer.compileAsync(scene, camera)];
+      if (feed) {
+        renderer.setRenderTarget(feed.target);
+        jobs.push(renderer.compileAsync(scene, camera));
+        renderer.setRenderTarget(null);
+      }
+      await Promise.all(jobs).catch(() => {});
+      return;
+    }
+    const groups = new Map();
+    scene.traverse((o) => {
+      if (!o.isMesh) return;
+      if (!groups.has(o.material)) groups.set(o.material, []);
+      groups.get(o.material).push(o);
+    });
+    const meshes = [...groups.values()].flat();
+    const shown = new Map(meshes.map((m) => [m, m.visible]));
+    for (const t of toys) t.mesh.position.set(HOME.x, TOY_REST, HOME.z + 0.8);
+    for (const list of groups.values()) {
+      for (const m of meshes) m.visible = false;
+      for (const m of list) m.visible = true;
+      renderer.shadowMap.needsUpdate = true;
+      renderer.render(scene, camera);
+      if (feed) {
+        renderer.setRenderTarget(feed.target);
+        renderer.render(scene, camera);
+        renderer.setRenderTarget(null);
+      }
+      await yieldToPage();
+      if (disposed) return;
+    }
+    for (const [m, v] of shown) m.visible = v;
+    feed?.draw(width, height);
+  }
 
-  if (poster) {
-    frame(0);
-    return {
-      canvas,
-      capture: (type = 'image/webp', quality = 0.9) => canvas.toDataURL(type, quality),
-      dispose() {
-        renderer.dispose();
-        renderer.forceContextLoss();
-        canvas.remove();
+  async function boot() {
+    await yieldToPage();
+    const steps = buildRobot(materials);
+    let next = steps.next();
+    while (!next.done) {
+      await yieldToPage();
+      if (disposed) return;
+      next = steps.next();
+    }
+    rig = next.value;
+    scene.add(rig.root);
+    ctl = createController(rig);
+    if (feed) rig.arm.eye.add(feed.camera);
+    brain = createBrain({
+      ctl,
+      rig,
+      toys,
+      scene,
+      home: HOME,
+      viewer: () => camera.position,
+      onChange(state, message) {
+        lastEvent = performance.now();
+        status = STATUS[state];
+        onStatus?.(status);
+        if (message) onAnnounce?.(message);
       },
-    };
+    });
+    ctl.reset(HOME.x, HOME.z, HOME.yaw, FIRST_LOOK);
+
+    await yieldToPage();
+    if (disposed) return;
+    stage = createStage(renderer, scene, { mobile, home: HOME });
+    stage.setShadowSize(mobile ? 1024 : 2048);
+    applyPalette(palette);
+    resize();
+    placeCamera();
+    scene.updateMatrixWorld();
+
+    if (poster) {
+      frame(0);
+      return;
+    }
+
+    await yieldToPage();
+    if (disposed) return;
+    await warmUp();
+    if (disposed) return;
+
+    resizeObserver.observe(host);
+    intersection.observe(host);
+    canvas.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerCancel);
+    document.documentElement.addEventListener('pointerleave', onPointerLeave);
+    document.addEventListener('visibilitychange', sync);
+
+    // Test hook for the Playwright checks (deterministic stepping); stripped
+    // from production builds.
+    if (import.meta.env.DEV) {
+      canvas.robot = {
+        ctl,
+        brain,
+        toys,
+        camera,
+        feed,
+        renderer,
+        throwTo,
+        pause() {
+          manual = true;
+          sync();
+        },
+        advance(seconds, dt = 1 / 60) {
+          for (let t = dt; t <= seconds + 1e-6; t += dt) step(dt);
+        },
+        render() {
+          feedClock = Infinity;
+          draw(1 / 60);
+        },
+      };
+    }
+
+    ready = true;
+    sync();
+    if (!running && !lost) frame(0);
   }
 
   const resizeObserver = new ResizeObserver(resize);
-  resizeObserver.observe(host);
   const intersection = new IntersectionObserver(
     ([entry]) => {
       visible = entry.isIntersecting;
@@ -506,7 +648,6 @@ export function createRobotScene({
     },
     { rootMargin: '120px' }
   );
-  intersection.observe(host);
 
   function onContextLost(e) {
     e.preventDefault();
@@ -518,43 +659,21 @@ export function createRobotScene({
   function onContextRestored() {
     // three re-creates GPU resources lazily; only the baked environment
     // (a render target) has to be rendered again.
-    stage.bake();
+    stage?.bake();
     lost = false;
     first = true;
     sync();
+    if (ready && !running) frame(0);
   }
 
-  canvas.addEventListener('pointerdown', onPointerDown);
   canvas.addEventListener('webglcontextlost', onContextLost);
   canvas.addEventListener('webglcontextrestored', onContextRestored);
-  window.addEventListener('pointermove', onPointerMove, { passive: true });
-  window.addEventListener('pointerup', onPointerUp);
-  window.addEventListener('pointercancel', onPointerCancel);
-  document.documentElement.addEventListener('pointerleave', onPointerLeave);
-  document.addEventListener('visibilitychange', sync);
 
-  // Compile shaders off the main thread where the browser supports it, for
-  // both the screen and the camera's offscreen target (different variants);
-  // otherwise the first frame compiles them while the poster is still up.
-  let warm = Promise.resolve();
-  if (renderer.extensions.has('KHR_parallel_shader_compile')) {
-    renderer.setRenderTarget(feed.target);
-    const offscreen = renderer.compileAsync(scene, feed.camera);
-    renderer.setRenderTarget(null);
-    warm = Promise.all([offscreen, renderer.compileAsync(scene, camera)]);
-  }
-  warm
-    .catch(() => {})
-    .then(() => {
-      if (disposed) return;
-      ready = true;
-      sync();
-      if (!running) frame(0);
-    });
-
-  const api = {
+  return {
     canvas,
+    ready: boot(),
     throwRandom,
+    capture: poster ? (type = 'image/webp', q = 0.9) => canvas.toDataURL(type, q) : undefined,
 
     setPalette(p) {
       palette = p;
@@ -563,6 +682,7 @@ export function createRobotScene({
     },
 
     dispose() {
+      if (disposed) return;
       disposed = true;
       sync();
       resizeObserver.disconnect();
@@ -578,32 +698,11 @@ export function createRobotScene({
       scene.traverse((o) => o.geometry?.dispose());
       for (const m of Object.values(materials)) m.dispose();
       toyMaterial.dispose();
-      stage.dispose();
+      stage?.dispose();
       feed?.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
       canvas.remove();
     },
   };
-
-  // Test hook for the Playwright checks (deterministic stepping); stripped
-  // from production builds.
-  if (import.meta.env.DEV) {
-    canvas.robot = {
-      ctl, brain, toys, camera, feed, renderer, throwTo,
-      pause() {
-        manual = true;
-        sync();
-      },
-      advance(seconds, dt = 1 / 60) {
-        for (let t = dt; t <= seconds + 1e-6; t += dt) step(dt);
-      },
-      render() {
-        feedClock = FEED_INTERVAL;
-        draw(1 / 60);
-      },
-    };
-  }
-
-  return api;
 }
