@@ -20,8 +20,10 @@ npm run build     # outputs Ashif/dist
 - three.js for the hero: a procedurally modeled Spot-style robot that fetches a
   toy wherever you click. It's code-split, loads after first paint behind a
   static poster, and pauses when off-screen.
-- Hubot Sans (display), Mona Sans (text), and JetBrains Mono, self-hosted
-  through Fontsource. Light and dark themes; first visit follows the OS.
+- Mona Sans (text) through Fontsource, and Hubot Sans (display) as two static
+  cuts made by `Ashif/scripts/subset-hubot.py` (42 KB instead of the 93 KB
+  variable file). Code and key caps use the system monospace font.
+- Light and dark themes. The site opens in light mode until a visitor picks one.
 
 ## Structure
 
@@ -50,9 +52,14 @@ Add a project there and it shows up in the projects section, the archive, the
 command palette, and RohanGPT's quick answers.
 
 Images live in `Ashif/public/img` as optimized WebP. Full-size originals are
-kept, undeployed, in `Ashif/source-images`. PDFs and logos stay in
-`Ashif/public/website-photos`. Use `assetUrl('img/…')` for public files so the
-relative `base` keeps working on GitHub Pages.
+kept, undeployed, in `Ashif/source-images`. Papers are in `Ashif/public/papers`
+and logos in `Ashif/public/website-photos`. Use `assetUrl('img/…')` for public
+files so the relative `base` keeps working on GitHub Pages.
+
+The downloadable résumé, `Ashif/public/Rohan_Malhotra_Resume.pdf`, is a copy of
+`resumes/pdf/Rohan_Malhotra_Resume_General.pdf`. After rebuilding the résumés,
+copy it over again. The `#/resume` page is generated from the site data and
+prints on one Letter page.
 
 ## RohanGPT
 
