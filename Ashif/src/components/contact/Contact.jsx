@@ -36,7 +36,7 @@ function ContactLinks({ className }) {
                   aria-hidden="true"
                   className="size-4 text-subtle transition-[translate,color] duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg"
                 />
-                <span className="sr-only">(opens in a new tab)</span>
+                <span className="sr-only"> (opens in a new tab)</span>
               </>
             ) : null}
           </a>

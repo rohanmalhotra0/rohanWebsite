@@ -12,8 +12,8 @@ const ANNOUNCEMENT = {
 
 /**
  * The email as one large mailto link with a copy button beside it. The type
- * scales with its column (cqi), so address and button stay on one line from a
- * 320px phone to the desktop column; below that it breaks after the local part.
+ * scales with its column (cqi), so address and button share one line from a
+ * 375px phone to the desktop column; narrower, it breaks after the local part.
  */
 export default function EmailLine({ className }) {
   const { status, copy } = useCopyToClipboard();
@@ -60,7 +60,7 @@ export default function EmailLine({ className }) {
             aria-hidden="true"
             className={cn(
               // Right-aligned on phones, where the button can sit at the screen edge.
-              'pointer-events-none absolute bottom-full right-1 z-10 mb-1 translate-y-1 whitespace-nowrap rounded-md bg-fg px-2 py-1 text-xs font-medium text-bg opacity-0 shadow-sm transition-[opacity,translate] duration-150 ease-out sm:right-auto sm:left-1/2 sm:mb-2 sm:-translate-x-1/2',
+              'pointer-events-none absolute bottom-full right-1 z-10 mb-1 translate-y-1 whitespace-nowrap rounded-md bg-fg px-2 py-1 text-xs font-medium text-bg opacity-0 transition-[opacity,translate] duration-150 ease-out sm:right-auto sm:left-1/2 sm:mb-2 sm:-translate-x-1/2',
               'group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100',
               status !== 'idle' && 'translate-y-0 opacity-100'
             )}

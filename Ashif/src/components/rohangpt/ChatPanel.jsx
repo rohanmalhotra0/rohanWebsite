@@ -13,13 +13,17 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
   const { messages, loading, error, sendMessage, retry, reset } = chat;
   const scrollRef = useRef(null);
   const contentRef = useRef(null);
-  const { scrollToBottom, revealReply } = useStickToBottom(scrollRef, contentRef);
   const hasMessages = messages.length > 0;
+  const { scrollToBottom, revealReply } = useStickToBottom(scrollRef, contentRef, hasMessages);
   const last = messages[messages.length - 1];
 
-  // A new question always jumps to the bottom; a new reply is shown from its start.
+  // A new question always jumps to the bottom; a new reply is shown from its
+  // start; an empty conversation reads from the top.
   useLayoutEffect(() => {
-    if (!last) return;
+    if (!last) {
+      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+      return;
+    }
     if (last.role === 'user') scrollToBottom();
     else revealReply(contentRef.current?.querySelector(`[data-message-id="${last.id}"]`));
   }, [last, scrollToBottom, revealReply]);
@@ -62,9 +66,11 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
         tabIndex={0}
         className="min-h-0 flex-1 overflow-y-auto [scrollbar-color:var(--line-strong)_transparent] [scrollbar-width:thin] focus-visible:outline-offset-[-2px] lg:overscroll-contain"
       >
-        <div ref={contentRef} className="flex min-h-full flex-col justify-end px-4 py-5 sm:px-5">
+        <div ref={contentRef} className="flex min-h-full flex-col justify-end p-4 sm:px-5 sm:py-5">
           <Greeting>{GREETING}</Greeting>
-          {hasMessages ? null : <SuggestionList onAsk={onAsk} className="ml-10 mt-4 lg:hidden" />}
+          {hasMessages ? null : (
+            <SuggestionList onAsk={onAsk} compact className="ml-10 mt-3 lg:hidden" />
+          )}
           <div
             role="log"
             aria-live="polite"

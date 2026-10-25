@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 const NEAR_BOTTOM_PX = 48;
 const EDGE_PX = 16;
@@ -7,10 +7,16 @@ const EDGE_PX = 16;
  * Keeps the conversation pinned to its newest message unless the reader has
  * scrolled up. Only a scroll that moves up counts as the reader leaving, so
  * programmatic scrolls (which always move down) never unstick it, and
- * scrolling back to the bottom sticks it again.
+ * scrolling back to the bottom sticks it again. Nothing is pinned while
+ * `active` is false (the empty state reads from the top).
  */
-export default function useStickToBottom(scrollRef, contentRef) {
+export default function useStickToBottom(scrollRef, contentRef, active) {
   const stickRef = useRef(true);
+  const activeRef = useRef(active);
+  // Updated before ResizeObserver callbacks run for the same commit.
+  useLayoutEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   useEffect(() => {
     const scroller = scrollRef.current;
@@ -29,7 +35,7 @@ export default function useStickToBottom(scrollRef, contentRef) {
     // The content grows with new messages; the scroller shrinks when the
     // input grows. Either way, stay at the bottom if we were there.
     const observer = new ResizeObserver(() => {
-      if (stickRef.current) scroller.scrollTop = scroller.scrollHeight;
+      if (activeRef.current && stickRef.current) scroller.scrollTop = scroller.scrollHeight;
     });
     observer.observe(content);
     observer.observe(scroller);

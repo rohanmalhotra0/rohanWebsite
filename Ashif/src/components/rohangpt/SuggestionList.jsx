@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { SUGGESTIONS } from './prompts';
 
 /** Suggested questions as plain text rows between hairlines. */
-export default function SuggestionList({ onAsk, labelledBy, className }) {
+export default function SuggestionList({ onAsk, labelledBy, compact = false, className }) {
   return (
     <ul aria-labelledby={labelledBy} className={cn('border-t border-line', className)}>
       {SUGGESTIONS.map((question) => (
@@ -11,7 +11,10 @@ export default function SuggestionList({ onAsk, labelledBy, className }) {
           <button
             type="button"
             onClick={() => onAsk(question)}
-            className="group flex min-h-12 w-full items-center justify-between gap-4 py-3 text-left text-[15px] leading-6 text-muted transition-colors duration-150 hover:text-fg focus-visible:text-fg"
+            className={cn(
+              'group flex w-full items-center justify-between gap-4 text-left text-[15px] leading-6 text-muted transition-colors duration-150 hover:text-fg focus-visible:text-fg',
+              compact ? 'min-h-11 py-2.5' : 'min-h-12 py-3'
+            )}
           >
             <span className="text-pretty">{question}</span>
             <ArrowRight
