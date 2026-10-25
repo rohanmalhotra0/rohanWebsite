@@ -279,13 +279,14 @@
   margin-top: 2px;
 }
 
+/* A real en dash (not a 1px border) so every bullet rasterizes identically;
+   a border at a fractional offset blurs across two pixel rows on some lines. */
 .rv-bullets li::before {
-  content: "";
+  content: "\2013";
   position: absolute;
-  top: 0.75em;
+  top: 0;
   left: -12px;
-  width: 6px;
-  border-top: 1px solid var(--paper-meta);
+  color: var(--paper-meta);
 }
 
 /* Skills: label and list. */
@@ -449,7 +450,6 @@
 
   .rv-bullets li::before {
     left: 1px;
-    width: 7px;
   }
 
   .rv-facts > div {

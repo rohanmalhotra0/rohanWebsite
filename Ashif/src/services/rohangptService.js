@@ -83,7 +83,7 @@ function parseMonth(text) {
 /** "May 2026 – Aug 2026" -> {start, end, ongoing}. */
 function parseRange(range) {
   const [from = '', to = ''] = String(range || '').split(/\s+[–—-]\s+/);
-  const ongoing = /present|now/i.test(to);
+  const ongoing = /\b(present|now)\b/i.test(to);
   return { start: parseMonth(from), end: ongoing ? null : parseMonth(to), ongoing };
 }
 

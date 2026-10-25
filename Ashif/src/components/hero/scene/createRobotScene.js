@@ -370,7 +370,7 @@ export function createRobotScene({
         feedClock %= FEED_INTERVAL;
         feedFrames++;
         stage.setView(width, height, false);
-        feed.capture(scene, width, height);
+        feed.capture(scene);
         updateOverlay(FEED_INTERVAL);
       }
       if (fpsClock >= 1) {
@@ -499,11 +499,16 @@ export function createRobotScene({
   document.documentElement.addEventListener('pointerleave', onPointerLeave);
   document.addEventListener('visibilitychange', sync);
 
-  // Compile shaders off the main thread where the browser supports it;
-  // otherwise the first frame compiles them (the poster covers that).
-  const warm = renderer.extensions.has('KHR_parallel_shader_compile')
-    ? renderer.compileAsync(scene, camera)
-    : Promise.resolve();
+  // Compile shaders off the main thread where the browser supports it, for
+  // both the screen and the camera's offscreen target (different variants);
+  // otherwise the first frame compiles them while the poster is still up.
+  let warm = Promise.resolve();
+  if (renderer.extensions.has('KHR_parallel_shader_compile')) {
+    renderer.setRenderTarget(feed.target);
+    const offscreen = renderer.compileAsync(scene, feed.camera);
+    renderer.setRenderTarget(null);
+    warm = Promise.all([offscreen, renderer.compileAsync(scene, camera)]);
+  }
   warm
     .catch(() => {})
     .then(() => {

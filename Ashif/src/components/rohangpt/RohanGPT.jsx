@@ -59,7 +59,7 @@ export default function RohanGPT() {
           <Reveal className="hidden lg:col-span-4 lg:block">
             <h3
               id={SUGGESTIONS_TITLE_ID}
-              className="flex h-11 items-center text-[13px] text-subtle"
+              className="flex h-12 items-center text-[13px] text-subtle"
             >
               Suggested questions
             </h3>

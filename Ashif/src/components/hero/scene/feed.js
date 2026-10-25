@@ -1,20 +1,20 @@
 import {
   Box3,
   Color,
-  FramebufferTexture,
-  LinearFilter,
   Mesh,
   OrthographicCamera,
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
   ShaderMaterial,
+  SRGBColorSpace,
   Vector2,
   Vector3,
+  WebGLRenderTarget,
 } from 'three';
 
-// The capture is copied straight from the canvas, so it is already tone
-// mapped, sRGB encoded and premultiplied.
+// The capture is linear and premultiplied (three blends that way); composite
+// it over a backdrop, then map luminance onto a two-tone tint.
 const FEED_FRAGMENT = /* glsl */ `
 uniform sampler2D map;
 uniform vec3 uBack;
@@ -26,7 +26,8 @@ varying vec2 vUv;
 void main() {
   vec4 raw = texture2D(map, vUv);
   vec3 c = raw.rgb + uBack * (1.0 - raw.a);
-  float l = smoothstep(0.03, 0.97, dot(c, vec3(0.299, 0.587, 0.114)));
+  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  l = smoothstep(0.0, 1.0, pow(l / (l + 0.35) * 1.35, 0.7));
   vec2 v = vUv - 0.5;
   l *= 1.0 - dot(v, v) * 0.55;
   vec2 p = abs((vUv - 0.5) * uSize) - (uSize * 0.5 - uRadius);
@@ -37,28 +38,25 @@ void main() {
 
 // Mono tint per theme: ink on paper in light mode, cool graphite in dark.
 const TINTS = {
-  light: { dark: 0x23211d, light: 0xf7f5ef, back: [0.62, 0.61, 0.58] },
-  dark: { dark: 0x0a0b0a, light: 0xd3d6ce, back: [0.3, 0.3, 0.29] },
+  light: { dark: 0x23211d, light: 0xf7f5ef, back: 0x8f8c84 },
+  dark: { dark: 0x0a0b0a, light: 0xd3d6ce, back: 0x3c3d3a },
 };
 
 const _box = new Box3();
 const _v = new Vector3();
-const ORIGIN = new Vector2(0, 0);
 
 /**
- * The robot's own camera. Each capture renders the gripper camera into the
- * corner of the canvas, copies it to a texture, and is later composited,
- * mono and rounded, into the inset after the main view is drawn. It reuses
- * the main view's shader programs, so it costs no extra compiles.
+ * The robot's own camera, rendered offscreen at ~30 fps and composited,
+ * mono and rounded, into a corner inset of the main canvas.
  */
 export function createFeed(renderer) {
+  const target = new WebGLRenderTarget(16, 9, { samples: 4 });
+  target.texture.colorSpace = SRGBColorSpace;
   const camera = new PerspectiveCamera(60, 16 / 9, 0.03, 30);
-  let texture = null;
-  let pixelRatio = 1;
 
   const uniforms = {
-    map: { value: null },
-    uBack: { value: new Vector3() },
+    map: { value: target.texture },
+    uBack: { value: new Color() },
     uDark: { value: new Color() },
     uLight: { value: new Color() },
     uSize: { value: new Vector2(256, 144) },
@@ -86,45 +84,39 @@ export function createFeed(renderer) {
 
   return {
     camera,
+    target,
     rect,
 
     setPalette(palette) {
       const t = TINTS[palette.theme];
       uniforms.uDark.value.set(t.dark);
       uniforms.uLight.value.set(t.light);
-      uniforms.uBack.value.fromArray(t.back);
+      uniforms.uBack.value.set(t.back);
     },
 
-    setRect(x, y, w, h, ratio) {
+    setRect(x, y, w, h, pixelRatio) {
       Object.assign(rect, { x, y, w, h });
-      pixelRatio = ratio;
       if (!w || !h) return;
       // Capture at up to 1.25x: soft like a real camera, and cheap.
-      const scale = Math.min(ratio, 1.25);
-      texture?.dispose();
-      texture = new FramebufferTexture(Math.round(w * scale), Math.round(h * scale));
-      texture.minFilter = LinearFilter;
-      texture.magFilter = LinearFilter;
-      uniforms.map.value = texture;
+      const scale = Math.min(pixelRatio, 1.25);
+      target.setSize(Math.round(w * scale), Math.round(h * scale));
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      uniforms.uSize.value.set(w * ratio, h * ratio);
-      uniforms.uRadius.value = 8 * ratio;
+      uniforms.uSize.value.set(w * pixelRatio, h * pixelRatio);
+      uniforms.uRadius.value = 8 * pixelRatio;
     },
 
-    /** Render the gripper camera and keep the pixels (before the main view). */
-    capture(scene, width, height) {
-      if (!texture) return;
-      const { image } = texture;
-      renderer.setViewport(0, 0, image.width / pixelRatio, image.height / pixelRatio);
+    /** Render the gripper camera offscreen. */
+    capture(scene) {
+      if (!rect.w) return;
+      renderer.setRenderTarget(target);
       renderer.render(scene, camera);
-      renderer.copyFramebufferToTexture(texture, ORIGIN);
-      renderer.setViewport(0, 0, width, height);
+      renderer.setRenderTarget(null);
     },
 
     /** Composite the last capture into the inset (after the main view). */
     draw(width, height) {
-      if (!texture) return;
+      if (!rect.w) return;
       const y = height - rect.y - rect.h;
       renderer.autoClear = false;
       renderer.setScissorTest(true);
@@ -168,7 +160,7 @@ export function createFeed(renderer) {
     },
 
     dispose() {
-      texture?.dispose();
+      target.dispose();
       quad.geometry.dispose();
       quad.material.dispose();
     },
