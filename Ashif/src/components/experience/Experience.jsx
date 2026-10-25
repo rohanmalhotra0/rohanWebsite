@@ -2,8 +2,8 @@ import { Container, Section, SectionHeader } from '@/components/primitives/Secti
 import Reveal from '@/components/primitives/Reveal';
 import { workExperience } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
-import { RoleBody, RoleHeader, RoleMeta } from './Role';
-import { groupByCompany, roleLocation, sharedLocation } from './timeline';
+import { RoleBody, RoleHeader, RoleMeta, SrCompany } from './Role';
+import { groupByCompany, sharedLocation } from './timeline';
 
 const groups = groupByCompany(workExperience);
 
@@ -27,8 +27,8 @@ function SingleRole({ role }) {
         subtitle={role.company}
         className={TITLE}
       />
-      <RoleMeta date={role.date} location={roleLocation(role)} className={META} />
-      <RoleBody role={role} expanded={role.index === 0} className={BODY} />
+      <RoleMeta date={role.date} location={role.location} className={META} />
+      <RoleBody role={role} className={BODY} />
     </div>
   );
 }
@@ -58,13 +58,14 @@ function CompanyRoles({ group }) {
               )}
             >
               {role.role}
+              <SrCompany company={group.company} />
             </h4>
             <RoleMeta
               date={role.date}
-              location={location ? null : roleLocation(role)}
+              location={location ? null : role.location}
               className={META}
             />
-            <RoleBody role={role} expanded={role.index === 0} className={BODY} />
+            <RoleBody role={role} className={BODY} />
           </li>
         ))}
       </ol>
@@ -76,10 +77,7 @@ export default function Experience() {
   return (
     <Section id="experience">
       <Container>
-        <SectionHeader
-          title="Experience"
-          description="Recent work: Oracle forecasting and an on-prem AI assistant at IBM, real-time vision for a Boston Dynamics Spot, and income-risk research for Kalshi."
-        />
+        <SectionHeader title="Experience" />
         <ol className="mt-12 sm:mt-16">
           {groups.map((group) => (
             <Reveal
