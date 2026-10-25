@@ -83,7 +83,8 @@ const SHIN = 60;
 export const FOOT_R = 6;
 const FOOT_Y = GROUND - FOOT_R;
 const STAND_Y = FOOT_Y - 96 - HIP_Y;
-const LIE_Y = GROUND - 30;
+// Sitting: the body rests low with the legs folded under it.
+const LIE_Y = GROUND - 40;
 // The far legs sit a little behind and above the near ones.
 const FAR = { x: 7, y: -4 };
 const SHOULDER = { x: 34, y: -30 };
@@ -155,9 +156,10 @@ export function spotJoints(pose) {
     const near = toWorld(leg.hx, HIP_Y);
     const hip = leg.far ? { x: near.x + FAR.x, y: near.y + FAR.y } : near;
     const step = gait(pose.phase + leg.phase);
-    // Folded flat under the body when lying down (the knee tucks in behind
-    // the hip); under the hip when standing.
-    const rest = pose.x + leg.hx + (leg.far ? FAR.x : 0) + lerp(2, 0, pose.power);
+    // Sitting, the foot tucks in just ahead of the hip, so the thigh slopes
+    // down and back to a knee near the floor and the shin lies along it
+    // underneath; standing, the foot is under the hip.
+    const rest = pose.x + leg.hx + (leg.far ? FAR.x : 0) + lerp(8, 0, pose.power);
     const fx = rest + step.dx * pose.stride;
     const fy = FOOT_Y + (leg.far ? FAR.y : 0) + step.dy * pose.stride - (pose.lifts?.[i] ?? 0);
     const j = ik(hip.x, hip.y, fx, fy, THIGH, SHIN, 1);
