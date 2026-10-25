@@ -134,11 +134,13 @@ function ExperienceSection() {
               ) : null}
             </h3>
           </Row>
-          <ul className="rv-bullets">
-            {job.highlights.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          {job.highlights?.length ? (
+            <ul className="rv-bullets">
+              {job.highlights.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       ))}
     </Section>

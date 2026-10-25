@@ -17,8 +17,8 @@ export function getDegreeProgress(startIso, endIso, now = Date.now()) {
   const start = parseDate(startIso);
   const end = parseDate(endIso);
   const total = end - start;
-  const ratio = total > 0 ? Math.min(1, Math.max(0, (now - start) / total)) : 1;
   const graduated = now >= end;
+  const ratio = total > 0 ? Math.min(1, Math.max(0, (now - start) / total)) : Number(graduated);
   const percent = Math.floor(ratio * 100);
 
   return {
