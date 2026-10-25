@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 // The hero name and body copy are the first things painted. Preload their
 // Latin font files so text doesn't wait for CSS discovery.
-const PRELOAD_FONTS = /assets\/(hubot-sans-latin-wdth-normal|mona-sans-latin-wght-normal)-[\w-]+\.woff2$/;
+const PRELOAD_FONTS = /assets\/(hubot-(display|heading)-latin|mona-sans-latin-wght-normal)-[\w-]+\.woff2$/;
 
 function preloadFonts() {
   return {
