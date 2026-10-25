@@ -29,7 +29,7 @@ const inputClass = cn(
 function Field({ id, label, error, children }) {
   const reduceMotion = useReducedMotion();
   return (
-    <div>
+    <div className="pb-2">
       <label htmlFor={id} className="mb-2 block text-sm font-medium text-fg">
         {label}
       </label>
@@ -72,7 +72,7 @@ function Success({ onReset }) {
         <h3
           ref={headingRef}
           tabIndex={-1}
-          className="type-heading text-[1.625rem] leading-[1.15] text-fg outline-none sm:text-3xl sm:leading-[1.15]"
+          className="type-heading text-balance text-[1.625rem] leading-[1.15] text-fg outline-none sm:text-3xl sm:leading-[1.15]"
         >
           Thanks, I’ll get back to you soon.
         </h3>
@@ -270,7 +270,7 @@ export default function ContactForm() {
               </div>
             ) : null}
 
-            <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:gap-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
               <Button
                 type="submit"
                 size="lg"

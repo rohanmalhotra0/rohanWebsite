@@ -494,7 +494,9 @@
     break-inside: avoid;
   }
 
-  .rv-section-title,
+  /* Keep a heading line with what follows it. (The section title needs no
+     rule: it shares a grid row with the first line of its section, and an
+     "avoid" on it would spread to the whole section.) */
   .rv-row {
     break-after: avoid;
   }

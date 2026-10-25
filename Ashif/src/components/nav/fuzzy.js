@@ -58,11 +58,14 @@ export function fuzzyMatch(query, text) {
   for (let j = 0; j < n && k < m; j += 1) if (t[j] === q[k]) k += 1;
   if (k < m) return null;
 
+  // Per position: the bonus for matching there, and the cost of a run
+  // starting there (nothing at a word start).
   const bonus = new Array(n);
+  const runStart = new Array(n);
   for (let j = 0; j < n; j += 1) {
-    bonus[j] = isWordStart(text, j)
-      ? BONUS_BOUNDARY + (j === 0 ? BONUS_FIRST_CHAR : 0)
-      : 0;
+    const wordStart = isWordStart(text, j);
+    bonus[j] = wordStart ? BONUS_BOUNDARY + (j === 0 ? BONUS_FIRST_CHAR : 0) : 0;
+    runStart[j] = wordStart ? 0 : PENALTY_MIDWORD_START;
   }
 
   // score[i][j]: best score for q[0..i] with q[i] matched at t[j].
@@ -76,7 +79,8 @@ export function fuzzyMatch(query, text) {
     if (i === 0) {
       for (let j = 0; j < n; j += 1) {
         if (t[j] !== q[0]) continue;
-        row[j] = SCORE_MATCH + bonus[j] - Math.min(j * 0.25, PENALTY_LEADING_MAX);
+        row[j] =
+          SCORE_MATCH + bonus[j] - runStart[j] - Math.min(j * 0.25, PENALTY_LEADING_MAX);
       }
     } else {
       const prev = score[i - 1];
@@ -99,7 +103,7 @@ export function fuzzyMatch(query, text) {
         let best = -Infinity;
         let arg = -1;
         if (gapFrom !== -1) {
-          best = gapBest - PENALTY_GAP_START - (j - 2) * PENALTY_GAP_EXTEND;
+          best = gapBest - PENALTY_GAP_START - (j - 2) * PENALTY_GAP_EXTEND - runStart[j];
           arg = gapFrom;
         }
         if (prev[j - 1] !== -Infinity && prev[j - 1] + BONUS_CONSECUTIVE > best) {
