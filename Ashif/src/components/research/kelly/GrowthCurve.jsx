@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import useScrub from '@/components/research/useScrub';
 import { breakEven, kelly, perBet } from './kelly';
 import { signedPercent } from './format';
 
@@ -19,7 +20,6 @@ const mono = { fontFamily: 'var(--font-mono)' };
 
 export default function GrowthCurve({ p, c, f, onChange, markers = [], compact = false, className = '' }) {
   const svgRef = useRef(null);
-  const dragging = useRef(false);
   const { W, H, X0, X1, Y0, Y1, ticks } = LAYOUTS[compact ? 'compact' : 'wide'];
   const id = compact ? 'kelly-c' : 'kelly-w';
   const xOf = (value) => X0 + (value / MAX_F) * (X1 - X0);
@@ -50,17 +50,7 @@ export default function GrowthCurve({ p, c, f, onChange, markers = [], compact =
     const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(svg.getScreenCTM().inverse());
     return Math.min(MAX_F, Math.max(0, ((point.x - X0) / (X1 - X0)) * MAX_F));
   };
-  const down = (event) => {
-    dragging.current = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    onChange(toF(event));
-  };
-  const move = (event) => {
-    if (dragging.current) onChange(toF(event));
-  };
-  const up = () => {
-    dragging.current = false;
-  };
+  const scrub = useScrub(toF, onChange);
 
   // Labels sit on whichever side has room.
   const kellyAnchor = xOf(fStar) < X0 + 90 ? 'start' : xOf(fStar) > X1 - 90 ? 'end' : 'middle';
@@ -73,10 +63,7 @@ export default function GrowthCurve({ p, c, f, onChange, markers = [], compact =
       className={`h-auto w-full touch-pan-y select-none ${className}`}
       role="img"
       aria-label={`Growth per bet against bet size. It peaks at the Kelly bet, ${pct(fStar)}, and drops below zero past ${pct(fZero)}.`}
-      onPointerDown={down}
-      onPointerMove={move}
-      onPointerUp={up}
-      onPointerCancel={up}
+      {...scrub}
     >
       <defs>
         <clipPath id={`${id}-above`}>

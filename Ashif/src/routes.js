@@ -124,6 +124,19 @@ for (const project of projects.filter((p) => p.caseStudy)) {
   });
 }
 
+// The income-hedging paper as something to play with, under Research.
+routes.push({
+  id: 'hedge',
+  path: '/research/hedge-your-paycheck/',
+  page: 'HedgePage',
+  parent: 'research',
+  block: routes.find((route) => route.id === 'research').block,
+  tagline: 'My Kalshi research, interactive',
+  title: 'Hedge your paycheck — Rohan Malhotra',
+  description:
+    'How a prediction-market contract could cushion a job loss, and what it can’t cover. An interactive version of my Kalshi research.',
+});
+
 /** Shown for any other path (and written to 404.html for GitHub Pages). */
 export const notFoundRoute = {
   id: 'not-found',
