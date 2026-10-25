@@ -1,18 +1,26 @@
 import { useId } from 'react';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Reveal from '@/components/primitives/Reveal';
+import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import { research } from '@/data/portfolioData';
-import { cn } from '@/lib/utils';
 import { dropSrcSetOnError, THUMBNAIL_SIZES, thumbnailSrcSet } from './thumbnail';
 
-/** Every paper, newest first. */
-export default function Research({ className }) {
+export default function Research() {
   return (
-    <ul className={cn('border-t border-line', className)}>
-      {research.map((paper, index) => (
-        <Paper key={paper.title} paper={paper} index={index} />
-      ))}
-    </ul>
+    <Section id="research">
+      <Container>
+        <SectionHeader
+          title="Research"
+          description="Two are published on VTechWorks, Virginia Tech’s research repository. The newest came out of my work at Kalshi."
+        />
+
+        <ul className="mt-12 border-t border-line sm:mt-16">
+          {research.map((paper, index) => (
+            <Paper key={paper.title} paper={paper} index={index} />
+          ))}
+        </ul>
+      </Container>
+    </Section>
   );
 }
 
@@ -26,7 +34,7 @@ function Paper({ paper, index }) {
         className="grid gap-6 py-10 sm:py-12 md:grid-cols-12 md:gap-8"
       >
         <div className="md:col-span-7">
-          <h2
+          <h3
             id={titleId}
             className="type-heading text-balance text-[1.625rem] leading-[1.15] text-fg"
           >
@@ -36,25 +44,16 @@ function Paper({ paper, index }) {
                 {paper.subtitle}
               </span>
             ) : null}
-          </h2>
+          </h3>
           <p className="mt-3 text-sm leading-6 text-subtle">
             {[paper.authors, paper.year, paper.venue].filter(Boolean).join(' · ')}
           </p>
           <p className="mt-4 max-w-[62ch] text-pretty text-[15px] leading-7 text-muted sm:text-base">
             {paper.description}
           </p>
-          {paper.liveUrl || paper.externalUrl || paper.explainer ? (
+          {paper.liveUrl || paper.externalUrl ? (
             // 44px tap targets; the negative margin keeps the visual rhythm.
             <div className="-mb-3 mt-3 flex flex-wrap gap-x-6">
-              {paper.explainer ? (
-                <a
-                  href={paper.explainer.href}
-                  className="link inline-flex min-h-11 items-center gap-1 text-[15px] font-medium text-fg"
-                >
-                  {paper.explainer.label}
-                  <ArrowRight aria-hidden="true" className="size-4 shrink-0 text-subtle" />
-                </a>
-              ) : null}
               {paper.liveUrl ? (
                 <PaperLink href={paper.liveUrl} title={paper.title}>
                   Read paper (PDF)

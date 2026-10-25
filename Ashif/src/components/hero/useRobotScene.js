@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { readPalette } from './palette';
-import { rendererName, SOFTWARE } from './webgl';
+
+const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render driver|microsoft basic/i;
 
 /** QA override for tools that render on software GL on purpose. */
 function forceWebGL() {
@@ -20,10 +21,19 @@ function context(options) {
   }
 }
 
+function rendererName(gl) {
+  const name = gl.getParameter(gl.RENDERER) || '';
+  // Chromium and Safari mask RENDERER; Firefox reports the real one (and
+  // warns about the debug extension), so only ask the extension when masked.
+  if (!/^webkit webgl$/i.test(name)) return name;
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  return (info && gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) || name;
+}
+
 /**
  * Probe WebGL 2 on throwaway canvases, so no renderer is built (or logs)
  * without it: 'none', 'software' (no GPU: SwiftShader, llvmpipe, a basic
- * display driver) or 'gpu'. The main-thread fallback for probeInWorker.
+ * display driver) or 'gpu'.
  */
 function probeWebGL() {
   const force = forceWebGL();
@@ -37,35 +47,6 @@ function probeWebGL() {
   if (!slow) return 'none';
   slow.getExtension('WEBGL_lose_context')?.loseContext();
   return force ? 'gpu' : 'software';
-}
-
-/**
- * The same probe in a worker, so the GPU setup behind the first WebGL context
- * never blocks the page. Resolves to 'gpu' or 'software', or null when the
- * worker can't tell (no workers or OffscreenCanvas, no WebGL in workers, an
- * error, or no answer within 2 s).
- */
-function probeInWorker() {
-  if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') return Promise.resolve(null);
-  return new Promise((resolve) => {
-    let worker = null;
-    let timer = 0;
-    const done = (result) => {
-      window.clearTimeout(timer);
-      worker?.terminate();
-      resolve(result);
-    };
-    timer = window.setTimeout(() => done(null), 2000);
-    try {
-      worker = new Worker(new URL('./probe.worker.js', import.meta.url), { type: 'module' });
-    } catch {
-      done(null);
-      return;
-    }
-    worker.onmessage = ({ data }) => done(data === 'gpu' || data === 'software' ? data : null);
-    worker.onerror = () => done(null);
-    worker.postMessage(null);
-  });
 }
 
 /**
@@ -128,30 +109,20 @@ export default function useRobotScene({ reducedMotion }) {
   );
 
   useEffect(() => {
-    let cancelled = false;
-    // Probe when the page is idle, not inside the first render's effects: in
-    // a worker when the browser can, else here.
-    const run = async () => {
-      const answer = await probeInWorker();
-      if (cancelled) return;
-      const gl = answer === 'software' && forceWebGL() ? 'gpu' : (answer ?? probeWebGL());
+    // Probe when the page is idle, not inside the first render's effects.
+    const run = () => {
+      const gl = probeWebGL();
       setWebgl(gl !== 'none');
       // Without a GPU the scene would block the main thread for seconds:
       // keep the poster and let the visitor opt in.
       if (gl === 'software') setMode('paused');
     };
-    let cancel;
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(run, { timeout: 1500 });
-      cancel = () => window.cancelIdleCallback(id);
-    } else {
-      const id = setTimeout(run, 200);
-      cancel = () => clearTimeout(id);
+      return () => window.cancelIdleCallback(id);
     }
-    return () => {
-      cancelled = true;
-      cancel();
-    };
+    const id = setTimeout(run, 200);
+    return () => clearTimeout(id);
   }, []);
 
   const active = webgl === true && (mode === 'forced' || (mode === 'auto' && !reducedMotion));
@@ -169,7 +140,7 @@ export default function useRobotScene({ reducedMotion }) {
         scene = createRobotScene({
           host: hostRef.current,
           overlay: { frame: frameRef, box: boxRef, hud: hudRef, controls: controlsRef, handle: handleRef },
-          palette: readPalette(hostRef.current),
+          palette: readPalette(),
           mobile,
           forced: mode === 'forced',
           onReady: () => setLive(true),

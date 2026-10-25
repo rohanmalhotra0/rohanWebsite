@@ -1,73 +1,54 @@
-import { useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
-const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const EASE = [0.16, 1, 0.3, 1];
 
 /**
  * Fades and lifts its children into view once, when scrolled to.
- * Stagger siblings with `delay={index * 0.05}` (seconds).
- *
- * The markup is always visible, so prerendered pages paint complete and
- * nothing depends on JavaScript. Once mounted, an element that starts out
- * off screen is hidden (unseen, since it's off screen) and comes up when it
- * scrolls a little way into view. Anything already on screen stays put.
- * Reduced motion skips all of it.
+ * Stagger siblings with `delay={index * 0.05}`.
  */
-export default function Reveal({ as = 'div', delay = 0, y = 14, className, children, ...rest }) {
-  const ref = useRef(null);
-  const Component = as;
-
-  useEffect(() => {
-    const element = ref.current;
-    if (
-      !element ||
-      !('IntersectionObserver' in window) ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return undefined;
-    }
-
-    let reveal = null;
-    const first = new IntersectionObserver(([entry]) => {
-      first.disconnect();
-      if (entry.isIntersecting) return;
-
-      const { style } = element;
-      style.opacity = '0';
-      style.transform = `translateY(${y}px)`;
-      reveal = new IntersectionObserver(
-        ([next]) => {
-          if (!next.isIntersecting) return;
-          reveal.disconnect();
-          style.transition = `opacity 0.6s ${EASE} ${delay}s, transform 0.6s ${EASE} ${delay}s`;
-          style.opacity = '';
-          style.transform = '';
-          element.addEventListener(
-            'transitionend',
-            () => {
-              style.transition = '';
-            },
-            { once: true }
-          );
-        },
-        // Wait until it is a little way up from the bottom edge.
-        { rootMargin: '0px 0px -12% 0px' }
-      );
-      reveal.observe(element);
-    });
-    first.observe(element);
-
-    return () => {
-      first.disconnect();
-      reveal?.disconnect();
-      // Never leave it hidden for a later run to inherit.
-      element.style.opacity = '';
-      element.style.transform = '';
-    };
-  }, [delay, y]);
+export default function Reveal({
+  as = 'div',
+  delay = 0,
+  y = 14,
+  amount = 0.15,
+  className,
+  children,
+  ...rest
+}) {
+  // Our own media query instead of motion's useReducedMotion, which logs a
+  // dev warning for every reduced-motion visitor.
+  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const Component = motion[as] ?? motion.div;
 
   // data-reveal lets print styles show content that hasn't scrolled into view.
+  if (reduceMotion) {
+    // Snap to visible: this also covers reduced motion switching on after an
+    // element mounted hidden and before it was revealed.
+    return (
+      <Component
+        data-reveal=""
+        initial={false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0 }}
+        className={className}
+        {...rest}
+      >
+        {children}
+      </Component>
+    );
+  }
+
   return (
-    <Component ref={ref} data-reveal="" className={className} {...rest}>
+    <Component
+      data-reveal=""
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount }}
+      transition={{ duration: 0.6, delay, ease: EASE }}
+      className={className}
+      {...rest}
+    >
       {children}
     </Component>
   );

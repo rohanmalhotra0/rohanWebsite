@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { OPEN_PALETTE } from '@/lib/events';
 
@@ -33,6 +33,154 @@ export function useScrolled(threshold = 4) {
   }, [threshold]);
 
   return scrolled;
+}
+
+// A thin horizontal band ~35% down the viewport. Whichever section crosses it
+// is current. The hero (#top) is observed too, so nothing is active there.
+const SPY_MARGIN = '-35% 0px -64% 0px';
+const LOCK_TIMEOUT_MS = 2000;
+const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
+const TAKEOVER_EVENTS = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+
+/** Input that means the user is now scrolling by hand. */
+function isTakeover(event) {
+  if (event.type === 'keydown') return SCROLL_KEYS.has(event.key);
+  // Pressing a link or button starts a new navigation, not a manual scroll.
+  if (event.type === 'pointerdown') return !event.target.closest?.('a, button');
+  return true;
+}
+
+const isOnScreen = (el) => {
+  const rect = el.getBoundingClientRect();
+  return rect.bottom > 0 && rect.top < window.innerHeight;
+};
+
+/**
+ * Scrollspy over `ids` (a stable array of section ids).
+ * - `active`: the current section id, or null in the hero.
+ * - `last`: the most recent non-null id (lets the marker fade out in place).
+ * - `lockTo(id)`: move the marker to `id` now and ignore the sections passed
+ *   on the way while the smooth scroll runs.
+ */
+export function useScrollSpy(ids) {
+  const [state, setState] = useState({ active: null, last: null });
+  const visible = useRef(new Map());
+  const order = useRef([]);
+  const atBottom = useRef(false);
+  // The latest click-triggered navigation: { target, locked, stop }.
+  const navigation = useRef(null);
+
+  const select = useCallback((id) => {
+    const next = !id || id === 'top' ? null : id;
+    setState((prev) =>
+      prev.active === next ? prev : { active: next, last: next ?? prev.last }
+    );
+  }, []);
+
+  const sync = useCallback(() => {
+    const nav = navigation.current;
+    if (nav?.locked) return;
+    const list = order.current;
+    // Scrolled all the way down: the last section may be too short to ever
+    // reach the band, but it is clearly the one being read, unless the user
+    // just asked for an earlier section that is still on screen.
+    if (atBottom.current) {
+      const asked = nav?.target && document.getElementById(nav.target);
+      select(asked && isOnScreen(asked) ? nav.target : list[list.length - 1]);
+      return;
+    }
+    const hit = list.find((id) => visible.current.get(id));
+    // Nothing under the band (e.g. in the footer): keep the previous section.
+    if (hit !== undefined) select(hit);
+  }, [select]);
+
+  useEffect(() => {
+    const elements = ['top', ...ids]
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    order.current = elements.map((el) => el.id);
+    visible.current = new Map();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) =>
+          visible.current.set(entry.target.id, entry.isIntersecting)
+        );
+        sync();
+      },
+      { rootMargin: SPY_MARGIN }
+    );
+    elements.forEach((el) => observer.observe(el));
+
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const { scrollY, innerHeight } = window;
+      const bottom =
+        scrollY > 0 && scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+      if (bottom !== atBottom.current) {
+        atBottom.current = bottom;
+        sync();
+      }
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, [ids, sync]);
+
+  const lockTo = useCallback(
+    (id) => {
+      navigation.current?.stop();
+      const nav = { target: id, locked: true };
+      navigation.current = nav;
+      select(id);
+
+      let timer = 0;
+      // The smooth scroll is over: follow the page again.
+      const unlock = () => {
+        if (!nav.locked) return;
+        nav.locked = false;
+        window.removeEventListener('scrollend', unlock);
+        window.clearTimeout(timer);
+        sync();
+      };
+      // The user scrolls by hand: forget the target too.
+      const onInput = (event) => {
+        if (!isTakeover(event)) return;
+        nav.target = null;
+        stopListening();
+        unlock();
+      };
+      const stopListening = () =>
+        TAKEOVER_EVENTS.forEach((type) => window.removeEventListener(type, onInput));
+      nav.stop = () => {
+        nav.locked = false;
+        window.removeEventListener('scrollend', unlock);
+        window.clearTimeout(timer);
+        stopListening();
+      };
+
+      // `scrollend` is the precise signal; the timeout covers browsers without
+      // it and clicks that don't scroll at all.
+      window.addEventListener('scrollend', unlock);
+      timer = window.setTimeout(unlock, LOCK_TIMEOUT_MS);
+      TAKEOVER_EVENTS.forEach((type) =>
+        window.addEventListener(type, onInput, { passive: true })
+      );
+    },
+    [select, sync]
+  );
+
+  useEffect(() => () => navigation.current?.stop(), []);
+
+  return { active: state.active, last: state.last, lockTo };
 }
 
 // Scroll locking is reference-counted so the menu and palette can overlap.

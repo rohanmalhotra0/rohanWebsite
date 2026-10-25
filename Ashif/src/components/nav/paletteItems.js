@@ -5,7 +5,6 @@
 // company, a tag, an author); `aliases` are synonyms that are only searched.
 
 import {
-  ChartSpline,
   Copy,
   Download,
   FileText,
@@ -16,13 +15,16 @@ import {
   Mail,
   MessageSquare,
   Moon,
-  Palette,
   Sun,
 } from 'lucide-react';
-import { caseStudyPath } from '@/components/projects/projectData';
-import { education, profile, projects, research, workExperience } from '@/data/portfolioData';
-import { PALETTES } from '@/lib/theme';
-import { navRoutes, routeById } from '@/routes';
+import {
+  education,
+  profile,
+  projects,
+  research,
+  sections,
+  workExperience,
+} from '@/data/portfolioData';
 import { scoreItem } from './fuzzy';
 
 // With an empty query: a short, ordered start page of `suggested` items.
@@ -46,38 +48,37 @@ const bareUrl = (url) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, 
 // github.com/<user> is a profile, not a repository.
 const isGitHubProfile = (url) => /^https?:\/\/(www\.)?github\.com\/[^/]+\/?$/i.test(url);
 
-const PAGE_SEARCH = {
-  home: { aliases: ['start', 'top', 'index'] },
+const SECTION_SEARCH = {
   experience: {
-    // Education and skills live on the Experience page.
-    keywords: [...workExperience.map((job) => job.company), education.school, education.college],
-    aliases: ['work', 'jobs', 'internships', 'education', 'school', 'university', 'courses', 'gpa', 'skills'],
+    keywords: workExperience.map((job) => job.company),
+    aliases: ['work', 'jobs', 'internships'],
   },
   projects: { aliases: ['portfolio', 'code', 'apps'] },
   research: { aliases: ['papers', 'publications'] },
-  about: { aliases: ['bio', 'me', 'photos', 'pictures'] },
-  chat: { aliases: ['ask', 'ai', 'assistant', 'rohangpt'] },
+  about: { aliases: ['bio', 'me', 'photos'] },
+  education: {
+    keywords: [education.school, education.college],
+    aliases: ['school', 'university', 'courses', 'gpa'],
+  },
+  rohangpt: { aliases: ['ask', 'ai', 'assistant'] },
   contact: { aliases: ['email', 'message', 'get in touch'] },
 };
 
-// Pages have no icon: the "Go to" heading says what they are.
-const goToItems = [{ ...routeById('home'), label: 'Home' }, ...navRoutes].map((page) => ({
-  id: `goto-${page.id}`,
+// Sections have no icon: the "Go to" heading says what they are.
+const goToItems = sections.map((section) => ({
+  id: `goto-${section.id}`,
   group: 'goto',
-  title: page.label,
-  keywords: unique(PAGE_SEARCH[page.id]?.keywords ?? []),
-  aliases: PAGE_SEARCH[page.id]?.aliases ?? [],
-  // Home is findable but not on the start page; the wordmark already goes there.
-  suggested: page.id !== 'home',
+  title: section.label,
+  keywords: unique(SECTION_SEARCH[section.id]?.keywords ?? []),
+  aliases: SECTION_SEARCH[section.id]?.aliases ?? [],
+  suggested: true,
   verb: 'Go',
-  action: { type: 'route', href: page.path },
+  action: { type: 'section', id: section.id },
 }));
 
 const projectItems = projects.map((project) => {
   const repoUrl = project.repoUrl && !isGitHubProfile(project.repoUrl) ? project.repoUrl : null;
-  // A case study is the best place to send someone; then the live site or source.
-  const study = caseStudyPath(project);
-  const href = study ? null : project.liveUrl || repoUrl;
+  const href = project.liveUrl || repoUrl;
   return {
     id: `project-${project.slug}`,
     group: 'projects',
@@ -88,11 +89,11 @@ const projectItems = projects.map((project) => {
     icon: Folder,
     suggested: Boolean(project.featured),
     external: Boolean(href),
-    verb: study ? 'Read case study' : project.liveUrl ? 'Open site' : repoUrl ? 'View source' : 'View project',
-    // Without a link of its own, a project opens in the Projects page's viewer.
+    verb: project.liveUrl ? 'Open site' : repoUrl ? 'View source' : 'View project',
+    // Without a link of its own, a project opens in the page's project viewer.
     action: href
       ? { type: 'url', href }
-      : { type: 'route', href: study ?? `${routeById('projects').path}#project/${project.slug}` },
+      : { type: 'hash', hash: `#project/${project.slug}` },
   };
 });
 
@@ -117,22 +118,6 @@ const researchItems = research
     action: { type: 'url', href: paper.liveUrl },
   }));
 
-// A paper with an interactive version on the site gets a row for it too.
-const explainerItems = research
-  .filter((paper) => paper.explainer)
-  .map((paper) => ({
-    id: `explainer-${paper.title}`,
-    group: 'research',
-    title: paper.explainer.label.replace(/^Try it:\s*/, ''),
-    meta: 'Interactive',
-    keywords: unique([paper.title, ...(paper.keywords ?? []), ...(paper.tags ?? [])]),
-    aliases: ['interactive', 'simulator', 'hedge', 'hedging', 'paycheck', 'job loss', 'unemployment'],
-    icon: ChartSpline,
-    suggested: true,
-    verb: 'Open',
-    action: { type: 'route', href: paper.explainer.href },
-  }));
-
 const themeItem = (theme) => {
   const next = theme === 'dark' ? 'light' : 'dark';
   return {
@@ -147,20 +132,6 @@ const themeItem = (theme) => {
     action: { type: 'theme' },
   };
 };
-
-// One row per palette; "palette", "colors" or a palette's name finds them.
-const paletteItems = (current) =>
-  PALETTES.map((option) => ({
-    id: `palette-${option.id}`,
-    group: 'actions',
-    title: `${option.name} palette`,
-    meta: option.id === current ? 'Current' : option.blurb,
-    keywords: [],
-    aliases: ['palette', 'colors', 'colours', 'color scheme', 'appearance', option.blurb.toLowerCase()],
-    icon: Palette,
-    verb: 'Apply',
-    action: { type: 'palette', id: option.id },
-  }));
 
 const actionItems = (theme) => [
   {
@@ -194,7 +165,7 @@ const actionItems = (theme) => [
     aliases: ['cv', 'resume'],
     icon: FileUser,
     verb: 'Open',
-    action: { type: 'route', href: routeById('resume').path },
+    action: { type: 'hash', hash: '#/resume' },
   },
   {
     id: 'action-github',
@@ -233,12 +204,10 @@ const actionItems = (theme) => [
   },
 ];
 
-/** Every item, for the current theme and palette (a few rows depend on them). */
-export const getPaletteItems = (theme, palette) => [
+/** All palette items for the current theme (one title depends on it). */
+export const getPaletteItems = (theme) => [
   ...projectItems,
   ...actionItems(theme),
-  ...paletteItems(palette),
-  ...explainerItems,
   ...researchItems,
   ...goToItems,
 ];

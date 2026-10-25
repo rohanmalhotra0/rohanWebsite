@@ -41,44 +41,6 @@ export function imageSize(project) {
   return { width, height, small: width < 600 };
 }
 
-// Each cover has smaller copies beside it, <name>-600.webp and <name>-900.webp
-// (only the widths below its own), so phones don't download the full size.
-const VARIANT_WIDTHS = [600, 900];
-
-/** A cover's srcset: its smaller copies, then the original. */
-export function coverSrcSet(project) {
-  if (!/\.webp$/.test(project.imageUrl ?? '')) return undefined;
-  const { width } = imageSize(project);
-  const variants = VARIANT_WIDTHS.filter((size) => size < width);
-  if (!variants.length) return undefined;
-  return [
-    ...variants.map((size) => `${project.imageUrl.replace(/\.webp$/, `-${size}.webp`)} ${size}w`),
-    `${project.imageUrl} ${width}w`,
-  ].join(', ');
-}
-
-// The covers' rendered widths, mirroring the featured grid in FeaturedWork.jsx
-// (update them together). The content box is the 78rem container less its
-// clamp(1rem, 4vw, 2.5rem) padding: 92vw on phones, 1168px at most. From lg
-// it has 12 columns with 32px gaps; at md, two.
-export const COVER_SIZES = {
-  // A wide row's image: 8 of 12 columns from lg, the full width below.
-  wide: ['(min-width: 1248px) 768px', '(min-width: 1024px) calc(66.7vw - 64px)', '92vw'].join(', '),
-  // A paired card: 6 of 12 columns from lg, half the width at md.
-  grid: [
-    '(min-width: 1248px) 568px',
-    '(min-width: 1024px) calc(50vw - 56px)',
-    '(min-width: 768px) calc(46vw - 16px)',
-    '92vw',
-  ].join(', '),
-};
-
-/** If a smaller copy is missing, drop srcset so the browser falls back to `src`. */
-export const dropSrcSetOnError = (event) => {
-  const image = event.currentTarget;
-  if (image.hasAttribute('srcset')) image.removeAttribute('srcset');
-};
-
 // Where to anchor each featured cover inside its 16:10 crop.
 const FOCAL_POINTS = {
   'epm-wizard': '0% 50%',
@@ -89,22 +51,6 @@ export const focalPoint = (project) => FOCAL_POINTS[project.slug] ?? '50% 50%';
 
 /** Shared layoutId for a featured cover and the viewer image it flies into. */
 export const mediaLayoutId = (slug) => `project-media-${slug}`;
-
-// Each category takes one of the palette's five category colors (c1–c5),
-// grouped by kind of work: the two AI categories share one, as do the two
-// numbers-heavy ones.
-const CATEGORY_COLOR = {
-  'AI & systems': 'c1',
-  'AI & robotics': 'c1',
-  Quant: 'c2',
-  Data: 'c2',
-  Education: 'c3',
-  Web: 'c4',
-  Systems: 'c5',
-};
-
-/** The CSS color for a project category, from the active palette. */
-export const categoryColor = (category) => `var(--${CATEGORY_COLOR[category] ?? 'c5'})`;
 
 /** "AI & systems · 2026", or just the category when the year is unknown. */
 export const projectMeta = (project) => [project.category, project.year].filter(Boolean).join(' · ');
@@ -163,14 +109,11 @@ export function categoryOptions(all, matching) {
   ];
 }
 
-// Deep links on the Projects page: /projects/#project/<slug>. Plain
-// #anchors are left alone.
+// Deep links: #project/<slug>. App owns #/resume; plain #section anchors are
+// left alone.
 const HASH = /^#project\/([a-z0-9-]+)$/i;
 
 export const projectHash = (slug) => `#project/${slug}`;
-
-/** The project's own page, if it has a case study (see routes.js). */
-export const caseStudyPath = (project) => (project.caseStudy ? `/projects/${project.slug}/` : null);
 
 export const findProject = (slug) => projects.find((p) => p.slug === slug) ?? null;
 

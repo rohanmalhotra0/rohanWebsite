@@ -85,7 +85,7 @@ function endStop(text) {
 }
 
 const EMAIL_LINK = mdLink(profile.email, `mailto:${profile.email}`);
-/** Rohan's own line from the Contact page. */
+/** Rohan's own line from the Contact section. */
 const INTERESTS = 'I’m interested in applied AI, robotics, quantitative systems, and developer tools.';
 
 /** "May 2026" -> {month: 4, year: 2026}, or null. */
@@ -232,10 +232,7 @@ const ANSWERS = {
     kalshi
       ? paragraphs(
           describeRole(kalshi),
-          hedgingPaper ? endStop(`The paper is ${mdLink(hedgingPaper.title, hedgingPaper.liveUrl)}`) : '',
-          hedgingPaper?.explainer
-            ? endStop(`There’s a simplified, interactive version on this site: ${mdLink('Hedge your paycheck', hedgingPaper.explainer.href)}`)
-            : ''
+          hedgingPaper ? endStop(`The paper is ${mdLink(hedgingPaper.title, hedgingPaper.liveUrl)}`) : ''
         )
       : '',
 
@@ -268,11 +265,11 @@ const ANSWERS = {
   contact: () =>
     paragraphs(
       `You can email me at ${EMAIL_LINK}.`,
-      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}, and you can ${mdLink('read my résumé', '/resume/')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`
+      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}, and you can ${mdLink('read my résumé', '#/resume')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`
     ),
 
   resume: () =>
-    `You can ${mdLink('read my résumé', '/resume/')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`,
+    `You can ${mdLink('read my résumé', '#/resume')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`,
 
   // Recruiting answers say only what the data says: no start dates, role
   // types, availability, or job-search status beyond graduation.
@@ -321,7 +318,7 @@ const ANSWERS = {
     return [
       endStop(`Some things I do away from work: ${joinAnd(activities.map((item) => item.label.toLowerCase()))}`),
       captioned ? endStop(`${captioned.label} is ${lowerFirst(captioned.caption).replace(/[.!]$/, '')}`) : '',
-      `There are photos on my ${mdLink('About', '/about/')} page${switzerland ? `, including one from ${switzerland.label}` : ''}.`,
+      `There are photos in the ${mdLink('About', '#about')} section${switzerland ? `, including one from ${switzerland.label}` : ''}.`,
     ]
       .filter(Boolean)
       .join(' ');
@@ -342,12 +339,12 @@ const ANSWERS = {
     return paragraphs(
       'I’d start with these:',
       bullets(picks),
-      `All ${projects.length} are on the ${mdLink('Projects', '/projects/')} page.`
+      `All ${projects.length} are in the ${mdLink('Projects', '#projects')} section.`
     );
   },
 
   projectCount: () =>
-    `There are ${projects.length} projects on this site, and ${countWord(featuredProjects.length)} are featured: ${endStop(joinAnd(featuredProjects.map((project) => projectLink(project, shortTitle(project.title)))))} They’re all on the ${mdLink('Projects', '/projects/')} page.`,
+    `There are ${projects.length} projects on this site, and ${countWord(featuredProjects.length)} are featured: ${endStop(joinAnd(featuredProjects.map((project) => projectLink(project, shortTitle(project.title)))))} They’re all in the ${mdLink('Projects', '#projects')} section.`,
 
   experience: () =>
     paragraphs(
@@ -787,14 +784,9 @@ export function findFollowUp(input, lastId) {
 /* Live endpoint                                                       */
 /* ------------------------------------------------------------------ */
 
-// The live endpoint's instructions, built on first use: the month in them
-// sets up the date formats (a long task on a phone), and this module loads
-// while other pages settle, when the router preloads Chat.
-let systemPrompt = null;
-function getSystemPrompt() {
-  if (systemPrompt) return systemPrompt;
-  const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  systemPrompt = `You are the assistant on Rohan Malhotra's portfolio site (rohanm.org). Answer as Rohan, in a plain, specific, first-person voice. Keep answers short: two to five sentences, or a few bullets. Markdown is fine (bold, inline code, links, bullet lists).
+const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+const SYSTEM_PROMPT = `You are the assistant on Rohan Malhotra's portfolio site (rohanm.org). Answer as Rohan, in a plain, specific, first-person voice. Keep answers short: two to five sentences, or a few bullets. Markdown is fine (bold, inline code, links, bullet lists).
 
 It is ${currentMonth}. Roles that have ended are finished: describe them in the past tense. Never say or imply that Rohan currently works at IBM or will work there again.
 
@@ -822,8 +814,6 @@ ${featuredProjects.map((project) => `  - ${project.title}: ${project.description
 - Contact: ${profile.email}, ${profile.linkedin}, ${profile.github}.
 
 Use only these facts. Do not invent employers, metrics, dates, publications, awards, opinions, or job-search status. If something is not listed, say you don't know and suggest emailing ${profile.email}. No hype or résumé-speak ("passionate", "cutting-edge", "leveraging").`;
-  return systemPrompt;
-}
 
 async function requestLiveReply({ history, input, signal }) {
   let response;
@@ -834,13 +824,13 @@ async function requestLiveReply({ history, input, signal }) {
       signal,
       body: JSON.stringify({
         messages: [
-          { role: 'system', content: getSystemPrompt() },
+          { role: 'system', content: SYSTEM_PROMPT },
           ...history,
           { role: 'user', content: input },
         ],
         message: input,
         name: 'Visitor',
-        systemPrompt: getSystemPrompt(),
+        systemPrompt: SYSTEM_PROMPT,
       }),
     });
   } catch (error) {
@@ -901,23 +891,15 @@ const createMessage = (role, content, extra) => ({
 /* Hook                                                                */
 /* ------------------------------------------------------------------ */
 
-// The conversation outlives the Chat page: leave it and come back, and it is
-// still there (until a reload).
-const kept = { messages: [] };
-
 /**
  * Chat state. Messages look like {id, role: 'user'|'assistant', content},
  * and assistant messages also carry `source` ('profile', 'live', or
  * 'unknown') and `topic` (the local answer's id, for follow-ups).
  */
 export function useRohanGPTChat() {
-  const [messages, setMessages] = useState(() => kept.messages);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  // A question left without its answer (the reader went to another page
-  // while it was coming) gets the usual error line and Retry.
-  const [error, setError] = useState(() =>
-    kept.messages[kept.messages.length - 1]?.role === 'user' ? 'The answer didn’t finish.' : null
-  );
+  const [error, setError] = useState(null);
 
   // The source of truth for callbacks, updated in step with every change so a
   // send that lands right after a reply still sees that reply.
@@ -929,7 +911,6 @@ export function useRohanGPTChat() {
 
   const update = useCallback((change) => {
     messagesRef.current = change(messagesRef.current);
-    kept.messages = messagesRef.current;
     setMessages(messagesRef.current);
   }, []);
 

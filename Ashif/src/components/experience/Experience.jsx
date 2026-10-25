@@ -1,8 +1,9 @@
+import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import Reveal from '@/components/primitives/Reveal';
 import { workExperience } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
 import { RoleBody, RoleHeader, RoleMeta, SrCompany } from './Role';
-import { groupByCompany, roleAnchor, sharedLocation } from './timeline';
+import { groupByCompany, sharedLocation } from './timeline';
 
 const groups = groupByCompany(workExperience);
 
@@ -72,24 +73,27 @@ function CompanyRoles({ group }) {
   );
 }
 
-/** Every role, newest first, grouped by company. */
-export default function Experience({ className }) {
+export default function Experience() {
   return (
-    <ol className={className}>
-      {groups.map((group) => (
-        <Reveal
-          as="li"
-          key={group.roles[0].index}
-          id={roleAnchor(group.company)}
-          className="scroll-mt-4 border-t border-line py-10 last:pb-0 md:py-12"
-        >
-          {group.roles.length > 1 ? (
-            <CompanyRoles group={group} />
-          ) : (
-            <SingleRole role={group.roles[0]} />
-          )}
-        </Reveal>
-      ))}
-    </ol>
+    <Section id="experience">
+      <Container>
+        <SectionHeader title="Experience" />
+        <ol className="mt-12 sm:mt-16">
+          {groups.map((group) => (
+            <Reveal
+              as="li"
+              key={group.roles[0].index}
+              className="border-t border-line py-10 last:pb-0 md:py-12"
+            >
+              {group.roles.length > 1 ? (
+                <CompanyRoles group={group} />
+              ) : (
+                <SingleRole role={group.roles[0]} />
+              )}
+            </Reveal>
+          ))}
+        </ol>
+      </Container>
+    </Section>
   );
 }

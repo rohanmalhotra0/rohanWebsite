@@ -15,9 +15,7 @@ import Reveal from '@/components/primitives/Reveal';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 import ArchivePreview from './ArchivePreview';
-import CategoryDot from './CategoryDot';
 import CategoryFilter from './CategoryFilter';
-import CategoryStrip from './CategoryStrip';
 import { ProjectLinkIcons } from './ProjectLinks';
 import {
   ARCHIVE_ROWS,
@@ -25,7 +23,6 @@ import {
   categoryOptions,
   EASE,
   matchesQuery,
-  caseStudyPath,
   projectHash,
   projectMeta,
 } from './projectData';
@@ -93,12 +90,10 @@ const ArchiveRow = memo(function ArchiveRow({
         {/* Links to the project's deep link; its ::after covers the row, so the
             whole row opens the viewer (a modified click opens a new tab). */}
         <a
-          href={caseStudyPath(project) ?? projectHash(project.slug)}
-          aria-haspopup={project.caseStudy ? undefined : 'dialog'}
+          href={projectHash(project.slug)}
+          aria-haspopup="dialog"
           data-project-trigger={`row:${project.slug}`}
           onClick={(event) => {
-            // A case study is a plain page link, which the router handles.
-            if (project.caseStudy) return;
             if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             event.preventDefault();
             onOpen(project.slug, event.currentTarget);
@@ -107,14 +102,10 @@ const ArchiveRow = memo(function ArchiveRow({
         >
           {project.title}
         </a>
-        <span className="mt-0.5 flex items-center gap-2 text-[13px] text-subtle md:hidden">
-          <CategoryDot category={project.category} />
-          <span className="truncate">{meta}</span>
-        </span>
+        <span className="mt-0.5 block truncate text-[13px] text-subtle md:hidden">{meta}</span>
       </span>
-      <span role="cell" className="hidden min-w-0 items-center gap-2.5 text-sm text-muted md:flex">
-        <CategoryDot category={project.category} />
-        <span className="truncate">{meta}</span>
+      <span role="cell" className="hidden truncate text-sm text-muted md:block">
+        {meta}
       </span>
       <span role="cell" className="hidden truncate text-[13px] text-subtle lg:block">
         {project.tags.join(' · ')}
@@ -227,9 +218,9 @@ function ProjectArchive({ projects, onOpen, onPreload }) {
   return (
     <div id="projects-archive" className="mt-24 border-t border-line pt-12 sm:mt-32 sm:pt-16">
       <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-8">
-        <h2 id={headingId} className="type-heading text-[1.75rem] text-fg sm:text-3xl">
+        <h3 id={headingId} className="type-heading text-[1.75rem] text-fg sm:text-3xl">
           All projects
-        </h2>
+        </h3>
         <div className="relative w-full md:w-72">
           <label htmlFor={searchId} className="sr-only">
             Search projects
@@ -271,7 +262,6 @@ function ProjectArchive({ projects, onOpen, onPreload }) {
       </Reveal>
 
       <Reveal className="mt-6">
-        <CategoryStrip options={options} value={category} onChange={updateCategory} className="mb-5" />
         <CategoryFilter options={options} value={category} onChange={updateCategory} />
       </Reveal>
 

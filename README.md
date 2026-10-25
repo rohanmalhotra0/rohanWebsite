@@ -11,9 +11,7 @@ cd Ashif
 npm ci
 npm run dev       # http://localhost:5173
 npm run lint
-npm run contrast  # WCAG AA check of every palette
 npm run build     # outputs Ashif/dist
-npm run og        # re-render the link-preview cards (needs Playwright)
 ```
 
 ## Stack
@@ -27,112 +25,40 @@ npm run og        # re-render the link-preview cards (needs Playwright)
 - Mona Sans (text) through Fontsource, and Hubot Sans (display) as two static
   cuts made by `Ashif/scripts/subset-hubot.py` (42 KB instead of the 93 KB
   variable file). Code and key caps use the system monospace font.
-- Five named palettes, each with a light and a dark theme: Spot (safety
-  yellow and graphite, the default), Terminal (phosphor green on navy),
-  Courant (NYU violet and gold), Market (teal and coral), and Paper (ink and
-  safety orange). The swatch button in the navbar switches them, the choice
-  is saved, and `index.html` applies it before first paint. Everything uses
-  semantic color tokens (`Ashif/src/styles/palettes.css`), so a palette
-  recolors the whole site, including the robot's paint, its toy and floor,
-  page headers, and the duotone photos on the About page.
-- Each page opens with a color block in its palette color, and ends with the
-  next page's block. Inside a block (`block-a`, `block-b`, `block-c`) the
-  page tokens point at the block's ink, so any component placed on one reads
-  correctly.
-- On Home, in the light themes, the robot stands in a dark "lab": the
-  palette's deepest block (`.hero-lab` in `palettes.css`), with its floor
-  lines in that block's bright ink. The end of the name that runs onto it
-  switches to the same ink, and the main button is in the palette's accent.
-  Paper keeps the plain look.
-- Videos (`LiteYouTube`) are a plain card until someone presses play, then a
-  youtube-nocookie player loads in the same 16:9 box. Nothing is fetched from
-  YouTube before that click, and with JavaScript off the card is a link.
-- Separate pages with real URLs: `/`, `/experience/`, `/projects/`,
-  `/research/`, `/about/`, `/chat/`, `/contact/`, and `/resume/`. A small
-  router (`Ashif/src/lib/router.js`, `RouterProvider.jsx`) turns clicks on
-  plain `<a href="/projects/">` links into in-place page changes with a short
-  crossfade, remembers scroll positions for Back, and moves focus to the new
-  page's heading. Each page's code is its own chunk, fetched on hover and
-  when the browser is idle; the home page's ships in the main bundle, so the
-  page most visits start on hydrates without another request. Old one-page
-  links (`/#projects`, `/#/resume`, `/#project/<slug>`) are redirected by
-  `index.html`.
-- `npm run build` also renders every page on the server
-  (`Ashif/src/entry-server.jsx`) and writes each one to its own HTML file with
-  its own title and description (`Ashif/scripts/prerender.mjs`), plus
-  `404.html` and `sitemap.xml`. Pages paint before any JavaScript runs; React
-  then hydrates them. Anything the first render shows has to come out the same
-  on the server and in the browser, so values only the browser knows (theme,
-  time, saved drafts) are read after mount or through `useSyncExternalStore`
-  with a server snapshot.
+- Light and dark themes. The site opens in light mode until a visitor picks one.
+- `npm run build` also renders the page on the server
+  (`Ashif/src/entry-server.jsx`) and writes that HTML into `dist/index.html`
+  (`Ashif/scripts/prerender.mjs`), so the page paints before any JavaScript
+  runs; React then hydrates it. Anything the first render shows has to come out
+  the same on the server and in the browser, so values only the browser knows
+  (theme, time, saved drafts) are read after mount or through
+  `useSyncExternalStore` with a server snapshot.
 
 ## Structure
 
 ```
 Ashif/src
-├── App.jsx                  # theme + router + the current page
-├── routes.js                # every page: URL, title, description, nav label
-├── pages/                   # one component per page (HomePage, ProjectsPage…)
-├── index.css                # utilities: color blocks, mesh, grain, type
-├── styles/palettes.css      # the five palettes, light and dark
+├── App.jsx                  # page shell + #/resume route
+├── index.css                # design tokens (dark/light), utilities
 ├── data/portfolioData.js    # all content: profile, experience, projects, research…
 ├── components/
-│   ├── layout/              # SiteLayout, the "Next page" link, load progress bar
-│   ├── primitives/          # Section, PageHeader, SectionHeader, Reveal, Button
+│   ├── primitives/          # Section, SectionHeader, Reveal, Button, TechList
 │   ├── theme/               # ThemeProvider (light/dark, circular reveal toggle)
-│   ├── nav/                 # navbar, mobile menu, ⌘K command palette
+│   ├── nav/                 # navbar + ⌘K command palette
 │   ├── hero/                # three.js robot fetch demo
-│   ├── home/                # home page previews: numbers, selected work, …
-│   ├── about/               # About intro + PhotoDeck (the draggable photo pile)
-│   ├── experience/  projects/  research/  education/
+│   ├── experience/  projects/  research/  about/  education/
 │   ├── rohangpt/            # chat UI
 │   ├── contact/  footer/
-│   └── resume/              # printable résumé view at /resume/
+│   └── resume/              # printable résumé view at #/resume
 ├── services/rohangptService.js
-└── lib/ hooks/              # router, theme, small window events
+└── lib/ hooks/
 ```
-
-## Palettes
-
-Palette values live in `Ashif/src/styles/palettes.css`, one block per palette
-and theme. After changing one:
-
-- `npm run contrast` checks every text pair against WCAG AA (body text,
-  secondary text, text on each color block, form borders, thin marks, and
-  the category colors) and fails if any falls short.
-- If `--bg`, `--fg`, `--mark`, `--robot`, `--robot-toy` or a light theme's
-  lab block changed, run `npm run posters` to re-render the hero stills in
-  `Ashif/public/img/hero` (needs Playwright; takes about a minute), so the
-  poster matches the live scene.
-
-To add a palette, add its two blocks to `palettes.css`, its entry to
-`PALETTES` and `THEME_COLORS` in `Ashif/src/lib/theme.js`, its id and page
-colors to the list in `index.html`'s head script, and its glow and duotone
-colors near the top of `palettes.css`; then render its posters.
-
-## Link previews
-
-Each page's `og:image` is its own 1200×630 card in `Ashif/public/og/`: the
-hero for Home (also used by the résumé and 404), each page's color block,
-the Kelly curve for Research, the lab for Hedge your paycheck, and the
-camera drawing for the Spot case study. `npm run og` draws them with
-Playwright from the site's own CSS and components (`Ashif/scripts/og/`), in
-the Spot palette, and `scripts/prerender.mjs` points each page at its card
-(`ogCard` in `Ashif/src/routes.js`). Re-run it after changing a page's name,
-tagline or block, the hero, or a lab's model or defaults; the build warns
-about a page whose card is missing and gives it the home page's.
 
 ## Editing content
 
-Almost everything on the site comes from `Ashif/src/data/portfolioData.js`.
-Add a project there and it shows up on the Projects page, the archive, the
-command palette, and RohanGPT's quick answers. `selectedWork` picks the three
-projects on the home page, and the photos in `photos` (after the portrait)
-make up the pile on the About page.
-
-To add a page, create `Ashif/src/pages/<Name>Page.jsx` and add an entry to
-`Ashif/src/routes.js`; the build prerenders it, and a `label` puts it in the
-navbar, footer, and command palette.
+Almost everything on the page comes from `Ashif/src/data/portfolioData.js`.
+Add a project there and it shows up in the projects section, the archive, the
+command palette, and RohanGPT's quick answers.
 
 Images live in `Ashif/public/img` as optimized WebP. Full-size originals are
 kept, undeployed, in `Ashif/source-images`. Papers are in `Ashif/public/papers`

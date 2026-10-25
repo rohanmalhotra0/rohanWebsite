@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight, Check, Search, X } from 'lucide-react';
 import { Kbd } from '@/components/primitives/Tag';
 import { focusChat } from '@/lib/events';
-import { navigate } from '@/lib/router';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import {
@@ -21,10 +20,11 @@ const MotionDiv = motion.div;
 const COPIED_MS = 1800;
 
 /**
- * ⌘K command palette: a modal combobox over every page, project, paper,
+ * ⌘K command palette: a modal combobox over every section, project, paper,
  * and site action, with fuzzy search and full keyboard control.
+ * `onNavigate(id)` scrolls to a section and keeps the navbar marker in step.
  */
-export default function CommandPalette({ open, onClose }) {
+export default function CommandPalette({ open, onClose, onNavigate }) {
   const dialogRef = useRef(null);
   const inputRef = useRef(null);
   const afterExit = useRef(null);
@@ -54,14 +54,15 @@ export default function CommandPalette({ open, onClose }) {
           dialogRef={dialogRef}
           inputRef={inputRef}
           requestClose={requestClose}
+          onNavigate={onNavigate}
         />
       ) : null}
     </AnimatePresence>
   );
 }
 
-function Palette({ dialogRef, inputRef, requestClose }) {
-  const { theme, palette, toggleTheme, setPalette } = useTheme();
+function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
+  const { theme, toggleTheme } = useTheme();
   const reduceMotion = useReducedMotion();
   const rootRef = useRef(null);
   const listRef = useRef(null);
@@ -76,7 +77,7 @@ function Palette({ dialogRef, inputRef, requestClose }) {
 
   useVisualViewportHeight(rootRef);
 
-  const items = useMemo(() => getPaletteItems(theme, palette), [theme, palette]);
+  const items = useMemo(() => getPaletteItems(theme), [theme]);
   const { groups, flat, count } = useMemo(() => searchPalette(query, items), [query, items]);
   const activeEntry = flat[activeIndex] ?? flat[0];
   const hasQuery = query.trim().length > 0;
@@ -114,8 +115,8 @@ function Palette({ dialogRef, inputRef, requestClose }) {
     setActiveIndex(index);
   };
 
-  // Hand focus to the page before navigating, so it can move to the page we
-  // go to rather than back to whatever opened the palette.
+  // Hand focus to the page before navigating, so the browser's next Tab
+  // starts from the section we scroll to rather than from the palette.
   const leaveFor = (go) => {
     requestClose({ restore: false });
     inputRef.current?.blur();
@@ -126,8 +127,8 @@ function Palette({ dialogRef, inputRef, requestClose }) {
   const run = ({ item }) => {
     const { action } = item;
     switch (action.type) {
-      case 'route':
-        leaveFor(() => navigate(action.href));
+      case 'section':
+        leaveFor(() => onNavigate(action.id));
         break;
       case 'ask':
         leaveFor(() => focusChat(action.prompt));
@@ -145,16 +146,14 @@ function Palette({ dialogRef, inputRef, requestClose }) {
         requestClose();
         window.location.href = action.href;
         break;
+      case 'hash':
+        requestClose({ restore: false });
+        window.location.hash = action.hash;
+        break;
       case 'copy':
         copyText(action.text).then((ok) => {
           setCopied({ id: item.id, ok });
           setAnnouncement(ok ? 'Email copied' : 'Could not copy the email');
-        });
-        break;
-      case 'palette':
-        // Like the theme: switch once the palette is gone, growing from the swatch button.
-        requestClose({
-          after: () => setPalette(action.id, centerOf(document.querySelector('[data-palette-button]'))),
         });
         break;
       case 'theme':

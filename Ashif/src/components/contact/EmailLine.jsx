@@ -27,7 +27,7 @@ export default function EmailLine({ className }) {
             The 0.22em offset clears descenders, so skip-ink never cuts the line. */}
         <a
           href={`mailto:${profile.email}`}
-          className="type-heading -my-3.5 min-w-0 py-3.5 text-[length:clamp(1rem,6cqi,2.75rem)] leading-[1.1] text-fg underline decoration-line-strong decoration-[length:0.05em] underline-offset-[0.22em] transition-[text-decoration-color] duration-150 [overflow-wrap:anywhere] hover:decoration-mark sm:text-[length:clamp(1.125rem,6.6cqi,2.75rem)]"
+          className="type-heading -my-3.5 min-w-0 py-3.5 text-[length:clamp(1rem,6cqi,2.75rem)] leading-[1.1] text-fg underline decoration-line-strong decoration-[length:0.05em] underline-offset-[0.22em] transition-[text-decoration-color] duration-150 [overflow-wrap:anywhere] hover:decoration-accent sm:text-[length:clamp(1.125rem,6.6cqi,2.75rem)]"
         >
           {profile.email}
         </a>

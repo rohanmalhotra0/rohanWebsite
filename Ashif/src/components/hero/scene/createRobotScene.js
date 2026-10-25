@@ -30,9 +30,9 @@ const FIELD = { minX: -0.9, maxX: 0.9, minZ: -1.5, maxZ: 0.75 };
 const MARGIN = 0.1;
 const TARGET = new Vector3(0, 0.14, 0.05);
 // Camera framing: a 3/4 view of a square reference frame (the poster) that
-// holds the whole field. How much of it must stay in view is set in CSS on
-// the stage (--fit-w, --fit-h; see RobotStage), so the poster is sized by the
-// same numbers. `crop` is the fallback for --fit-h.
+// holds the whole field. Wide stages crop its top and bottom by up to
+// `crop`, narrow ones fit its width; the poster is sized in CSS with the
+// same rule (see RobotStage).
 export const VIEW = { az: 0.03, el: 0.33, dist: 6.6, fov: 20, crop: 0.72 };
 // Where the gripper camera looks on frame one (and in the poster), and the
 // toy lying on the floor before anyone throws one.
@@ -197,12 +197,7 @@ export function createRobotScene({
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    // At least --fit-w of the reference square's width and --fit-h of its
-    // height stay in view.
-    const fit = getComputedStyle(host);
-    const fitW = parseFloat(fit.getPropertyValue('--fit-w')) || 1;
-    const fitH = parseFloat(fit.getPropertyValue('--fit-h')) || VIEW.crop;
-    baseZoom = Math.max(fitW / camera.aspect, fitH);
+    baseZoom = Math.max(1 / camera.aspect, VIEW.crop);
     if (ctl) frameRobot(0);
     else {
       zoom = baseZoom;
@@ -690,9 +685,7 @@ export function createRobotScene({
   function applyPalette(p) {
     stage?.setPalette(p);
     feed?.setPalette(p);
-    toyMaterial.color.set(p.toy ?? p.accent);
-    // Each palette repaints the robot (Spot yellow, Terminal green, …).
-    if (p.robot) materials.paint.color.set(p.robot);
+    toyMaterial.color.set(p.accent);
   }
 
   // Boot ------------------------------------------------------------------
@@ -869,15 +862,10 @@ export function createRobotScene({
     if (ready && !lost) frame(0);
   }
 
-  // Follow the theme and palette attributes directly, so the canvas recolours
-  // in the same frame as the page (including inside the view transition).
-  const themeObserver = new MutationObserver(() => setPalette(readPalette(host)));
-  if (!poster) {
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme', 'data-palette'],
-    });
-  }
+  // Follow the theme attribute directly, so the canvas recolours in the same
+  // frame as the page (including inside the theme view transition).
+  const themeObserver = new MutationObserver(() => setPalette(readPalette()));
+  if (!poster) themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   return {
     canvas,
