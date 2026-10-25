@@ -3,7 +3,12 @@ import { cn } from '@/lib/utils';
 
 /* Renders the node tree from markdown.js as React elements. */
 
-const isExternal = (href) => !href.startsWith('#') && !href.startsWith('mailto:');
+// The site's own pages (/projects/), #fragments, and mail links open here;
+// other sites and files (a PDF) open in a new tab.
+const isExternal = (href) =>
+  !href.startsWith('#') &&
+  !href.startsWith('mailto:') &&
+  !(href.startsWith('/') && !/\.\w+$/.test(href.split(/[?#]/)[0]));
 
 function Inline({ nodes }) {
   return nodes.map((node, index) => {

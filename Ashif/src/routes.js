@@ -1,0 +1,153 @@
+// The site's pages. Each has its own URL and is prerendered into its own HTML
+// file at build time (scripts/prerender.mjs). Each page's code is a separate
+// chunk that loads when a visitor is about to need it (see lib/router.jsx).
+import { projects } from '@/data/portfolioData';
+
+// One lazy loader per file in ./pages, keyed by './pages/<Name>.jsx'.
+const pageModules = import.meta.glob('./pages/*.jsx');
+
+/**
+ * `page` names the component file in ./pages. `label` puts a route in the
+ * navbar, footer, and command palette. `title` and `description` go into the
+ * prerendered <head>, and `description` is also the teaser at the bottom of
+ * the page before it.
+ */
+export const routes = [
+  {
+    id: 'home',
+    path: '/',
+    page: 'HomePage',
+    title: 'Rohan Malhotra',
+    description:
+      'Rohan Malhotra is an NYU Courant math and computer science student building applied AI, robotics, and quantitative systems. Past work includes IBM and Kalshi.',
+  },
+  {
+    id: 'experience',
+    path: '/experience/',
+    page: 'ExperiencePage',
+    label: 'Experience',
+    title: 'Experience — Rohan Malhotra',
+    description:
+      'Internships in robotics, quant development, machine learning, aerospace research, and data, plus my degree at NYU Courant.',
+  },
+  {
+    id: 'projects',
+    path: '/projects/',
+    page: 'ProjectsPage',
+    label: 'Projects',
+    title: 'Projects — Rohan Malhotra',
+    description: `${projects.length} projects, from internship work to small tools I built for myself.`,
+  },
+  {
+    id: 'research',
+    path: '/research/',
+    page: 'ResearchPage',
+    label: 'Research',
+    title: 'Research — Rohan Malhotra',
+    description:
+      'Papers on hedging income risk with prediction markets, Reddit sentiment in financial models, and Kelly-criterion capital allocation.',
+  },
+  {
+    id: 'about',
+    path: '/about/',
+    page: 'AboutPage',
+    label: 'About',
+    title: 'About — Rohan Malhotra',
+    description:
+      'Who I am outside the résumé, what I’m working on now, and photos from the Alps, a lake, and a basketball court.',
+  },
+  {
+    id: 'chat',
+    path: '/chat/',
+    page: 'ChatPage',
+    label: 'Chat',
+    title: 'Ask about my work — Rohan Malhotra',
+    description:
+      'Ask about my projects, internships, research, or anything on my résumé. The answers come from my own notes.',
+  },
+  {
+    id: 'contact',
+    path: '/contact/',
+    page: 'ContactPage',
+    label: 'Contact',
+    title: 'Contact — Rohan Malhotra',
+    description:
+      'I’m interested in applied AI, robotics, quantitative systems, and developer tools. Send me a note if the work overlaps.',
+  },
+  {
+    id: 'resume',
+    path: '/resume/',
+    page: 'ResumePage',
+    title: 'Résumé — Rohan Malhotra',
+    description:
+      'Rohan Malhotra’s one-page résumé: IBM, Kalshi, Aress Software, the Virginia Tech Hume Center, and NYU Courant.',
+    // Its own toolbar instead of the site's navbar and footer.
+    chrome: false,
+  },
+];
+
+/** Shown for any other path (and written to 404.html for GitHub Pages). */
+export const notFoundRoute = {
+  id: 'not-found',
+  path: null,
+  page: 'NotFoundPage',
+  title: 'Page not found — Rohan Malhotra',
+  description: 'There’s no page at this address.',
+};
+
+/** The pages in the navbar, footer, and palette, in reading order. */
+export const navRoutes = routes.filter((route) => route.label);
+
+export const routeById = (id) => routes.find((route) => route.id === id) ?? null;
+
+/** The page that comes after `route` in reading order, for the link at its end. */
+export function nextRoute(route) {
+  const index = navRoutes.indexOf(route);
+  return index >= 0 ? (navRoutes[index + 1] ?? null) : null;
+}
+
+/**
+ * '/projects', '/projects/' and '/projects/index.html' are one page. Paths
+ * that aren't pages (a PDF, an image) come back unchanged in shape, so they
+ * never match a route.
+ */
+export function normalizePath(pathname) {
+  let path = String(pathname || '/').replace(/\/index\.html$/, '/');
+  if (!path.endsWith('/')) path += '/';
+  return path.replace(/\/{2,}/g, '/');
+}
+
+const byPath = new Map(routes.map((route) => [route.path, route]));
+
+/** The route for a pathname, or null when it isn't one of the site's pages. */
+export const findRoute = (pathname) => byPath.get(normalizePath(pathname)) ?? null;
+
+const loaded = new Map();
+const loading = new Map();
+
+/**
+ * Load a route's page component once. Resolves to the component; a failed
+ * load isn't kept, so the next attempt fetches again.
+ */
+export function loadRoute(route) {
+  if (loaded.has(route.id)) return Promise.resolve(loaded.get(route.id));
+  let promise = loading.get(route.id);
+  if (!promise) {
+    promise = pageModules[`./pages/${route.page}.jsx`]().then(
+      (module) => {
+        loaded.set(route.id, module.default);
+        loading.delete(route.id);
+        return module.default;
+      },
+      (error) => {
+        loading.delete(route.id);
+        throw error;
+      }
+    );
+    loading.set(route.id, promise);
+  }
+  return promise;
+}
+
+/** The route's page component if it has loaded, else null. */
+export const loadedPage = (route) => loaded.get(route.id) ?? null;

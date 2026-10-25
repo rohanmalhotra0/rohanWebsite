@@ -26,7 +26,7 @@ function preloadFonts() {
               rel: 'preload',
               as: 'font',
               type: 'font/woff2',
-              href: `./${file}`,
+              href: `/${file}`,
               crossorigin: '',
             },
             injectTo: 'head',
@@ -38,7 +38,9 @@ function preloadFonts() {
 }
 
 export default defineConfig({
-  base: './',
+  // Every page is its own HTML file at its own path (/projects/index.html…),
+  // so assets are addressed from the root, not relative to the page.
+  base: '/',
   define: {
     'import.meta.env.VITE_BUILD_YEAR': JSON.stringify(String(new Date().getFullYear())),
   },
@@ -50,6 +52,8 @@ export default defineConfig({
   },
   build: {
     target: 'es2020',
+    // scripts/prerender.mjs reads it to preload each page's own chunks.
+    manifest: true,
     rollupOptions: {
       output: {
         // Vendor chunks cache across deploys; the app chunk changes often.

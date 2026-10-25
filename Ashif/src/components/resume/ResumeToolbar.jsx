@@ -1,6 +1,7 @@
 import { ArrowLeft, Download, Moon, Printer, Sun } from 'lucide-react';
 import Button from '@/components/primitives/Button';
 import { profile } from '@/data/portfolioData';
+import { canGoBack } from '@/lib/router';
 import { useTheme } from '@/lib/theme';
 
 // Compact with a mouse, 44px on touch screens.
@@ -27,12 +28,22 @@ function ThemeToggle() {
   );
 }
 
+// Came here from another page of the site: step back to it (and to where it
+// was scrolled). Opened directly: go to the home page.
+function back(event) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  if (!canGoBack()) return;
+  event.preventDefault();
+  window.history.back();
+}
+
 export default function ResumeToolbar() {
   return (
     <header className="rv-toolbar sticky top-0 z-40 border-b border-line bg-bg pt-[env(safe-area-inset-top)]">
       <div className="rv-frame flex h-14 items-center justify-between gap-3 sm:h-16">
         <Button
-          href="#top"
+          href="/"
+          onClick={back}
           variant="ghost"
           size="sm"
           className={`-ml-[13px] px-2.5 text-fg ${TOUCH}`}

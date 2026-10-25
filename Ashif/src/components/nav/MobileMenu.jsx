@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight, X } from 'lucide-react';
-import { profile, sections } from '@/data/portfolioData';
+import { profile } from '@/data/portfolioData';
 import Button from '@/components/primitives/Button';
 import { cn } from '@/lib/utils';
+import { navRoutes } from '@/routes';
 import { SearchButton, Wordmark } from './BarControls';
 import ThemeToggle from './ThemeToggle';
 import { useFocusTrap, useModalFocus, useReducedMotion, useScrollLock } from './hooks';
-import { isPlainClick } from './navigation';
+import { isPlainClick } from '@/lib/router';
 import { BAR_ROW, ICON_BUTTON } from './styles';
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -24,19 +25,11 @@ const LINKS = [
  * Full-screen menu for small screens. Modal: focus is trapped while open and
  * handed back to the menu button on close; Esc, the close button, or a tap on
  * empty space closes it. Its top row repeats the navbar so it opens in place.
- * `onNavigate(id)` runs before an in-page link scrolls, `onSearch` opens the
- * palette (`onSearchIntent` warms it), and `triggerRef` (the menu button) gets
- * focus back on close.
+ * `active` is the current page's id, `onSearch` opens the palette
+ * (`onSearchIntent` warms it), and `triggerRef` (the menu button) gets focus
+ * back on close.
  */
-export default function MobileMenu({
-  open,
-  onClose,
-  active,
-  onNavigate,
-  onSearch,
-  onSearchIntent,
-  triggerRef,
-}) {
+export default function MobileMenu({ open, onClose, active, onSearch, onSearchIntent, triggerRef }) {
   const sheetRef = useRef(null);
   const closeRef = useRef(null);
 
@@ -65,12 +58,11 @@ export default function MobileMenu({
     onClose();
   };
 
-  // In-page links: the anchor does the scrolling (fragment navigation also
-  // moves the focus starting point there), so just close and tell the spy.
-  const onSectionClick = (id) => (event) => {
+  // Page links: the router changes the page (and moves focus to its
+  // heading), so just close without handing focus back to the menu button.
+  const onPageClick = (event) => {
     if (!isPlainClick(event)) return;
     event.currentTarget.blur();
-    onNavigate(id);
     close({ restore: false });
   };
 
@@ -83,7 +75,7 @@ export default function MobileMenu({
           closeRef={closeRef}
           active={active}
           onClose={() => close()}
-          onSectionClick={onSectionClick}
+          onPageClick={onPageClick}
           onLeave={() => close({ restore: false })}
           onSearch={onSearch}
           onSearchIntent={onSearchIntent}
@@ -93,16 +85,7 @@ export default function MobileMenu({
   );
 }
 
-function Sheet({
-  sheetRef,
-  closeRef,
-  active,
-  onClose,
-  onSectionClick,
-  onLeave,
-  onSearch,
-  onSearchIntent,
-}) {
+function Sheet({ sheetRef, closeRef, active, onClose, onPageClick, onLeave, onSearch, onSearchIntent }) {
   const reduceMotion = useReducedMotion();
   const rise = (i) =>
     reduceMotion
@@ -133,7 +116,7 @@ function Sheet({
     >
       <div className="shrink-0 pt-[env(safe-area-inset-top)]">
         <div className={BAR_ROW}>
-          <Wordmark onClick={onSectionClick('top')} />
+          <Wordmark onClick={onPageClick} />
           <div className="flex items-center">
             <SearchButton onClick={onSearch} onIntent={onSearchIntent} />
             <ThemeToggle className={ICON_BUTTON} />
@@ -153,14 +136,14 @@ function Sheet({
       {/* Same name as the bar's nav: only one of the two is ever exposed. */}
       <nav aria-label="Primary" className="container-page shrink-0 pt-5">
         <ul className="border-t border-line">
-          {sections.map((section, i) => {
-            const isActive = active === section.id;
+          {navRoutes.map((page, i) => {
+            const isActive = active === page.id;
             return (
-              <MotionLi key={section.id} {...rise(i)} className="border-b border-line">
+              <MotionLi key={page.id} {...rise(i)} className="border-b border-line">
                 <a
-                  href={`#${section.id}`}
-                  onClick={onSectionClick(section.id)}
-                  aria-current={isActive ? 'true' : undefined}
+                  href={page.path}
+                  onClick={onPageClick}
+                  aria-current={isActive ? 'page' : undefined}
                   className="type-heading flex min-h-14 items-center text-[1.75rem] text-fg transition-opacity active:opacity-60 md:min-h-20 md:text-[2.75rem]"
                 >
                   <span
@@ -169,7 +152,7 @@ function Sheet({
                       isActive && 'underline decoration-accent decoration-2'
                     )}
                   >
-                    {section.label}
+                    {page.label}
                   </span>
                 </a>
               </MotionLi>
@@ -179,10 +162,10 @@ function Sheet({
       </nav>
 
       <MotionDiv
-        {...rise(sections.length)}
+        {...rise(navRoutes.length)}
         className="container-page mt-auto shrink-0 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-8"
       >
-        <Button href="#/resume" variant="secondary" size="lg" onClick={onLeave} className="w-full">
+        <Button href="/resume/" variant="secondary" size="lg" onClick={onLeave} className="w-full">
           Résumé
         </Button>
         <ul className="mt-2 flex items-center justify-between">

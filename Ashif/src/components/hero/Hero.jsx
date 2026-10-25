@@ -19,7 +19,11 @@ export default function Hero() {
         <div className="relative z-10 lg:col-span-5 lg:row-start-2">
           {/* "Malhotra" is ~5.2em wide in Hubot Sans: on phones size it to the
               gutters (with margin to spare); from lg it is a fixed display size. */}
-          <h1 className="type-display text-[length:min(calc((100vw_-_2rem)/5.6),4.5rem)] text-fg lg:text-[length:clamp(3.25rem,8vw,7.5rem)]">
+          <h1
+            tabIndex={-1}
+            data-page-focus=""
+            className="type-display text-[length:min(calc((100vw_-_2rem)/5.6),4.5rem)] text-fg outline-none lg:text-[length:clamp(3.25rem,8vw,7.5rem)]"
+          >
             {profile.name}
           </h1>
           <p className="mt-5 max-w-[34rem] text-pretty text-base leading-[1.65] text-muted sm:text-[17px] lg:mt-7">
@@ -29,10 +33,10 @@ export default function Hero() {
 
         <div className="relative z-10 mt-6 lg:col-span-5 lg:row-start-3 lg:mt-9">
           <div className="flex flex-wrap gap-3">
-            <Button href="#projects" size="lg">
+            <Button href="/projects/" size="lg">
               View projects
             </Button>
-            <Button href="#/resume" variant="secondary" size="lg">
+            <Button href="/resume/" variant="secondary" size="lg">
               Résumé
             </Button>
           </div>

@@ -17,14 +17,8 @@ import {
   Moon,
   Sun,
 } from 'lucide-react';
-import {
-  education,
-  profile,
-  projects,
-  research,
-  sections,
-  workExperience,
-} from '@/data/portfolioData';
+import { education, profile, projects, research, workExperience } from '@/data/portfolioData';
+import { navRoutes, routeById } from '@/routes';
 import { scoreItem } from './fuzzy';
 
 // With an empty query: a short, ordered start page of `suggested` items.
@@ -48,32 +42,31 @@ const bareUrl = (url) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, 
 // github.com/<user> is a profile, not a repository.
 const isGitHubProfile = (url) => /^https?:\/\/(www\.)?github\.com\/[^/]+\/?$/i.test(url);
 
-const SECTION_SEARCH = {
+const PAGE_SEARCH = {
+  home: { aliases: ['start', 'top', 'index'] },
   experience: {
-    keywords: workExperience.map((job) => job.company),
-    aliases: ['work', 'jobs', 'internships'],
+    // Education and skills live on the Experience page.
+    keywords: [...workExperience.map((job) => job.company), education.school, education.college],
+    aliases: ['work', 'jobs', 'internships', 'education', 'school', 'university', 'courses', 'gpa', 'skills'],
   },
   projects: { aliases: ['portfolio', 'code', 'apps'] },
   research: { aliases: ['papers', 'publications'] },
-  about: { aliases: ['bio', 'me', 'photos'] },
-  education: {
-    keywords: [education.school, education.college],
-    aliases: ['school', 'university', 'courses', 'gpa'],
-  },
-  rohangpt: { aliases: ['ask', 'ai', 'assistant'] },
+  about: { aliases: ['bio', 'me', 'photos', 'pictures'] },
+  chat: { aliases: ['ask', 'ai', 'assistant', 'rohangpt'] },
   contact: { aliases: ['email', 'message', 'get in touch'] },
 };
 
-// Sections have no icon: the "Go to" heading says what they are.
-const goToItems = sections.map((section) => ({
-  id: `goto-${section.id}`,
+// Pages have no icon: the "Go to" heading says what they are.
+const goToItems = [{ ...routeById('home'), label: 'Home' }, ...navRoutes].map((page) => ({
+  id: `goto-${page.id}`,
   group: 'goto',
-  title: section.label,
-  keywords: unique(SECTION_SEARCH[section.id]?.keywords ?? []),
-  aliases: SECTION_SEARCH[section.id]?.aliases ?? [],
-  suggested: true,
+  title: page.label,
+  keywords: unique(PAGE_SEARCH[page.id]?.keywords ?? []),
+  aliases: PAGE_SEARCH[page.id]?.aliases ?? [],
+  // Home is findable but not on the start page; the wordmark already goes there.
+  suggested: page.id !== 'home',
   verb: 'Go',
-  action: { type: 'section', id: section.id },
+  action: { type: 'route', href: page.path },
 }));
 
 const projectItems = projects.map((project) => {
@@ -90,10 +83,10 @@ const projectItems = projects.map((project) => {
     suggested: Boolean(project.featured),
     external: Boolean(href),
     verb: project.liveUrl ? 'Open site' : repoUrl ? 'View source' : 'View project',
-    // Without a link of its own, a project opens in the page's project viewer.
+    // Without a link of its own, a project opens in the Projects page's viewer.
     action: href
       ? { type: 'url', href }
-      : { type: 'hash', hash: `#project/${project.slug}` },
+      : { type: 'route', href: `${routeById('projects').path}#project/${project.slug}` },
   };
 });
 
@@ -165,7 +158,7 @@ const actionItems = (theme) => [
     aliases: ['cv', 'resume'],
     icon: FileUser,
     verb: 'Open',
-    action: { type: 'hash', hash: '#/resume' },
+    action: { type: 'route', href: routeById('resume').path },
   },
   {
     id: 'action-github',

@@ -3,6 +3,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import '@fontsource-variable/mona-sans/wght.css';
 import './index.css';
 import App from './App.jsx';
+import { findRoute, loadRoute, notFoundRoute } from './routes';
 
 // After a redeploy, an open tab still points at the old hashed chunks, which
 // are gone. Reload once to pick up the new build; the timestamp stops a reload
@@ -20,22 +21,37 @@ window.addEventListener('vite:preloadError', (event) => {
 });
 
 const container = document.getElementById('root');
+const path = window.location.pathname;
+const route = findRoute(path) ?? notFoundRoute;
 const app = (
   <StrictMode>
-    <App />
+    <App initialPath={path} />
   </StrictMode>
 );
 
-// Production builds prerender the portfolio into #root (scripts/prerender.mjs),
-// so it paints before any JavaScript runs. Hydrating inside a transition lets
-// React split that work into small slices instead of one long task. The résumé
-// route starts from an empty root instead.
-if (container.hasAttribute('data-prerendered') && window.location.hash !== '#/resume') {
-  startTransition(() => {
-    hydrateRoot(container, app);
-  });
-} else {
-  container.removeAttribute('data-prerendered');
-  container.replaceChildren();
-  createRoot(container).render(app);
-}
+// Production builds prerender every page into its own HTML file
+// (scripts/prerender.mjs), so it paints before any JavaScript runs. The
+// page's code loads first, then React hydrates the markup inside a
+// transition, which splits the work into small slices instead of one long
+// task. A host that served another page's file (some SPA fallbacks do) gets
+// a fresh render instead of a mismatched hydration.
+const prerendered = container.dataset.prerendered !== undefined && container.dataset.route === route.id;
+
+loadRoute(route).then(
+  () => {
+    if (prerendered) {
+      startTransition(() => {
+        hydrateRoot(container, app);
+      });
+      return;
+    }
+    delete container.dataset.prerendered;
+    container.replaceChildren();
+    createRoot(container).render(app);
+  },
+  () => {
+    // The page's code didn't load (offline?). Prerendered markup stays up as
+    // a static page; its links still work as ordinary links.
+    if (!prerendered) createRoot(container).render(app);
+  }
+);

@@ -85,7 +85,7 @@ function endStop(text) {
 }
 
 const EMAIL_LINK = mdLink(profile.email, `mailto:${profile.email}`);
-/** Rohan's own line from the Contact section. */
+/** Rohan's own line from the Contact page. */
 const INTERESTS = 'I’m interested in applied AI, robotics, quantitative systems, and developer tools.';
 
 /** "May 2026" -> {month: 4, year: 2026}, or null. */
@@ -265,11 +265,11 @@ const ANSWERS = {
   contact: () =>
     paragraphs(
       `You can email me at ${EMAIL_LINK}.`,
-      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}, and you can ${mdLink('read my résumé', '#/resume')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`
+      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}, and you can ${mdLink('read my résumé', '/resume/')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`
     ),
 
   resume: () =>
-    `You can ${mdLink('read my résumé', '#/resume')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`,
+    `You can ${mdLink('read my résumé', '/resume/')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`,
 
   // Recruiting answers say only what the data says: no start dates, role
   // types, availability, or job-search status beyond graduation.
@@ -318,7 +318,7 @@ const ANSWERS = {
     return [
       endStop(`Some things I do away from work: ${joinAnd(activities.map((item) => item.label.toLowerCase()))}`),
       captioned ? endStop(`${captioned.label} is ${lowerFirst(captioned.caption).replace(/[.!]$/, '')}`) : '',
-      `There are photos in the ${mdLink('About', '#about')} section${switzerland ? `, including one from ${switzerland.label}` : ''}.`,
+      `There are photos on my ${mdLink('About', '/about/')} page${switzerland ? `, including one from ${switzerland.label}` : ''}.`,
     ]
       .filter(Boolean)
       .join(' ');
@@ -339,12 +339,12 @@ const ANSWERS = {
     return paragraphs(
       'I’d start with these:',
       bullets(picks),
-      `All ${projects.length} are in the ${mdLink('Projects', '#projects')} section.`
+      `All ${projects.length} are on the ${mdLink('Projects', '/projects/')} page.`
     );
   },
 
   projectCount: () =>
-    `There are ${projects.length} projects on this site, and ${countWord(featuredProjects.length)} are featured: ${endStop(joinAnd(featuredProjects.map((project) => projectLink(project, shortTitle(project.title)))))} They’re all in the ${mdLink('Projects', '#projects')} section.`,
+    `There are ${projects.length} projects on this site, and ${countWord(featuredProjects.length)} are featured: ${endStop(joinAnd(featuredProjects.map((project) => projectLink(project, shortTitle(project.title)))))} They’re all on the ${mdLink('Projects', '/projects/')} page.`,
 
   experience: () =>
     paragraphs(
@@ -891,15 +891,23 @@ const createMessage = (role, content, extra) => ({
 /* Hook                                                                */
 /* ------------------------------------------------------------------ */
 
+// The conversation outlives the Chat page: leave it and come back, and it is
+// still there (until a reload).
+const kept = { messages: [] };
+
 /**
  * Chat state. Messages look like {id, role: 'user'|'assistant', content},
  * and assistant messages also carry `source` ('profile', 'live', or
  * 'unknown') and `topic` (the local answer's id, for follow-ups).
  */
 export function useRohanGPTChat() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => kept.messages);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // A question left without its answer (the reader went to another page
+  // while it was coming) gets the usual error line and Retry.
+  const [error, setError] = useState(() =>
+    kept.messages[kept.messages.length - 1]?.role === 'user' ? 'The answer didn’t finish.' : null
+  );
 
   // The source of truth for callbacks, updated in step with every change so a
   // send that lands right after a reply still sees that reply.
@@ -911,6 +919,7 @@ export function useRohanGPTChat() {
 
   const update = useCallback((change) => {
     messagesRef.current = change(messagesRef.current);
+    kept.messages = messagesRef.current;
     setMessages(messagesRef.current);
   }, []);
 

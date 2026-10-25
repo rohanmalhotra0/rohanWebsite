@@ -1,6 +1,6 @@
-// The prerendered HTML has to match the client build, whose base is './'
-// (Vite always reports '/' while rendering on the server).
-const BASE = import.meta.env.SSR ? './' : import.meta.env.BASE_URL || '/';
+// Pages live at /, /projects/, /about/ and so on, so public files are
+// addressed from the site root.
+const BASE = import.meta.env.BASE_URL || '/';
 
 export const assetUrl = (path) =>
   `${BASE}${String(path || '').replace(/^\/+/, '')}`;
@@ -550,6 +550,9 @@ export const projects = [
   },
 ];
 
+/** Projects on the home page, by slug, in order: one each for robotics, AI, and quant. */
+export const selectedWork = ['spot-vision', 'epm-wizard', 'refrax'];
+
 export const skillGroups = [
   {
     label: 'Languages',
@@ -567,17 +570,6 @@ export const skillGroups = [
     label: 'Financial systems',
     items: ['Oracle EPM Cloud', 'OIC', 'EPM Automate', 'Monte Carlo', 'Excel Macros'],
   },
-];
-
-/** Page sections in order; drives the navbar, command palette, and footer. */
-export const sections = [
-  { id: 'experience', label: 'Experience' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'research', label: 'Research' },
-  { id: 'about', label: 'About' },
-  { id: 'education', label: 'Education' },
-  { id: 'rohangpt', label: 'Chat' },
-  { id: 'contact', label: 'Contact' },
 ];
 
 /** Places I have worked or studied, for the hero "worked at" strip. */

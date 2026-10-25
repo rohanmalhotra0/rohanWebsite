@@ -31,6 +31,30 @@ export function groupByCompany(roles) {
   }, []);
 }
 
+/** The id of a company's entry on the Experience page: "IBM" -> "ibm". */
+export const roleAnchor = (company) =>
+  String(company)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const yearOf = (text) => Number(/\b(\d{4})\b/.exec(text || '')?.[1]) || null;
+
+/**
+ * The years a group of roles covers, short: "2026", or "2024 – 2025" when it
+ * spans more than one. Dates read like "Nov 2024 – May 2025".
+ */
+export function yearSpan(roles) {
+  const years = roles
+    .flatMap((role) => String(role.date || '').split(/\s+[–-]\s+/))
+    .map(yearOf)
+    .filter(Boolean);
+  if (!years.length) return '';
+  const first = Math.min(...years);
+  const last = Math.max(...years);
+  return first === last ? String(first) : `${first} – ${last}`;
+}
+
 /** The location every role in a group shares, or null. */
 export function sharedLocation(roles) {
   const [{ location }] = roles;

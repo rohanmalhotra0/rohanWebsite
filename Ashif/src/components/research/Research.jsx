@@ -1,26 +1,18 @@
 import { useId } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Reveal from '@/components/primitives/Reveal';
-import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import { research } from '@/data/portfolioData';
+import { cn } from '@/lib/utils';
 import { dropSrcSetOnError, THUMBNAIL_SIZES, thumbnailSrcSet } from './thumbnail';
 
-export default function Research() {
+/** Every paper, newest first. */
+export default function Research({ className }) {
   return (
-    <Section id="research">
-      <Container>
-        <SectionHeader
-          title="Research"
-          description="Two are published on VTechWorks, Virginia Tech’s research repository. The newest came out of my work at Kalshi."
-        />
-
-        <ul className="mt-12 border-t border-line sm:mt-16">
-          {research.map((paper, index) => (
-            <Paper key={paper.title} paper={paper} index={index} />
-          ))}
-        </ul>
-      </Container>
-    </Section>
+    <ul className={cn('border-t border-line', className)}>
+      {research.map((paper, index) => (
+        <Paper key={paper.title} paper={paper} index={index} />
+      ))}
+    </ul>
   );
 }
 

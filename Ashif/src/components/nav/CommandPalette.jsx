@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight, Check, Search, X } from 'lucide-react';
 import { Kbd } from '@/components/primitives/Tag';
 import { focusChat } from '@/lib/events';
+import { navigate } from '@/lib/router';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import {
@@ -20,11 +21,10 @@ const MotionDiv = motion.div;
 const COPIED_MS = 1800;
 
 /**
- * ⌘K command palette: a modal combobox over every section, project, paper,
+ * ⌘K command palette: a modal combobox over every page, project, paper,
  * and site action, with fuzzy search and full keyboard control.
- * `onNavigate(id)` scrolls to a section and keeps the navbar marker in step.
  */
-export default function CommandPalette({ open, onClose, onNavigate }) {
+export default function CommandPalette({ open, onClose }) {
   const dialogRef = useRef(null);
   const inputRef = useRef(null);
   const afterExit = useRef(null);
@@ -54,14 +54,13 @@ export default function CommandPalette({ open, onClose, onNavigate }) {
           dialogRef={dialogRef}
           inputRef={inputRef}
           requestClose={requestClose}
-          onNavigate={onNavigate}
         />
       ) : null}
     </AnimatePresence>
   );
 }
 
-function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
+function Palette({ dialogRef, inputRef, requestClose }) {
   const { theme, toggleTheme } = useTheme();
   const reduceMotion = useReducedMotion();
   const rootRef = useRef(null);
@@ -115,8 +114,8 @@ function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
     setActiveIndex(index);
   };
 
-  // Hand focus to the page before navigating, so the browser's next Tab
-  // starts from the section we scroll to rather than from the palette.
+  // Hand focus to the page before navigating, so it can move to the page we
+  // go to rather than back to whatever opened the palette.
   const leaveFor = (go) => {
     requestClose({ restore: false });
     inputRef.current?.blur();
@@ -127,8 +126,8 @@ function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
   const run = ({ item }) => {
     const { action } = item;
     switch (action.type) {
-      case 'section':
-        leaveFor(() => onNavigate(action.id));
+      case 'route':
+        leaveFor(() => navigate(action.href));
         break;
       case 'ask':
         leaveFor(() => focusChat(action.prompt));
@@ -145,10 +144,6 @@ function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
       case 'mailto':
         requestClose();
         window.location.href = action.href;
-        break;
-      case 'hash':
-        requestClose({ restore: false });
-        window.location.hash = action.hash;
         break;
       case 'copy':
         copyText(action.text).then((ok) => {
