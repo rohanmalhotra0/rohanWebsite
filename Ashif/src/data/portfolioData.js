@@ -2,6 +2,9 @@
 // addressed from the site root.
 const BASE = import.meta.env.BASE_URL || '/';
 
+// The Dev Club IBM video of the Spot demo (IBM role and Spot case study).
+const SPOT_VIDEO = { id: 'ba-QHNwbSI4', title: 'Spot dog-toy detection', source: 'Dev Club IBM' };
+
 export const assetUrl = (path) =>
   `${BASE}${String(path || '').replace(/^\/+/, '')}`;
 
@@ -120,7 +123,8 @@ export const workExperience = [
     logoClassName: 'h-[68px] w-auto max-w-[72%]',
     summary:
       'I trained the vision system for a Boston Dynamics Spot demo and connected real-time detection to the robot.',
-    video: { id: 'ba-QHNwbSI4', title: 'Spot dog-toy detection', source: 'Dev Club IBM' },
+    video: SPOT_VIDEO,
+    link: { href: '/projects/spot-vision/', label: 'How the Spot demo worked' },
     highlights: [
       'Trained YOLO11 models on 898 manually labeled images, reaching about 99.4% precision, 99.4% recall, and 99.5% mAP@50.',
       'Connected real-time inference to the Spot SDK with Python, OpenCV, gRPC, multithreading, and lock-free inference queues.',
@@ -340,6 +344,44 @@ export const projects = [
     repoUrl: 'https://github.com/rohanmalhotra0',
     tags: ['YOLO11', 'OpenCV', 'Spot SDK', 'gRPC'],
     featured: true,
+    // A page of its own at /projects/spot-vision/. Facts from the résumé and
+    // my internship log.
+    caseStudy: {
+      context: 'Robotics Engineer Intern at IBM · Jun – Aug 2026',
+      video: SPOT_VIDEO,
+      stats: [
+        { value: '898', label: 'hand-labeled images' },
+        { value: '99.4%', label: 'precision' },
+        { value: '99.4%', label: 'recall' },
+        { value: '99.5%', label: 'mAP@50' },
+      ],
+      steps: [
+        {
+          title: 'Label',
+          text: 'I boxed the dog toy by hand in 898 images with LabelImg, saved as Pascal VOC XML.',
+        },
+        {
+          title: 'Train',
+          text: 'I converted the labels to YOLO format and trained YOLO11 models on them.',
+        },
+        {
+          title: 'Evaluate',
+          text: 'I tested the models on precision, recall, mAP@50, and mAP@50-95, and tracked errors while fine-tuning.',
+        },
+        {
+          title: 'Connect',
+          text: 'I connected real-time inference to the robot through the Spot SDK and a gRPC connection, using a multithreaded pipeline with a lock-free inference queue.',
+        },
+        {
+          title: 'Fetch',
+          text: 'Spot finds the toy and retrieves it on its own, with a victory dance when the detection is over 70% confident.',
+        },
+      ],
+      safety: 'I added movement controls, an emergency kill-switch, and automatic power-down logic.',
+      outcome:
+        'I presented it live at IBM DevCon and to IBM’s interns, and open-sourced the model weights, training pipeline, and deployment docs. IBM sales and client-success teams adopted the demo.',
+      stack: ['YOLO11', 'Python', 'OpenCV', 'LabelImg', 'Spot SDK', 'gRPC'],
+    },
   },
   {
     title: 'Income Risk Hedging Engine',

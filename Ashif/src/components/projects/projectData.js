@@ -115,6 +115,9 @@ const HASH = /^#project\/([a-z0-9-]+)$/i;
 
 export const projectHash = (slug) => `#project/${slug}`;
 
+/** The project's own page, if it has a case study (see routes.js). */
+export const caseStudyPath = (project) => (project.caseStudy ? `/projects/${project.slug}/` : null);
+
 export const findProject = (slug) => projects.find((p) => p.slug === slug) ?? null;
 
 /** The slug in a `#project/<slug>` hash, if it names a real project. */
