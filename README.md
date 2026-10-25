@@ -18,8 +18,10 @@ npm run build     # outputs Ashif/dist
 
 - React 19 + Vite 7, Tailwind CSS v4, `motion` for UI animation.
 - three.js for the hero: a procedurally modeled Spot-style robot that fetches a
-  toy wherever you click. It's code-split, loads after first paint behind a
-  static poster, and pauses when off-screen.
+  toy you drag into place or throw with a click, then dances with it. It's
+  code-split, loads after first paint behind a static poster, pauses when
+  off-screen, and stays on the poster (with a "Run demo" button) on software
+  WebGL or very slow devices.
 - Mona Sans (text) through Fontsource, and Hubot Sans (display) as two static
   cuts made by `Ashif/scripts/subset-hubot.py` (42 KB instead of the 93 KB
   variable file). Code and key caps use the system monospace font.
