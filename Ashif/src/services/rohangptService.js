@@ -247,7 +247,7 @@ const ANSWERS = {
 
   education: () =>
     paragraphs(
-      `I’m studying for ${article(education.degree)} ${education.degree.replace(/^(B\.[AS]\.)\s+/, '$1 in ')} with a ${education.minor} at ${profile.school}. I’m ${lowerFirst(education.accelerated)} My GPA is ${education.gpa}/${education.gpaScale}.`,
+      `I’m studying for ${article(education.degree)} ${education.degree.replace(/^(B\.[AS]\.)\s+/, '$1 in ')} as a double major at ${profile.school}. I’m ${lowerFirst(education.accelerated)} My GPA is ${education.gpa}/${education.gpaScale}.`,
       `Coursework includes ${joinAnd(education.coursework.slice(0, 6))}, plus the graduate course ${education.graduateCourse.title}.`
     ),
 
@@ -278,7 +278,7 @@ const ANSWERS = {
 
   /** What he does now: a student; past roles stay in the past tense. */
   current: () => {
-    const student = `I’m a computer science student at ${profile.school}, graduating in ${profile.graduation}.`;
+    const student = `I’m a math and computer science double major at ${profile.school}, graduating in ${profile.graduation}.`;
     const ongoing = workExperience.filter((job) => hasRealDate(job.date) && !hasEnded(job.date));
     if (ongoing.length) return paragraphs(student, ongoing.map(roleSentence).join(' '));
 

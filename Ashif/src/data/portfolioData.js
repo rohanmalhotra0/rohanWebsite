@@ -14,11 +14,11 @@ export const profile = {
   headline: 'Applied AI, quantitative systems, and robotics.',
   /** Hero line: leads with the IBM robotics and Kalshi work, in past tense. */
   intro:
-    'I’m a computer science student at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
+    'I’m a math and computer science double major at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
   school: 'NYU Courant',
   graduation: 'May 2027',
   summary:
-    'I’m a computer science student at NYU Courant. Lately I’ve been building Oracle finance tools, computer-vision systems for Boston Dynamics Spot, and quantitative research software.',
+    'I’m a math and computer science double major at NYU Courant. Lately I’ve been building Oracle finance tools, computer-vision systems for Boston Dynamics Spot, and quantitative research software.',
 };
 
 export const heroStats = [
@@ -589,8 +589,8 @@ export const affiliations = ['IBM', 'Kalshi', 'Virginia Tech Hume Center', 'NYU 
 export const education = {
   school: 'New York University',
   college: 'Courant Institute of Mathematical Sciences',
-  degree: 'B.A. Computer Science',
-  minor: 'Mathematics minor',
+  degree: 'B.A. Mathematics and Computer Science',
+  minor: 'Double Major',
   gpa: '3.7',
   gpaScale: '4.0',
   start: '2024-08-01',
