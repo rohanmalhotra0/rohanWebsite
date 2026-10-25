@@ -81,9 +81,11 @@ export default function Education() {
           {graduateCourse ? (
             <Row delay={0.1} label={<h4 className={LABEL}>Graduate course</h4>}>
               <p className="text-base font-medium leading-7 text-fg">{graduateCourse.title}</p>
-              <p className="mt-1 max-w-xl text-pretty text-[15px] leading-6 text-muted">
-                {graduateCourse.description}
-              </p>
+              {graduateCourse.description ? (
+                <p className="mt-1 max-w-xl text-pretty text-[15px] leading-6 text-muted">
+                  {graduateCourse.description}
+                </p>
+              ) : null}
             </Row>
           ) : null}
 

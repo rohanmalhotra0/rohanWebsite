@@ -17,16 +17,8 @@ export const profile = {
     'I’m a math and computer science double major at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
   school: 'NYU Courant',
   graduation: 'May 2027',
-  summary:
-    'I’m a math and computer science double major at NYU Courant. Lately I’ve been building Oracle finance tools, computer-vision systems for Boston Dynamics Spot, and quantitative research software.',
 };
 
-export const heroStats = [
-  { value: 99.5, decimals: 1, suffix: '%', label: 'mAP@50 on the Spot vision model' },
-  { value: 95.0, decimals: 1, suffix: '%', label: 'EPM task accuracy after fine-tuning, up from 36.7%' },
-  { value: 26, label: 'projects on this site' },
-  { value: 3, label: 'years to finish the NYU degree' },
-];
 
 export const photos = [
   {
@@ -579,7 +571,7 @@ export const sections = [
   { id: 'research', label: 'Research' },
   { id: 'about', label: 'About' },
   { id: 'education', label: 'Education' },
-  { id: 'rohangpt', label: 'Ask me' },
+  { id: 'rohangpt', label: 'Chat' },
   { id: 'contact', label: 'Contact' },
 ];
 
@@ -601,7 +593,6 @@ export const education = {
   accelerated: 'I’m finishing the degree in three years.',
   graduateCourse: {
     title: 'Mathematical Techniques for CS Applications',
-    description: 'Advanced mathematical tools for algorithms, modeling, and computation.',
   },
   coursework: [
     'Algorithms',

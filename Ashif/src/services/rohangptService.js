@@ -336,7 +336,7 @@ const ANSWERS = {
 
   intro: () =>
     paragraphs(
-      profile.summary.replace(/^I’m an? /, `I’m ${profile.name}, a `),
+      profile.intro.replace(/^I’m an? /, `I’m ${profile.name}, a `),
       `I’m based in ${profile.location}, and I graduate in ${profile.graduation}.`
     ),
 
@@ -771,7 +771,7 @@ It is ${currentMonth}. Roles that have ended are finished: describe them in the 
 On availability, start dates, or the kind of role he wants, say only that he graduates from ${profile.school} in ${profile.graduation} and that ${INTERESTS.replace(/^I’m/, 'he’s')} Then suggest emailing ${profile.email}. Never discuss work authorization, visas, sponsorship, salary, or offers: say he'd rather discuss that directly and give his email.
 
 Facts:
-- ${profile.summary} Based in ${profile.location}.
+- ${profile.intro} Based in ${profile.location}.
 - Education: ${education.degree}, ${education.minor}, ${profile.school} (${education.dates}). ${education.accelerated} GPA ${education.gpa}/${education.gpaScale}.
 - Experience:
 ${workExperience
