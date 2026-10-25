@@ -25,7 +25,7 @@ export default function About() {
 
           <Reveal
             as="p"
-            className="text-pretty text-[1.375rem] font-[450] leading-[1.42] tracking-[-0.012em] text-fg sm:text-2xl md:col-span-11 md:row-start-2 lg:col-span-6 xl:text-[1.75rem] xl:leading-[1.38]"
+            className="max-w-[28em] text-pretty text-[1.375rem] font-[450] leading-[1.42] tracking-[-0.012em] text-fg sm:text-2xl md:col-span-11 md:row-start-2 lg:col-span-6 xl:text-[1.75rem] xl:leading-[1.38]"
           >
             {tie(
               'I learn by building. If I get curious about prediction markets, I make a hedging model. If I want to understand computer vision, I train a robot to find a toy. This site is basically the trail of whatever I was trying to figure out next.'
@@ -34,17 +34,21 @@ export default function About() {
 
           <Reveal
             delay={0.08}
-            className="md:col-span-5 md:col-start-8 md:row-start-3 lg:row-span-3 lg:row-start-1"
+            className="flex flex-col md:col-span-5 md:col-start-8 md:row-start-3 lg:row-span-3 lg:row-start-1"
           >
-            <img
-              src={portrait.src}
-              alt={portrait.alt}
-              width={portrait.width}
-              height={portrait.height}
-              loading="lazy"
-              decoding="async"
-              className="aspect-[4/5] w-full rounded-lg bg-surface-2 object-cover object-[50%_20%] outline -outline-offset-1 outline-fg/10 md:aspect-[2/3]"
-            />
+            {/* At least 2:3 on desktop; grows taller (cropping the sides) if the text
+                column ever outgrows it, so the bottom lines still meet. */}
+            <div className="relative aspect-[4/5] rounded-lg bg-surface-2 lg:aspect-[2/3] lg:grow">
+              <img
+                src={portrait.src}
+                alt={portrait.alt}
+                width={portrait.width}
+                height={portrait.height}
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 size-full rounded-lg object-cover object-[50%_20%] outline -outline-offset-1 outline-fg/10"
+              />
+            </div>
             <MetaLine className="mt-4" />
           </Reveal>
 
@@ -62,9 +66,10 @@ export default function About() {
                 'Right now I’m finishing my last year at NYU and trying not to turn every random idea into another side project.'
               )}
             </p>
-            {/* Sits at the bottom of the column, in space the portrait already takes up,
-                so it can appear (or not) without moving anything. */}
-            <GitHubActivity className="md:mt-auto" />
+            {/* Desktop: pinned to the bottom of the column, level with the line under the
+                portrait, in space that is reserved, so it can appear (or not) without
+                moving anything. Narrower screens: it follows the text, in free space. */}
+            <GitHubActivity className="lg:mt-auto lg:flex lg:min-h-28 lg:flex-col lg:justify-end" />
           </Reveal>
         </div>
 
