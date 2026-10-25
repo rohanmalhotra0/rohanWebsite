@@ -70,10 +70,12 @@ function Slider({ id, label, value, min, max, onChange, display, valueText, mark
           <span
             key={mark.key}
             aria-hidden="true"
-            className="pointer-events-none absolute top-full -mt-1 flex -translate-x-[5px] items-center gap-1 whitespace-nowrap font-mono text-[11px] leading-4"
-            style={{ left: at(mark.value), color: mark.color }}
+            className="pointer-events-none absolute top-full -mt-1 flex -translate-x-[5px] items-center gap-1 whitespace-nowrap font-mono text-[11px] leading-4 text-fg"
+            style={{ left: at(mark.value) }}
           >
-            <span className="text-[10px]">▲</span>
+            <svg viewBox="0 0 10 9" className="size-2.5" style={{ fill: mark.color }}>
+              <path d="M5 0l5 9H0z" />
+            </svg>
             {mark.label}
           </span>
         ))}
@@ -159,7 +161,7 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
         <p className="text-pretty text-[15px] leading-6 text-muted md:col-span-2 lg:col-span-4">
           {edge > 0 ? (
             <>
-              A {edge}-point edge. Kelly says bet <span className="font-mono font-bold text-accent">{pct(fStar)}</span>{' '}
+              A {edge}-point edge. Kelly says bet <span className="font-mono font-bold text-fg">{pct(fStar)}</span>{' '}
               of your money each time: <span className="whitespace-nowrap font-mono text-fg">f* = (p − c)/(1 − c)</span>.
               {price === 50 ? ' At 50¢ that’s the paper’s even-money bet, f* = p − q.' : ''}
             </>
@@ -235,7 +237,7 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
         </p>
         <p className="mt-1 text-pretty text-[13px] leading-5 text-muted">
           At 2× Kelly your edge is gone: long-run growth is about zero. Past 2×, you lose money in the long run, even with
-          an edge. Simulated coin flips; illustration, not advice.
+          an edge. Simulated coin flips.
         </p>
       </div>
 
@@ -255,14 +257,14 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
               marks={
                 fStar > 0
                   ? [
-                      { key: 'kelly', label: 'Kelly', value: Math.round(fStar * 100), color: 'var(--accent)' },
+                      { key: 'kelly', label: 'Kelly', value: Math.round(fStar * 100), color: 'var(--fg)' },
                       ...(fZero - fStar > 0.06
                         ? [
                             {
                               key: 'zero',
                               label: fZero - fStar > 0.24 ? 'broke' : '',
                               value: Math.round(fZero * 100),
-                              color: 'var(--toy)',
+                              color: 'var(--stop)',
                             },
                           ]
                         : []),
@@ -273,7 +275,7 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
           </div>
           <p className="min-h-12 text-pretty text-[15px] leading-6 text-fg">{words}</p>
           <dl className="grid grid-cols-2 gap-x-5 gap-y-6">
-            <Readout label="Typical growth per bet" value={signedPercent(rate)} tone={rate < 0 ? 'text-toy' : 'text-accent'} />
+            <Readout label="Typical growth per bet" value={signedPercent(rate)} tone={rate < 0 ? 'text-stop' : 'text-accent'} />
             <Readout label={`Typical bankroll after ${STEPS} bets`} value={multiple(Math.exp(STEPS * growth(p, c, f)))} />
           </dl>
         </div>

@@ -89,12 +89,12 @@ export default function GrowthCurve({ p, c, f, onChange, markers = [], compact =
           <rect x={X0} y={Y0 - 12} width={X1 - X0} height={Y1 - Y0 + 12} />
         </clipPath>
         <linearGradient id={`${id}-gain`} x1="0" y1={Y0} x2="0" y2={zero} gradientUnits="userSpaceOnUse">
-          <stop offset="0" style={{ stopColor: 'var(--spot)', stopOpacity: 0.75 }} />
-          <stop offset="1" style={{ stopColor: 'var(--spot)', stopOpacity: 0.12 }} />
+          <stop offset="0" style={{ stopColor: 'var(--c5)', stopOpacity: 0.6 }} />
+          <stop offset="1" style={{ stopColor: 'var(--c5)', stopOpacity: 0.08 }} />
         </linearGradient>
         <linearGradient id={`${id}-loss`} x1="0" y1={zero} x2="0" y2={Y1} gradientUnits="userSpaceOnUse">
-          <stop offset="0" style={{ stopColor: 'var(--toy)', stopOpacity: 0.12 }} />
-          <stop offset="1" style={{ stopColor: 'var(--toy)', stopOpacity: 0.5 }} />
+          <stop offset="0" style={{ stopColor: 'var(--stop)', stopOpacity: 0.12 }} />
+          <stop offset="1" style={{ stopColor: 'var(--stop)', stopOpacity: 0.5 }} />
         </linearGradient>
       </defs>
 
@@ -126,8 +126,8 @@ export default function GrowthCurve({ p, c, f, onChange, markers = [], compact =
       </text>
 
       {/* Break-even: past it, growth is negative. */}
-      <circle cx={xOf(fZero)} cy={zero} r="4.5" fill="var(--surface)" stroke="var(--toy)" strokeWidth="2.5" />
-      <text x={xOf(fZero) + (zeroAnchor === 'start' ? 26 : -12)} y={zero + 24} fontSize="13" textAnchor={zeroAnchor} fill="var(--toy)">
+      <circle cx={xOf(fZero)} cy={zero} r="4.5" fill="var(--surface)" stroke="var(--stop)" strokeWidth="2.5" />
+      <text x={xOf(fZero) + (zeroAnchor === 'start' ? 26 : -12)} y={zero + 24} fontSize="13" textAnchor={zeroAnchor} fill="var(--fg)">
         Past {pct(fZero)}, you go broke
       </text>
 
@@ -148,8 +148,8 @@ export default function GrowthCurve({ p, c, f, onChange, markers = [], compact =
       </text>
 
       {/* Your bet. */}
-      <line x1={xOf(f)} y1={zero} x2={xOf(f)} y2={handleY} stroke={losing ? 'var(--toy)' : 'var(--fg)'} strokeWidth="1.5" strokeDasharray="3 4" />
-      <circle cx={xOf(f)} cy={handleY} r="10" fill={losing ? 'var(--toy)' : 'var(--fg)'} stroke="var(--surface)" strokeWidth="3" className="cursor-ew-resize" />
+      <line x1={xOf(f)} y1={zero} x2={xOf(f)} y2={handleY} stroke={losing ? 'var(--stop)' : 'var(--accent)'} strokeWidth="1.5" strokeDasharray="3 4" />
+      <circle cx={xOf(f)} cy={handleY} r="10" fill={losing ? 'var(--stop)' : 'var(--accent)'} stroke="var(--surface)" strokeWidth="3" className="cursor-ew-resize" />
     </svg>
   );
 }

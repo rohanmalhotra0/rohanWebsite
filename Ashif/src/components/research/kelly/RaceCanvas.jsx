@@ -65,7 +65,7 @@ export default function RaceCanvas({ paths, colors, names, dashes = [], runKey, 
       for (let e = Math.ceil(bottom); e <= Math.floor(top); e++) {
         const yy = y(10 ** e);
         const ruinLine = e === -2;
-        ctx.strokeStyle = ruinLine ? color('--toy') : e === 0 ? color('--subtle') : color('--line');
+        ctx.strokeStyle = ruinLine ? color('--stop') : e === 0 ? color('--subtle') : color('--line');
         ctx.lineWidth = 1;
         ctx.setLineDash(e === 0 || ruinLine ? [4, 4] : []);
         ctx.beginPath();
@@ -73,7 +73,7 @@ export default function RaceCanvas({ paths, colors, names, dashes = [], runKey, 
         ctx.lineTo(PAD.left + plotW, yy);
         ctx.stroke();
         if (e % every === 0 || e === 0 || ruinLine) {
-          ctx.fillStyle = ruinLine ? color('--toy') : e === 0 ? color('--fg') : color('--subtle');
+          ctx.fillStyle = ruinLine ? color('--muted') : e === 0 ? color('--fg') : color('--subtle');
           ctx.fillText(ruinLine ? 'ruin' : powerLabel(e), PAD.left - 8, yy);
         }
       }
@@ -120,10 +120,11 @@ export default function RaceCanvas({ paths, colors, names, dashes = [], runKey, 
           ctx.arc(hx, hy, 4, 0, Math.PI * 2);
           ctx.fill();
         }
-        heads.push({ x: hx, y: hy, tone, text: `${labels[i]} ${isOut ? 'ruined' : multiple(path[end])}` });
+        heads.push({ x: hx, y: hy, tone, dash: patterns[i], text: `${labels[i]} ${isOut ? 'ruined' : multiple(path[end])}` });
       });
 
-      // Labels beside the heads, nudged apart so they don't collide.
+      // Labels beside the heads, nudged apart so they don't collide: a short
+      // stroke of the line's color, then the words in the text color.
       ctx.font = `600 12px ${mono}`;
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'left';
@@ -133,14 +134,24 @@ export default function RaceCanvas({ paths, colors, names, dashes = [], runKey, 
         heads[i].ly = Math.max(heads[i].y, prev + 15);
         prev = heads[i].ly;
       }
+      const SWATCH = 12;
       for (const h of heads) {
-        const lx = Math.min(h.x + 9, width - ctx.measureText(h.text).width - 2);
+        const textWidth = ctx.measureText(h.text).width;
+        const lx = Math.min(h.x + 9, width - textWidth - SWATCH - 6);
         ctx.fillStyle = color('--surface');
         ctx.globalAlpha = 0.85;
-        ctx.fillRect(lx - 3, h.ly - 8, ctx.measureText(h.text).width + 6, 16);
+        ctx.fillRect(lx - 3, h.ly - 8, textWidth + SWATCH + 10, 16);
         ctx.globalAlpha = 1;
-        ctx.fillStyle = h.tone;
-        ctx.fillText(h.text, lx, h.ly);
+        ctx.strokeStyle = h.tone;
+        ctx.lineWidth = 3;
+        ctx.setLineDash(h.dash ? [4, 2] : []);
+        ctx.beginPath();
+        ctx.moveTo(lx, h.ly);
+        ctx.lineTo(lx + SWATCH - 2, h.ly);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = color('--fg');
+        ctx.fillText(h.text, lx + SWATCH + 3, h.ly);
       }
     };
 

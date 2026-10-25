@@ -28,9 +28,9 @@ function Lopsided({ p, c }) {
   }
   const area = `M${X0},${zero}L${points.join('L')}L${X1},${zero}Z`;
   const marks = [
-    { m: 0.5, label: '½ Kelly', color: 'var(--fg)' },
-    { m: 1, label: 'Kelly', color: 'var(--accent)' },
-    { m: 2, label: '2×', color: 'var(--toy)' },
+    { m: 0.5, label: '½ Kelly', color: 'var(--c5)' },
+    { m: 1, label: 'Kelly', color: 'var(--fg)' },
+    { m: 2, label: '2×', color: 'var(--c4)' },
   ];
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="mx-auto block h-auto w-full max-w-[24rem]" aria-hidden="true">
@@ -46,8 +46,8 @@ function Lopsided({ p, c }) {
         </clipPath>
       </defs>
       <g clipPath="url(#lopsided-plot)">
-        <path d={area} clipPath="url(#lopsided-above)" fill="var(--spot)" opacity="0.35" />
-        <path d={area} clipPath="url(#lopsided-below)" fill="var(--toy)" opacity="0.32" />
+        <path d={area} clipPath="url(#lopsided-above)" fill="var(--c5)" opacity="0.3" />
+        <path d={area} clipPath="url(#lopsided-below)" fill="var(--stop)" opacity="0.3" />
         <path d={`M${points.join('L')}`} fill="none" stroke="var(--fg)" strokeWidth="2.25" />
       </g>
       <line x1={X0} y1={zero} x2={X1} y2={zero} stroke="var(--line-strong)" />
@@ -88,13 +88,13 @@ function Bar({ label, share }) {
     <div>
       <div className="flex items-baseline justify-between text-sm">
         <span className="text-muted">{label}</span>
-        <span className={`font-mono font-bold tabular-nums ${share < 0 ? 'text-stop' : 'text-fg'}`}>{signedShare(share)}</span>
+        <span className="font-mono font-bold tabular-nums text-fg">{signedShare(share)}</span>
       </div>
       <div className="relative mt-1.5 h-3 rounded-full bg-surface-2">
         <span aria-hidden="true" className="absolute inset-y-[-3px] w-px bg-line-strong" style={{ left: `${ZERO}%` }} />
         <span
           aria-hidden="true"
-          className={`absolute inset-y-0 rounded-full transition-[left,width] duration-200 ease-out motion-reduce:transition-none ${share < 0 ? 'bg-toy' : 'bg-spot'}`}
+          className={`absolute inset-y-0 rounded-full transition-[left,width] duration-200 ease-out motion-reduce:transition-none ${share < 0 ? 'bg-stop' : 'bg-c5'}`}
           style={{ left: `${left}%`, width: `${width}%` }}
         />
       </div>

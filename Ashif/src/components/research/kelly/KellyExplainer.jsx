@@ -37,6 +37,7 @@ export default function KellyExplainer({ className }) {
 
       <div className="mt-10 sm:mt-12">
         <KellyLab price={price} setPrice={setPrice} chance={chance} setChance={setChance} />
+        <p className="mt-3 text-[13px] leading-5 text-subtle">Illustration, not advice.</p>
       </div>
 
       <KellyOdds price={price} chance={chance} />

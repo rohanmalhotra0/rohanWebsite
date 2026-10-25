@@ -9,6 +9,20 @@ import { betsFor, STEPS, STRATEGIES } from './strategies';
 
 const RUNS = 1000;
 
+/** A bankroll multiple; under ×1 it gets a red down-marker (the number stays in the text color, for contrast). */
+function Result({ value }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {value < 1 ? (
+        <svg aria-hidden="true" viewBox="0 0 10 9" className="size-2.5 shrink-0" style={{ fill: 'var(--stop)' }}>
+          <path d="M0 0h10L5 9z" />
+        </svg>
+      ) : null}
+      {multiple(value)}
+    </span>
+  );
+}
+
 /** A share as a bar inside its cell. */
 function Share({ value, tone }) {
   return (
@@ -50,20 +64,20 @@ export default function KellyOdds({ price, chance }) {
             <dl className="mt-3 space-y-2.5 text-[13px]">
               <div>
                 <dt className="text-muted">Typical result</dt>
-                <dd className={`font-mono text-lg font-bold tabular-nums ${rows[i].median < 1 ? 'text-stop' : 'text-fg'}`}>
-                  {multiple(rows[i].median)}
+                <dd className="font-mono text-lg font-bold tabular-nums text-fg">
+                  <Result value={rows[i].median} />
                 </dd>
               </div>
               <div>
                 <dt className="text-muted">Ever drops to half your money</dt>
                 <dd className="mt-1">
-                  <Share value={rows[i].halved} tone="var(--spot)" />
+                  <Share value={rows[i].halved} tone="var(--fg)" />
                 </dd>
               </div>
               <div>
                 <dt className="text-muted">Ruined (down 99%)</dt>
                 <dd className="mt-1">
-                  <Share value={rows[i].ruined} tone="var(--toy)" />
+                  <Share value={rows[i].ruined} tone="var(--stop)" />
                 </dd>
               </div>
             </dl>
@@ -105,14 +119,14 @@ export default function KellyOdds({ price, chance }) {
                   </span>
                 </th>
                 <td className="px-3 py-3.5 font-mono tabular-nums text-muted">{Math.round(rows[i].f * 100)}%</td>
-                <td className={`px-3 py-3.5 font-mono font-bold tabular-nums ${rows[i].median < 1 ? 'text-stop' : 'text-fg'}`}>
-                  {multiple(rows[i].median)}
+                <td className="px-3 py-3.5 font-mono font-bold tabular-nums text-fg">
+                  <Result value={rows[i].median} />
                 </td>
                 <td className="px-3 py-3.5">
-                  <Share value={rows[i].halved} tone="var(--spot)" />
+                  <Share value={rows[i].halved} tone="var(--fg)" />
                 </td>
                 <td className="px-5 py-3.5">
-                  <Share value={rows[i].ruined} tone="var(--toy)" />
+                  <Share value={rows[i].ruined} tone="var(--stop)" />
                 </td>
               </tr>
             ))}

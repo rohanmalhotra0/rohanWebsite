@@ -26,7 +26,9 @@
  *   robot-toy                its toy, where the accent won't show (else accent)
  *
  * The home hero's lab panel (.hero-lab, below) and the Spot story's fixed
- * object colors (the end of this file) are set here too.
+ * object colors (the end of this file) are set here too. A region marked
+ * data-theme="dark" inside the page (the labs on the research page) takes
+ * its palette's dark theme, whatever the page's theme.
  */
 
 /* The palette's swatch (the navbar button, drawn from CSS so it is right at
@@ -112,7 +114,8 @@
   --robot: #f4a11c;
 }
 
-[data-palette="paper"][data-theme="dark"] {
+[data-palette="paper"][data-theme="dark"],
+[data-palette="paper"] [data-theme="dark"] {
   color-scheme: dark;
   --bg: #0e0e0d;
   --surface: #161615;
@@ -177,7 +180,8 @@
   --robot-toy: #ff6a1f;
 }
 
-[data-palette="spot"][data-theme="dark"] {
+[data-palette="spot"][data-theme="dark"],
+[data-palette="spot"] [data-theme="dark"] {
   color-scheme: dark;
   --bg: #111214;
   --surface: #18191c;
@@ -240,7 +244,8 @@
   --robot: #1fbf63;
 }
 
-[data-palette="terminal"][data-theme="dark"] {
+[data-palette="terminal"][data-theme="dark"],
+[data-palette="terminal"] [data-theme="dark"] {
   color-scheme: dark;
   --bg: #060b17;
   --surface: #0b1221;
@@ -305,7 +310,8 @@
   --robot-toy: #b98aff;
 }
 
-[data-palette="courant"][data-theme="dark"] {
+[data-palette="courant"][data-theme="dark"],
+[data-palette="courant"] [data-theme="dark"] {
   color-scheme: dark;
   --bg: #110a1b;
   --surface: #180f26;
@@ -368,7 +374,8 @@
   --robot: #14a394;
 }
 
-[data-palette="market"][data-theme="dark"] {
+[data-palette="market"][data-theme="dark"],
+[data-palette="market"] [data-theme="dark"] {
   color-scheme: dark;
   --bg: #061514;
   --surface: #0b1e1d;
