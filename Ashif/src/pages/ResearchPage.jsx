@@ -1,12 +1,13 @@
 import { Container, PageHeader } from '@/components/primitives/Section';
 import KellyExplainer from '@/components/research/kelly/KellyExplainer';
 import Research from '@/components/research/Research';
+import { routeById } from '@/routes';
 
 export default function ResearchPage() {
   return (
     <>
       <PageHeader
-        title="Research"
+        route={routeById('research')}
         description="Two are published on VTechWorks, Virginia Tech’s research repository. The newest came out of my work at Kalshi."
       />
       <Container className="pb-20 sm:pb-28">

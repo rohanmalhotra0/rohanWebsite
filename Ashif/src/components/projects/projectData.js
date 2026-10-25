@@ -52,6 +52,22 @@ export const focalPoint = (project) => FOCAL_POINTS[project.slug] ?? '50% 50%';
 /** Shared layoutId for a featured cover and the viewer image it flies into. */
 export const mediaLayoutId = (slug) => `project-media-${slug}`;
 
+// Each category takes one of the palette's five category colors (c1–c5),
+// grouped by kind of work: the two AI categories share one, as do the two
+// numbers-heavy ones.
+const CATEGORY_COLOR = {
+  'AI & systems': 'c1',
+  'AI & robotics': 'c1',
+  Quant: 'c2',
+  Data: 'c2',
+  Education: 'c3',
+  Web: 'c4',
+  Systems: 'c5',
+};
+
+/** The CSS color for a project category, from the active palette. */
+export const categoryColor = (category) => `var(--${CATEGORY_COLOR[category] ?? 'c5'})`;
+
 /** "AI & systems · 2026", or just the category when the year is unknown. */
 export const projectMeta = (project) => [project.category, project.year].filter(Boolean).join(' · ');
 

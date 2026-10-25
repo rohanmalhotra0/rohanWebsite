@@ -61,7 +61,7 @@ export default function CommandPalette({ open, onClose }) {
 }
 
 function Palette({ dialogRef, inputRef, requestClose }) {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, palette, toggleTheme, setPalette } = useTheme();
   const reduceMotion = useReducedMotion();
   const rootRef = useRef(null);
   const listRef = useRef(null);
@@ -76,7 +76,7 @@ function Palette({ dialogRef, inputRef, requestClose }) {
 
   useVisualViewportHeight(rootRef);
 
-  const items = useMemo(() => getPaletteItems(theme), [theme]);
+  const items = useMemo(() => getPaletteItems(theme, palette), [theme, palette]);
   const { groups, flat, count } = useMemo(() => searchPalette(query, items), [query, items]);
   const activeEntry = flat[activeIndex] ?? flat[0];
   const hasQuery = query.trim().length > 0;
@@ -149,6 +149,12 @@ function Palette({ dialogRef, inputRef, requestClose }) {
         copyText(action.text).then((ok) => {
           setCopied({ id: item.id, ok });
           setAnnouncement(ok ? 'Email copied' : 'Could not copy the email');
+        });
+        break;
+      case 'palette':
+        // Like the theme: switch once the palette is gone, growing from the swatch button.
+        requestClose({
+          after: () => setPalette(action.id, centerOf(document.querySelector('[data-palette-button]'))),
         });
         break;
       case 'theme':

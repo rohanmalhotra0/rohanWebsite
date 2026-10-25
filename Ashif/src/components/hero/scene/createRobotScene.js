@@ -690,7 +690,9 @@ export function createRobotScene({
   function applyPalette(p) {
     stage?.setPalette(p);
     feed?.setPalette(p);
-    toyMaterial.color.set(p.accent);
+    toyMaterial.color.set(p.toy ?? p.accent);
+    // Each palette repaints the robot (Spot yellow, Terminal green, …).
+    if (p.robot) materials.paint.color.set(p.robot);
   }
 
   // Boot ------------------------------------------------------------------
@@ -867,10 +869,15 @@ export function createRobotScene({
     if (ready && !lost) frame(0);
   }
 
-  // Follow the theme attribute directly, so the canvas recolours in the same
-  // frame as the page (including inside the theme view transition).
-  const themeObserver = new MutationObserver(() => setPalette(readPalette()));
-  if (!poster) themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  // Follow the theme and palette attributes directly, so the canvas recolours
+  // in the same frame as the page (including inside the view transition).
+  const themeObserver = new MutationObserver(() => setPalette(readPalette(host)));
+  if (!poster) {
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'data-palette'],
+    });
+  }
 
   return {
     canvas,

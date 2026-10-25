@@ -297,7 +297,7 @@ export default function PhotoDeck({ photos, className }) {
                 onClick={() => showPhoto(index)}
                 className={cn(
                   'block size-12 overflow-hidden rounded-md bg-surface-2 ring-offset-2 ring-offset-bg transition-[box-shadow,opacity] duration-200 sm:size-14',
-                  index === top ? 'ring-2 ring-accent' : 'opacity-70 ring-1 ring-line hover:opacity-100'
+                  index === top ? 'ring-2 ring-mark' : 'opacity-70 ring-1 ring-line hover:opacity-100'
                 )}
               >
                 <img
@@ -401,8 +401,26 @@ function Print({
       draggable={false}
       // As tall as the desk allows, and never wider than it.
       style={{ height: `min(70cqh, ${(76 / aspect).toFixed(2)}cqw)` }}
-      className="pointer-events-none block w-auto max-w-none select-none rounded-[2px] bg-surface-2 dark:brightness-[0.92]"
+      className={cn(
+        'pointer-events-none block w-auto max-w-none select-none rounded-[2px] bg-surface-2 transition-[filter] duration-700 ease-out',
+        isTop ? 'dark:brightness-[0.92]' : 'grayscale contrast-[1.08]'
+      )}
     />
+  );
+
+  // Prints under the pile are a duotone in the palette's two photo colors
+  // (shadows in --duo-dark, highlights in --duo-light); the one on top
+  // develops into full color as the tint fades.
+  const tint = cn(
+    'pointer-events-none absolute inset-0 rounded-[2px] transition-opacity duration-700 ease-out',
+    isTop ? 'opacity-0' : 'opacity-100'
+  );
+  const print = (
+    <span className="relative block">
+      {image}
+      <span aria-hidden="true" className={cn(tint, 'bg-[var(--duo-light)] mix-blend-multiply')} />
+      <span aria-hidden="true" className={cn(tint, 'bg-[var(--duo-dark)] mix-blend-screen')} />
+    </span>
   );
 
   return (
@@ -454,10 +472,10 @@ function Print({
           }}
           className={cn('block rounded-[2px] outline-offset-[6px]', !draggable && 'cursor-zoom-in')}
         >
-          {image}
+          {print}
         </button>
       ) : (
-        image
+        print
       )}
     </MotionDiv>
   );

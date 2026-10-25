@@ -1,4 +1,5 @@
 import Reveal from '@/components/primitives/Reveal';
+import CategoryDot from '@/components/projects/CategoryDot';
 import TypeCover from '@/components/projects/TypeCover';
 import { focalPoint, imageSize, projectHash, projectMeta } from '@/components/projects/projectData';
 import { projects, selectedWork } from '@/data/portfolioData';
@@ -57,7 +58,10 @@ function WorkCard({ project }) {
         {project.title}
       </h3>
       <p className="mt-2 line-clamp-3 text-pretty text-[15px] leading-6 text-muted">{project.description}</p>
-      <p className="mt-3 text-sm text-subtle">{projectMeta(project)}</p>
+      <p className="mt-3 flex items-center gap-2 text-sm text-subtle">
+        <CategoryDot category={project.category} />
+        {projectMeta(project)}
+      </p>
     </a>
   );
 }

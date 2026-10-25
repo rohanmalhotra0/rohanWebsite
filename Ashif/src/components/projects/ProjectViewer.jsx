@@ -14,6 +14,7 @@ import {
   projectLinks,
   projectMeta,
 } from './projectData';
+import CategoryDot from './CategoryDot';
 import TypeCover from './TypeCover';
 import { lockScroll, preloadImage } from './viewerDom';
 
@@ -191,7 +192,10 @@ function Slide({ project, viewer, titleId, reduceMotion }) {
           >
             {project.title}
           </h2>
-          <p className="mt-3 text-sm text-subtle">{projectMeta(project)}</p>
+          <p className="mt-3 flex items-center gap-2 text-sm text-subtle">
+            <CategoryDot category={project.category} />
+            {projectMeta(project)}
+          </p>
           <p className="mt-6 max-w-prose text-pretty text-base leading-relaxed text-fg">
             {project.description}
           </p>

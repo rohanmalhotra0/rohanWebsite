@@ -1,0 +1,468 @@
+/*
+ * Palettes. Five named palettes, each with a light and a dark theme, picked
+ * by <html data-palette="…" data-theme="…">. index.html sets both before
+ * first paint from the visitor's saved choice (Spot and light by default).
+ * Components only use the semantic tokens, so a palette recolors the whole
+ * site, the robot included (hero/palette.js reads --bg, --fg, --mark,
+ * --robot and --robot-toy).
+ *
+ * Text pairs are checked by scripts/check-contrast.mjs (npm run contrast):
+ * fg, muted and subtle on bg and surface, accent-strong on bg, each ink on
+ * its fill, and the category colors c1–c5 against the page. Run it after
+ * changing any value here.
+ *
+ *   bg, surface, surface-2   page, raised panels, wells
+ *   fg, muted, subtle        text, secondary text, small print
+ *   line, line-strong        hairlines; input is form-field borders (3:1)
+ *   accent / accent-ink      the palette's signature fill and text on it
+ *   mark                     accent for thin marks (underlines, rings): 3:1
+ *   accent-strong            accent as text, links on hover, focus rings
+ *   accent-2 / accent-2-ink  a second fill
+ *   block-a/b/c, on-block-*  color-block page headers and bands
+ *   c1–c5                    project categories (dots and bars)
+ *   glow-1, glow-2           light pooling on color blocks (decorative)
+ *   duo-dark, duo-light      duotone for the photos under the pile
+ *   robot                    the hero robot's paint
+ *   robot-toy                its toy, where the accent won't show (else accent)
+ *
+ * The home hero's lab panel (.hero-lab, below) and the Spot story's fixed
+ * object colors (the end of this file) are set here too.
+ */
+
+/* The palette's swatch (the navbar button, drawn from CSS so it is right at
+   first paint; the same pairs as PALETTES in lib/theme.js), glows for the
+   mesh on color blocks (index.css), and the duotone for the photos under the
+   pile on the About page. The same in both themes. */
+:root,
+[data-palette="paper"] {
+  --swatch-1: #141414;
+  --swatch-2: #ff5b14;
+  --glow-1: #ff5b14;
+  --glow-2: #5b7bff;
+  --duo-dark: #141414;
+  --duo-light: #ff8a4c;
+}
+
+[data-palette="spot"] {
+  --swatch-1: #ffc700;
+  --swatch-2: #1d1e22;
+  --glow-1: #fff06a;
+  --glow-2: #ff8a1f;
+  --duo-dark: #1d1e22;
+  --duo-light: #ffd23f;
+}
+
+[data-palette="terminal"] {
+  --swatch-1: #3dff8f;
+  --swatch-2: #0d1a33;
+  --glow-1: #3dff8f;
+  --glow-2: #59c2ff;
+  --duo-dark: #0a1630;
+  --duo-light: #5dffa5;
+}
+
+[data-palette="courant"] {
+  --swatch-1: #57068c;
+  --swatch-2: #e3a92f;
+  --glow-1: #f2c14e;
+  --glow-2: #b98aff;
+  --duo-dark: #2b0f4c;
+  --duo-light: #f2c14e;
+}
+
+[data-palette="market"] {
+  --swatch-1: #0c625b;
+  --swatch-2: #ff6b57;
+  --glow-1: #ff7a66;
+  --glow-2: #2dd4bf;
+  --duo-dark: #083b38;
+  --duo-light: #ff8f7d;
+}
+
+/* Paper: warm paper, ink, safety orange. The calm one, and the fallback. */
+:root,
+[data-palette="paper"][data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f2ee;
+  --surface: #faf9f6;
+  --surface-2: #e9e8e3;
+  --fg: #141414;
+  --muted: #55554f;
+  --subtle: #6b6b65;
+  --line: #dcdbd5;
+  --line-strong: #c4c3bc;
+  --accent: #ff5b14;
+  --accent-ink: #141414;
+  --mark: #d24a0d;
+  --accent-strong: #b83a0a;
+  --input: #8c8c86;
+  --accent-2: #2747c9;
+  --accent-2-ink: #ffffff;
+  --block-a: #141414;
+  --on-block-a: #f3f2ee;
+  --block-b: #ff5b14;
+  --on-block-b: #141414;
+  --block-c: #e2e0d8;
+  --on-block-c: #141414;
+  --c1: #d9480f;
+  --c2: #2747c9;
+  --c3: #1f7a45;
+  --c4: #8a3ab9;
+  --c5: #8a6512;
+  --robot: #f4a11c;
+}
+
+[data-palette="paper"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e0e0d;
+  --surface: #161615;
+  --surface-2: #1e1e1c;
+  --fg: #ecebe6;
+  --muted: #a3a29b;
+  --subtle: #8d8c86;
+  --line: #262624;
+  --line-strong: #3a3a37;
+  --accent: #ff6a2b;
+  --accent-ink: #141414;
+  --mark: #ff6a2b;
+  --accent-strong: #ff7a3d;
+  --input: #6b6b67;
+  --accent-2: #7b93ff;
+  --accent-2-ink: #0e0e0d;
+  --block-a: #ecebe6;
+  --on-block-a: #0e0e0d;
+  --block-b: #ff6a2b;
+  --on-block-b: #141414;
+  --block-c: #232321;
+  --on-block-c: #ecebe6;
+  --c1: #ff6a2b;
+  --c2: #7b93ff;
+  --c3: #4cc38a;
+  --c4: #c98bff;
+  --c5: #d6b25e;
+  --robot: #f4a11c;
+}
+
+/* Spot: safety yellow on cream and graphite, like the robot itself. */
+[data-palette="spot"][data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f2e4;
+  --surface: #fffcf2;
+  --surface-2: #ece6d2;
+  --fg: #17181b;
+  --muted: #4d4a41;
+  --subtle: #625e55;
+  --line: #ddd5bd;
+  --line-strong: #c7bd9f;
+  --accent: #ffc700;
+  --accent-ink: #17181b;
+  --mark: #b07d00;
+  --accent-strong: #7a5600;
+  --input: #857c68;
+  --accent-2: #17181b;
+  --accent-2-ink: #ffc700;
+  --block-a: #ffc700;
+  --on-block-a: #17181b;
+  --block-b: #1d1e22;
+  --on-block-b: #ffc700;
+  --block-c: #ff8a1f;
+  --on-block-c: #17181b;
+  --c1: #a97800;
+  --c2: #17181b;
+  --c3: #d9480f;
+  --c4: #2563c9;
+  --c5: #3f7d20;
+  --robot: #ffc400;
+  /* Safety orange, so the toy reads apart from the yellow robot. */
+  --robot-toy: #ff6a1f;
+}
+
+[data-palette="spot"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111214;
+  --surface: #18191c;
+  --surface-2: #212327;
+  --fg: #f3efe3;
+  --muted: #b0ab9c;
+  --subtle: #959083;
+  --line: #2a2c31;
+  --line-strong: #3c3f46;
+  --accent: #ffc700;
+  --accent-ink: #111214;
+  --mark: #ffc700;
+  --accent-strong: #ffd23f;
+  --input: #6e7076;
+  --accent-2: #f3efe3;
+  --accent-2-ink: #111214;
+  --block-a: #ffc700;
+  --on-block-a: #111214;
+  --block-b: #26282d;
+  --on-block-b: #ffc700;
+  --block-c: #ff8a1f;
+  --on-block-c: #111214;
+  --c1: #ffc700;
+  --c2: #e9e5da;
+  --c3: #ff7a3d;
+  --c4: #6ea8ff;
+  --c5: #7bd46a;
+  --robot: #ffc400;
+}
+
+/* Terminal: phosphor green on midnight navy, for the quant side. */
+[data-palette="terminal"][data-theme="light"] {
+  color-scheme: light;
+  --bg: #edf5f0;
+  --surface: #f8fcfa;
+  --surface-2: #dfece5;
+  --fg: #0a1426;
+  --muted: #3b5348;
+  --subtle: #4a6357;
+  --line: #cddfd5;
+  --line-strong: #b1c8bb;
+  --accent: #00c060;
+  --accent-ink: #03140a;
+  --mark: #00994c;
+  --accent-strong: #006b36;
+  --input: #7a9187;
+  --accent-2: #0a4fa3;
+  --accent-2-ink: #ffffff;
+  --block-a: #0a1426;
+  --on-block-a: #3dff8f;
+  --block-b: #00c060;
+  --on-block-b: #03140a;
+  --block-c: #0d2b4a;
+  --on-block-c: #9fe7ff;
+  --c1: #008a45;
+  --c2: #0a5fbf;
+  --c3: #9a6800;
+  --c4: #c2185b;
+  --c5: #6b3fd1;
+  --robot: #1fbf63;
+}
+
+[data-palette="terminal"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #060b17;
+  --surface: #0b1221;
+  --surface-2: #111a2d;
+  --fg: #d9fbe8;
+  --muted: #92b8a6;
+  --subtle: #7ea291;
+  --line: #16213a;
+  --line-strong: #24324f;
+  --accent: #3dff8f;
+  --accent-ink: #03140a;
+  --mark: #3dff8f;
+  --accent-strong: #5effa5;
+  --input: #52688c;
+  --accent-2: #59c2ff;
+  --accent-2-ink: #03101c;
+  --block-a: #0d1a33;
+  --on-block-a: #3dff8f;
+  --block-b: #3dff8f;
+  --on-block-b: #04120b;
+  --block-c: #10263a;
+  --on-block-c: #9fe7ff;
+  --c1: #3dff8f;
+  --c2: #59c2ff;
+  --c3: #ffd166;
+  --c4: #ff6b9a;
+  --c5: #b18cff;
+  --robot: #36e07f;
+}
+
+/* Courant: NYU violet and warm gold, for the math. */
+[data-palette="courant"][data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f1fa;
+  --surface: #fcfaff;
+  --surface-2: #e9e2f2;
+  --fg: #1d1030;
+  --muted: #54476a;
+  --subtle: #65587a;
+  --line: #dcd3e8;
+  --line-strong: #c4b7d7;
+  --accent: #57068c;
+  --accent-ink: #ffffff;
+  --mark: #57068c;
+  --accent-strong: #57068c;
+  --input: #887c9d;
+  --accent-2: #e3a92f;
+  --accent-2-ink: #1d1030;
+  --block-a: #57068c;
+  --on-block-a: #fff4dc;
+  --block-b: #e3a92f;
+  --on-block-b: #1d1030;
+  --block-c: #2b0f4c;
+  --on-block-c: #f2c14e;
+  --c1: #57068c;
+  --c2: #a06d05;
+  --c3: #c2185b;
+  --c4: #1f6fb2;
+  --c5: #2e7d4f;
+  --robot: #e3a92f;
+  /* The accent violet would vanish in the violet lab panel. */
+  --robot-toy: #b98aff;
+}
+
+[data-palette="courant"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #110a1b;
+  --surface: #180f26;
+  --surface-2: #221733;
+  --fg: #f2ebfa;
+  --muted: #b3a5c7;
+  --subtle: #9c8db1;
+  --line: #2a1e3d;
+  --line-strong: #3d2d56;
+  --accent: #b98aff;
+  --accent-ink: #110a1b;
+  --mark: #b98aff;
+  --accent-strong: #c9a3ff;
+  --input: #6e6086;
+  --accent-2: #f2c14e;
+  --accent-2-ink: #110a1b;
+  --block-a: #3b0f68;
+  --on-block-a: #fff0cc;
+  --block-b: #f2c14e;
+  --on-block-b: #1d1030;
+  --block-c: #57068c;
+  --on-block-c: #fff4dc;
+  --c1: #b98aff;
+  --c2: #f2c14e;
+  --c3: #ff7aa8;
+  --c4: #6eb6ff;
+  --c5: #6fd49a;
+  --robot: #e8b23a;
+}
+
+/* Market: teal and coral, for prediction markets. */
+[data-palette="market"][data-theme="light"] {
+  color-scheme: light;
+  --bg: #eef6f4;
+  --surface: #f8fcfb;
+  --surface-2: #dfeeeb;
+  --fg: #082221;
+  --muted: #3a5754;
+  --subtle: #4a6865;
+  --line: #cde2de;
+  --line-strong: #afcac5;
+  --accent: #ff6b57;
+  --accent-ink: #2a0c06;
+  --mark: #e04f3c;
+  --accent-strong: #b0321f;
+  --input: #78938f;
+  --accent-2: #0f766e;
+  --accent-2-ink: #ffffff;
+  --block-a: #0c625b;
+  --on-block-a: #f2fffc;
+  --block-b: #ff6b57;
+  --on-block-b: #2a0c06;
+  --block-c: #083b38;
+  --on-block-c: #ffb4a8;
+  --c1: #0f766e;
+  --c2: #c43d28;
+  --c3: #9a6400;
+  --c4: #3b5bd9;
+  --c5: #8a3fd1;
+  --robot: #14a394;
+}
+
+[data-palette="market"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #061514;
+  --surface: #0b1e1d;
+  --surface-2: #112927;
+  --fg: #e2f4f1;
+  --muted: #9cbab5;
+  --subtle: #84a39e;
+  --line: #173230;
+  --line-strong: #234643;
+  --accent: #ff7a66;
+  --accent-ink: #2a0c06;
+  --mark: #ff7a66;
+  --accent-strong: #ff9483;
+  --input: #567a75;
+  --accent-2: #2dd4bf;
+  --accent-2-ink: #04201d;
+  --block-a: #0f5f58;
+  --on-block-a: #effffb;
+  --block-b: #ff7a66;
+  --on-block-b: #2a0c06;
+  --block-c: #0b2f2c;
+  --on-block-c: #ffb4a8;
+  --c1: #2dd4bf;
+  --c2: #ff7a66;
+  --c3: #f2c14e;
+  --c4: #8ea2ff;
+  --c5: #c79bff;
+  --robot: #22b8a8;
+}
+
+/* The home hero's robot stage. In the light themes the robot stands in a
+   dark lab: the palette's deepest block, its floor lines in that block's
+   bright ink (Spot graphite and yellow, Terminal navy and green, Courant
+   violet and gold, Market deep teal and coral). Dark themes already are one,
+   and Paper keeps the plain page. Inside it the page tokens point at the
+   block (index.css), and hero/palette.js reads them there, so the scene's
+   floor, lighting and posters follow. --lab-ink colors the part of the
+   hero's name that runs onto the panel (Hero.jsx). */
+[data-palette="spot"][data-theme="light"] {
+  --lab-ink: var(--on-block-b);
+}
+
+[data-palette="spot"][data-theme="light"] .hero-lab {
+  @apply block-b mesh grain;
+}
+
+[data-palette="terminal"][data-theme="light"] {
+  --lab-ink: var(--on-block-a);
+}
+
+[data-palette="terminal"][data-theme="light"] .hero-lab {
+  @apply block-a mesh grain;
+}
+
+[data-palette="courant"][data-theme="light"] {
+  --lab-ink: var(--on-block-c);
+}
+
+[data-palette="courant"][data-theme="light"] .hero-lab {
+  @apply block-c mesh grain;
+}
+
+[data-palette="market"][data-theme="light"] {
+  --lab-ink: var(--on-block-c);
+}
+
+[data-palette="market"][data-theme="light"] .hero-lab {
+  @apply block-c mesh grain;
+}
+
+/* The home hero's main button (an ink button, Hero.jsx) is in the palette's
+   accent; Paper, the plain look, keeps the ink. */
+:root:not([data-palette="paper"]) .hero-cta {
+  --fg: var(--accent);
+  --bg: var(--accent-ink);
+}
+
+/* The Spot story's objects (components/projects/spot): the robot's yellow
+   and dark parts, the pink toy, ink for text on either, and the kill-switch
+   red. They're the real things' colors, so they don't follow the palette. */
+:root,
+[data-theme="light"] {
+  --spot: #f6b423;
+  --spot-dark: #27282c;
+  --toy: #f2559f;
+  --on-bright: #141414;
+  --stop: #d92d20;
+}
+
+[data-theme="dark"] {
+  --spot: #f2ad1d;
+  --spot-dark: #4a4c52;
+  --toy: #ff69b0;
+  --on-bright: #141414;
+  /* White E-STOP text needs 4.5:1. */
+  --stop: #da3829;
+}

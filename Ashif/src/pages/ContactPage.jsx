@@ -7,7 +7,7 @@ const route = routeById('contact');
 export default function ContactPage() {
   return (
     <>
-      <PageHeader title="Contact" description={route.description} />
+      <PageHeader route={route} />
       <Container className="pb-20 sm:pb-28">
         <Contact className="mt-12 sm:mt-16" />
       </Container>

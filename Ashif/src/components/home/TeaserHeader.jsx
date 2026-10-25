@@ -9,7 +9,7 @@ export default function TeaserHeader({ id, title, href, linkLabel }) {
         {title}
       </h2>
       <a href={href} className="group -my-2 inline-flex min-h-11 items-center gap-1.5 text-[15px] font-medium text-fg">
-        <span className="link group-hover:decoration-accent">{linkLabel}</span>
+        <span className="link group-hover:decoration-mark">{linkLabel}</span>
         <ArrowRight
           aria-hidden="true"
           strokeWidth={1.75}

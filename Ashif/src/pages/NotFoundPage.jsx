@@ -1,12 +1,13 @@
 import { ArrowRight } from 'lucide-react';
 import { Container, PageHeader } from '@/components/primitives/Section';
-import { navRoutes } from '@/routes';
+import { navRoutes, notFoundRoute } from '@/routes';
 
 /** Any address that isn't a page: say so, and offer every page that is. */
 export default function NotFoundPage() {
   return (
     <>
       <PageHeader
+        route={notFoundRoute}
         title="Page not found"
         description="There’s no page at this address. It may have moved when the site was split into pages."
       />
@@ -18,7 +19,7 @@ export default function NotFoundPage() {
                 href={page.path}
                 className="group flex min-h-14 items-center justify-between gap-4 text-[17px] font-medium text-fg"
               >
-                <span className="link group-hover:decoration-accent">{page.label}</span>
+                <span className="link group-hover:decoration-mark">{page.label}</span>
                 <ArrowRight
                   aria-hidden="true"
                   strokeWidth={1.75}
