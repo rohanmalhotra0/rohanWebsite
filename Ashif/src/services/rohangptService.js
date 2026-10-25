@@ -232,7 +232,10 @@ const ANSWERS = {
     kalshi
       ? paragraphs(
           describeRole(kalshi),
-          hedgingPaper ? endStop(`The paper is ${mdLink(hedgingPaper.title, hedgingPaper.liveUrl)}`) : ''
+          hedgingPaper ? endStop(`The paper is ${mdLink(hedgingPaper.title, hedgingPaper.liveUrl)}`) : '',
+          hedgingPaper?.explainer
+            ? endStop(`There’s a simplified, interactive version on this site: ${mdLink('Hedge your paycheck', hedgingPaper.explainer.href)}`)
+            : ''
         )
       : '',
 

@@ -223,6 +223,8 @@ export const research = [
     imageUrl: assetUrl('img/research/income-hedging.webp'),
     imageAlt: 'First page of the paper',
     liveUrl: assetUrl('papers/hedging-income-risk-prediction-markets.pdf'),
+    // An interactive version on its own page.
+    explainer: { href: '/research/hedge-your-paycheck/', label: 'Try it: Hedge your paycheck' },
     tags: ['Prediction Markets', 'Poisson Process', 'Monte Carlo'],
   },
   {

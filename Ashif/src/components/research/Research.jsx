@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import Reveal from '@/components/primitives/Reveal';
 import { research } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
@@ -43,9 +43,18 @@ function Paper({ paper, index }) {
           <p className="mt-4 max-w-[62ch] text-pretty text-[15px] leading-7 text-muted sm:text-base">
             {paper.description}
           </p>
-          {paper.liveUrl || paper.externalUrl ? (
+          {paper.liveUrl || paper.externalUrl || paper.explainer ? (
             // 44px tap targets; the negative margin keeps the visual rhythm.
             <div className="-mb-3 mt-3 flex flex-wrap gap-x-6">
+              {paper.explainer ? (
+                <a
+                  href={paper.explainer.href}
+                  className="link inline-flex min-h-11 items-center gap-1 text-[15px] font-medium text-fg"
+                >
+                  {paper.explainer.label}
+                  <ArrowRight aria-hidden="true" className="size-4 shrink-0 text-subtle" />
+                </a>
+              ) : null}
               {paper.liveUrl ? (
                 <PaperLink href={paper.liveUrl} title={paper.title}>
                   Read paper (PDF)

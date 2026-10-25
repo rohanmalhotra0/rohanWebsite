@@ -5,6 +5,7 @@
 // company, a tag, an author); `aliases` are synonyms that are only searched.
 
 import {
+  ChartSpline,
   Copy,
   Download,
   FileText,
@@ -116,6 +117,22 @@ const researchItems = research
     action: { type: 'url', href: paper.liveUrl },
   }));
 
+// A paper with an interactive version on the site gets a row for it too.
+const explainerItems = research
+  .filter((paper) => paper.explainer)
+  .map((paper) => ({
+    id: `explainer-${paper.title}`,
+    group: 'research',
+    title: paper.explainer.label.replace(/^Try it:\s*/, ''),
+    meta: 'Interactive',
+    keywords: unique([paper.title, ...(paper.keywords ?? []), ...(paper.tags ?? [])]),
+    aliases: ['interactive', 'simulator', 'hedge', 'hedging', 'paycheck', 'job loss', 'unemployment'],
+    icon: ChartSpline,
+    suggested: true,
+    verb: 'Open',
+    action: { type: 'route', href: paper.explainer.href },
+  }));
+
 const themeItem = (theme) => {
   const next = theme === 'dark' ? 'light' : 'dark';
   return {
@@ -221,6 +238,7 @@ export const getPaletteItems = (theme, palette) => [
   ...projectItems,
   ...actionItems(theme),
   ...paletteItems(palette),
+  ...explainerItems,
   ...researchItems,
   ...goToItems,
 ];

@@ -156,7 +156,7 @@ export default function WhyHalf({ price, chance }) {
               value={real}
               onChange={(event) => setReal(Number(event.target.value))}
               aria-valuetext={`Your real edge is ${real}% of what you think. Full Kelly gets ${signedShare(full)} of the best growth; half Kelly gets ${signedShare(half)}.`}
-              className="kelly-range mt-1 block w-full"
+              className="lab-range mt-1 block w-full"
               style={{ '--val': `${((real - 10) / 140) * 100}%` }}
             />
             <div className="mt-4 space-y-3">

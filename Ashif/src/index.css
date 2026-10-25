@@ -390,23 +390,23 @@ html[data-vt="page"]::view-transition-new(root) {
 
 /* The Kelly explainer's sliders (components/research/kelly): a track that
    fills with the accent up to the value (--val), and a round thumb. */
-.kelly-range {
+.lab-range {
   appearance: none;
   height: 28px;
   background: transparent;
   cursor: pointer;
 }
-.kelly-range::-webkit-slider-runnable-track {
+.lab-range::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 3px;
   background: linear-gradient(to right, var(--accent) var(--val), var(--line-strong) var(--val));
 }
-.kelly-range::-moz-range-track {
+.lab-range::-moz-range-track {
   height: 6px;
   border-radius: 3px;
   background: linear-gradient(to right, var(--accent) var(--val), var(--line-strong) var(--val));
 }
-.kelly-range::-webkit-slider-thumb {
+.lab-range::-webkit-slider-thumb {
   appearance: none;
   width: 22px;
   height: 22px;
@@ -415,21 +415,21 @@ html[data-vt="page"]::view-transition-new(root) {
   background: var(--fg);
   border: 4px solid var(--accent);
 }
-.kelly-range::-moz-range-thumb {
+.lab-range::-moz-range-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
   background: var(--fg);
   border: 4px solid var(--accent);
 }
-.kelly-range:focus-visible {
+.lab-range:focus-visible {
   outline: none;
 }
-.kelly-range:focus-visible::-webkit-slider-thumb {
+.lab-range:focus-visible::-webkit-slider-thumb {
   outline: 2px solid var(--accent-strong);
   outline-offset: 3px;
 }
-.kelly-range:focus-visible::-moz-range-thumb {
+.lab-range:focus-visible::-moz-range-thumb {
   outline: 2px solid var(--accent-strong);
   outline-offset: 3px;
 }

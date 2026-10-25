@@ -10,6 +10,8 @@
 // stake. Then g(f) = p·ln(1 + b·f) + q·ln(1 − f) and f* = (p − c)/(1 − c).
 // At c = 0.5, b = 1 and both reduce to the paper's case.
 
+import { seededRandom } from '@/lib/random';
+
 /** Profit per unit staked when a contract bought at `c` pays out. */
 export const payout = (c) => (1 - c) / c;
 
@@ -69,17 +71,6 @@ export function crossover(p, c) {
   return (lo + hi) / 2;
 }
 
-/** A small seeded random generator (mulberry32): the same numbers everywhere. */
-function random(seed) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 /** A bankroll that falls below this share of where it started is ruined. */
 export const RUIN = 0.01;
 
@@ -94,7 +85,7 @@ export const RUIN = 0.01;
  * to half of the starting money, and are ever ruined.
  */
 export function simulate({ p, c, bets, runs = 1000, steps = 200, seed = 7 }) {
-  const next = random(seed);
+  const next = seededRandom(seed);
   const b = payout(c);
   const n = bets.length;
   const up = bets.map((f) => 1 + b * f);

@@ -5,6 +5,7 @@ import RaceCanvas from './RaceCanvas';
 import { breakEven, growth, kelly, perBet, RUIN, simulate } from './kelly';
 import { multiple, signedPercent } from './format';
 import { betsFor, STEPS, STRATEGIES } from './strategies';
+import { Readout, Slider } from '@/components/research/LabControls';
 
 // The lab, always drawn in the dark theme: set a contract's price and your
 // probability, watch five bettors race on the same coin flips, then try any
@@ -39,58 +40,6 @@ function outcome(paths) {
     ? `${ruined.map((r, i) => `${r.label} ${i === 0 ? 'went broke ' : ''}at bet ${r.at}`).join(', ')}. `
     : 'Nobody went broke this time. ';
   return `${broke}${lead} New flips change the winner; the odds below don’t.`;
-}
-
-function Slider({ id, label, value, min, max, onChange, display, valueText, marks = [] }) {
-  const at = (v) => `calc(11px + (100% - 22px) * ${(v - min) / (max - min)})`;
-  return (
-    <div>
-      <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-sm text-muted">
-          {label}
-        </label>
-        <output htmlFor={id} className="font-mono text-lg font-bold text-fg tabular-nums">
-          {display}
-        </output>
-      </div>
-      <div className="relative mt-1.5">
-        <input
-          id={id}
-          type="range"
-          min={min}
-          max={max}
-          step="1"
-          value={value}
-          onChange={(event) => onChange(Number(event.target.value))}
-          aria-valuetext={valueText}
-          className="kelly-range block w-full"
-          style={{ '--val': `${((value - min) / (max - min)) * 100}%` }}
-        />
-        {marks.map((mark) => (
-          <span
-            key={mark.key}
-            aria-hidden="true"
-            className="pointer-events-none absolute top-full -mt-1 flex -translate-x-[5px] items-center gap-1 whitespace-nowrap font-mono text-[11px] leading-4 text-fg"
-            style={{ left: at(mark.value) }}
-          >
-            <svg viewBox="0 0 10 9" className="size-2.5" style={{ fill: mark.color }}>
-              <path d="M5 0l5 9H0z" />
-            </svg>
-            {mark.label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Readout({ label, value, tone = 'text-fg' }) {
-  return (
-    <div className="flex flex-col-reverse justify-end gap-1">
-      <dt className="text-[13px] leading-5 text-muted">{label}</dt>
-      <dd className={`type-heading text-[1.75rem] leading-none tabular-nums ${tone}`}>{value}</dd>
-    </div>
-  );
 }
 
 const button =
