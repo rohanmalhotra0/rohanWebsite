@@ -17,6 +17,7 @@ import {
   Moon,
   Sun,
 } from 'lucide-react';
+import { caseStudyPath } from '@/components/projects/projectData';
 import { education, profile, projects, research, workExperience } from '@/data/portfolioData';
 import { navRoutes, routeById } from '@/routes';
 import { scoreItem } from './fuzzy';
@@ -71,7 +72,9 @@ const goToItems = [{ ...routeById('home'), label: 'Home' }, ...navRoutes].map((p
 
 const projectItems = projects.map((project) => {
   const repoUrl = project.repoUrl && !isGitHubProfile(project.repoUrl) ? project.repoUrl : null;
-  const href = project.liveUrl || repoUrl;
+  // A case study is the best place to send someone; then the live site or source.
+  const study = caseStudyPath(project);
+  const href = study ? null : project.liveUrl || repoUrl;
   return {
     id: `project-${project.slug}`,
     group: 'projects',
@@ -82,11 +85,11 @@ const projectItems = projects.map((project) => {
     icon: Folder,
     suggested: Boolean(project.featured),
     external: Boolean(href),
-    verb: project.liveUrl ? 'Open site' : repoUrl ? 'View source' : 'View project',
+    verb: study ? 'Read case study' : project.liveUrl ? 'Open site' : repoUrl ? 'View source' : 'View project',
     // Without a link of its own, a project opens in the Projects page's viewer.
     action: href
       ? { type: 'url', href }
-      : { type: 'route', href: `${routeById('projects').path}#project/${project.slug}` },
+      : { type: 'route', href: study ?? `${routeById('projects').path}#project/${project.slug}` },
   };
 });
 

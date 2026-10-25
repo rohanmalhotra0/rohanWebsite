@@ -71,7 +71,7 @@ export function RoleHeader({ company, imageUrl, title, subtitle, className }) {
   );
 }
 
-/** Summary, an optional video, highlights, and tools for one role. */
+/** Summary, an optional video and link, highlights, and tools for one role. */
 export function RoleBody({ role, className }) {
   return (
     <div className={className}>
@@ -81,6 +81,13 @@ export function RoleBody({ role, className }) {
         </p>
       ) : null}
       {role.video ? <LiteYouTube {...role.video} className="mt-6 max-w-[38rem]" /> : null}
+      {role.link ? (
+        <p className="mt-3 text-[15px]">
+          <a href={role.link.href} className="link font-medium text-fg">
+            {role.link.label}
+          </a>
+        </p>
+      ) : null}
       <Highlights
         items={role.highlights}
         visible={visibleHighlights(role.index, role.highlights?.length ?? 0)}

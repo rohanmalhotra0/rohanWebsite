@@ -1,9 +1,11 @@
 import { memo } from 'react';
 import { motion } from 'motion/react';
+import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
 import { ProjectLinks } from './ProjectLinks';
 import TypeCover from './TypeCover';
 import {
+  caseStudyPath,
   FLIGHT,
   focalPoint,
   imageSize,
@@ -37,14 +39,19 @@ const FeaturedCard = memo(function FeaturedCard({
   const { width, height } = imageSize(project);
   const wide = layout !== 'grid';
   const flipped = layout === 'end';
-  const href = projectHash(project.slug);
+  // A project with a case study goes to its page; the rest open the viewer.
+  const study = caseStudyPath(project);
+  const href = study ?? projectHash(project.slug);
 
   // A mouse click (not Enter) on a hover device means the image is zoomed.
-  const open = (event) => onOpen(index, { fromHover: event.detail > 0 && canHover() });
+  const open = (event) =>
+    study ? navigate(study) : onOpen(index, { fromHover: event.detail > 0 && canHover() });
 
   // The title links to the project's deep link: a modified click opens it in a
-  // new tab, a plain click opens the viewer here.
+  // new tab, a plain click opens the viewer here. A case study link is a plain
+  // page link, which the router handles.
   const openFromLink = (event) => {
+    if (study) return;
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     open(event);
@@ -61,7 +68,7 @@ const FeaturedCard = memo(function FeaturedCard({
         {/* Its ::after covers the card, so the whole card is one target. */}
         <a
           href={href}
-          aria-haspopup="dialog"
+          aria-haspopup={study ? undefined : 'dialog'}
           data-project-trigger={`card:${project.slug}`}
           onClick={openFromLink}
           className="decoration-fg/30 decoration-2 underline-offset-[0.14em] outline-none after:absolute after:inset-0 after:content-[''] group-hover:underline"

@@ -16,7 +16,8 @@ const MARKER_SLIDE = { duration: 0.35, ease: [0.16, 1, 0.3, 1] };
 /** `route` is the page on screen; its link is marked. */
 export default function Navbar({ route }) {
   const scrolled = useScrolled();
-  const active = navRoutes.includes(route) ? route.id : null;
+  // A case study sits under Projects.
+  const active = navRoutes.includes(route) ? route.id : (route.parent ?? null);
   // The marker stays mounted on the last page's link so it can fade out in
   // place when you go to a page without one (home, 404).
   const [last, setLast] = useState(active);
