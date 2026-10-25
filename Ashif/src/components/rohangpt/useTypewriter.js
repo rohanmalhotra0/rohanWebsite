@@ -65,9 +65,11 @@ export default function useTypewriter(ref, enabled) {
     root.dataset.typing = '';
 
     const duration = Math.min(MAX_MS, Math.max(MIN_MS, total * MS_PER_CHAR));
+    // The clock starts now, not at the first frame, so a busy main thread
+    // makes the reveal skip ahead rather than run long.
+    const startTime = performance.now();
     let textIndex = 0;
     let paintIndex = 0;
-    let startTime = 0;
     let frame = 0;
 
     const finish = () => {
@@ -78,8 +80,7 @@ export default function useTypewriter(ref, enabled) {
     };
 
     const tick = (now) => {
-      if (!startTime) startTime = now;
-      const shown = Math.ceil(((now - startTime) / duration) * total);
+      const shown = Math.max(0, Math.ceil(((now - startTime) / duration) * total));
       if (shown >= total) {
         finish();
         return;
