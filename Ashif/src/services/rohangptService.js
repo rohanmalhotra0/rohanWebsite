@@ -121,10 +121,7 @@ const findRole = (company, pattern) =>
   workExperience.find((job) => job.company === company && pattern.test(job.role));
 
 /** Fuller names for prose where the short data label reads oddly. */
-const FULL_NAMES = { 'Hume Center': 'Virginia Tech Hume Center' };
-const fullName = (company) => FULL_NAMES[company] ?? company;
-const inProse = (company) => {
-  const name = fullName(company);
+const inProse = (name) => {
   return /\b(center|institute|university|lab)$/i.test(name) ? `the ${name}` : name;
 };
 
@@ -184,7 +181,7 @@ const appDev = findRole('IBM', /applications developer/i);
 const robotics = findRole('IBM', /robotics/i);
 const ibmJobs = workExperience.filter((job) => job.company === 'IBM');
 const kalshi = workExperience.find((job) => job.company === 'Kalshi');
-const hume = workExperience.find((job) => job.company === 'Hume Center');
+const hume = workExperience.find((job) => job.company === 'Virginia Tech Hume Center');
 const hedgingPaper = research.find((paper) => /income risk/i.test(paper.title));
 const hedgingEngine = findProject('income-risk-hedging');
 const epmProjects = projects.filter((project) => /\bepm\b/i.test(project.title));
@@ -247,7 +244,7 @@ const ANSWERS = {
 
   education: () =>
     paragraphs(
-      `I’m studying for ${article(education.degree)} ${education.degree.replace(/^(B\.[AS]\.)\s+/, '$1 in ')} as a double major at ${profile.school}. I’m ${lowerFirst(education.accelerated)} My GPA is ${education.gpa}/${education.gpaScale}.`,
+      `I’m studying for ${article(education.degree)} ${education.degree.replace(/^(B\.[AS]\.)\s+/, '$1 in ')} as a double major at ${profile.school}. ${education.accelerated} My GPA is ${education.gpa}/${education.gpaScale}.`,
       `Coursework includes ${joinAnd(education.coursework.slice(0, 6))}, plus the graduate course ${education.graduateCourse.title}.`
     ),
 
@@ -331,7 +328,7 @@ const ANSWERS = {
       bullets(
         workExperience.map(
           (job) =>
-            `**${fullName(job.company)}**, ${job.role}${hasRealDate(job.date) ? ` (${job.date})` : ''}`
+            `**${job.company}**, ${job.role}${hasRealDate(job.date) ? ` (${job.date})` : ''}`
         )
       ),
       'Ask about any of them by name.'
@@ -479,7 +476,7 @@ const TOPICS = [
 const COMPANY_ANSWERS = { IBM: ANSWERS.ibm };
 const COMPANY_ALIASES = {
   IBM: ['international business machines'],
-  'Hume Center': ['hume', 'virginia tech', 'contentcube', 'cubesat', 'satellite', 'aerospace', 'low earth orbit'],
+  'Virginia Tech Hume Center': ['hume', 'virginia tech', 'contentcube', 'cubesat', 'satellite', 'aerospace', 'low earth orbit'],
   'Y-Axis': ['yaxis'],
 };
 const STOP_WORDS = new Set(['the', 'and', 'of', 'center', 'software', 'inc']);
@@ -780,7 +777,7 @@ Facts:
 ${workExperience
   .map(
     (job) =>
-      `  - ${fullName(job.company)}, ${job.role}${hasRealDate(job.date) ? ` (${job.date})` : ''}: ${job.highlights.join(' ')}`
+      `  - ${job.company}, ${job.role}${hasRealDate(job.date) ? ` (${job.date})` : ''}: ${job.highlights.join(' ')}`
   )
   .join('\n')}
 - Research:
