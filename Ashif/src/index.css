@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+/* Hubot Sans at the only two points the site uses it: display (width 125%,
+   weight 800) and headings (width 112%, weight 700). Two static Latin cuts
+   of ~21 KB each instead of the 93 KB variable file; regenerate them with
+   scripts/subset-hubot.py. Other scripts fall back to Mona Sans. */
+@font-face {
+  font-family: "Hubot Sans";
+  src: url("./assets/fonts/hubot-display-latin.woff2") format("woff2");
+  font-weight: 800;
+  font-stretch: 125%;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Hubot Sans";
+  src: url("./assets/fonts/hubot-heading-latin.woff2") format("woff2");
+  font-weight: 700;
+  font-stretch: 112%;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* Theme is driven by <html data-theme="light|dark">, set before first paint
    from the saved choice or the OS preference (see index.html). */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -10,8 +38,7 @@
     "Mona Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   --font-display:
-    "Hubot Sans Variable", "Mona Sans Variable", ui-sans-serif, system-ui,
-    sans-serif;
+    "Hubot Sans", "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
   /* System mono: it only shows up in key caps and the robot HUD, so a
      webfont isn't worth the download. */
   --font-mono:
