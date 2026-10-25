@@ -296,7 +296,10 @@ export default function ContactForm() {
                       !sending && 'invisible'
                     )}
                   >
-                    <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+                    <LoaderCircle
+                      aria-hidden="true"
+                      className={cn('size-4', sending && 'animate-spin')}
+                    />
                     Sending…
                   </span>
                 </span>
