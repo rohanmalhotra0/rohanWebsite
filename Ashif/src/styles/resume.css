@@ -4,11 +4,23 @@
    as print, so on a desktop screen it matches the printed pages line for
    line. */
 
-/* Toolbar and sheet share one frame, so their edges line up. */
+/* Toolbar and sheet share one frame, so their edges line up. On wide
+   screens the sheet is shown at 120%, like a PDF viewer. `zoom` (unlike a
+   transform) reflows and re-rasterizes, so lines break exactly as in print. */
+.rv {
+  --rv-zoom: 1;
+}
+
+@media screen and (min-width: 1200px) {
+  .rv {
+    --rv-zoom: 1.2;
+  }
+}
+
 .rv-frame {
   --rv-gutter: 16px;
   width: 100%;
-  max-width: calc(816px + 2 * var(--rv-gutter));
+  max-width: calc(816px * var(--rv-zoom) + 2 * var(--rv-gutter));
   margin-inline: auto;
   padding-inline: max(var(--rv-gutter), env(safe-area-inset-left))
     max(var(--rv-gutter), env(safe-area-inset-right));
@@ -36,6 +48,7 @@
   max-width: 816px;
   margin-inline: auto;
   padding: 48px 48px 56px;
+  zoom: var(--rv-zoom);
   border-radius: 2px;
   background: #fff;
   color: var(--paper-text);
@@ -476,6 +489,7 @@
   .rv-paper {
     max-width: none;
     padding: 0;
+    zoom: 1;
     border-radius: 0;
     box-shadow: none !important;
     animation: none !important;
