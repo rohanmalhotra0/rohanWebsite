@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-palette="spot">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -7,7 +7,7 @@
       name="description"
       content="Rohan Malhotra is an NYU Courant math and computer science student building applied AI, robotics, and quantitative systems. Past work includes IBM and Kalshi."
     />
-    <meta name="theme-color" content="#f3f2ee" />
+    <meta name="theme-color" content="#f6f2e4" />
     <meta name="color-scheme" content="light dark" />
     <link rel="canonical" href="https://rohanm.org/" />
 
@@ -40,7 +40,7 @@
     <title>Rohan Malhotra</title>
 
     <!-- Before first paint: send old one-page links to their new pages, and
-         apply the saved theme. Light is the default; the toggle saves dark. -->
+         apply the saved theme and palette (light and Spot by default). -->
     <script>
       (function () {
         // The site used to be one page with #anchors; those links now have pages.
@@ -63,18 +63,32 @@
           }
         }
 
-        var theme;
+        var theme, palette;
         try {
           theme = localStorage.getItem('rm-theme');
+          palette = localStorage.getItem('rm-palette');
         } catch (e) {}
         if (theme !== 'light' && theme !== 'dark') {
           theme = 'light';
         }
+        // Each palette's page background, light and dark, for the browser
+        // chrome. Same ids and colors as PALETTES/THEME_COLORS in lib/theme.js.
+        var chrome = {
+          spot: ['#f6f2e4', '#111214'],
+          terminal: ['#edf5f0', '#060b17'],
+          courant: ['#f5f1fa', '#110a1b'],
+          market: ['#eef6f4', '#061514'],
+          paper: ['#f3f2ee', '#0e0e0d']
+        };
+        if (!Object.prototype.hasOwnProperty.call(chrome, palette)) {
+          palette = 'spot';
+        }
         document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.palette = palette;
         document.querySelector('meta[name="color-scheme"]').setAttribute('content', theme);
         document
           .querySelector('meta[name="theme-color"]')
-          .setAttribute('content', theme === 'dark' ? '#0e0e0d' : '#f3f2ee');
+          .setAttribute('content', chrome[palette][theme === 'dark' ? 1 : 0]);
 
         // ⌘ or Ctrl in shortcut hints (both are in the markup; CSS picks one).
         var platform =
@@ -87,19 +101,17 @@
         }
 
         // On the home page the hero's robot poster is the largest thing on
-        // the first screen; start fetching the right theme's copy before any
-        // JS runs.
+        // the first screen; start fetching the right palette and theme's copy
+        // before any JS runs.
         if (location.pathname === '/') {
+          var name = '/img/hero/robot-' + palette + '-' + theme;
           var poster = document.createElement('link');
           poster.rel = 'preload';
           poster.as = 'image';
-          poster.href = '/img/hero/robot-' + theme + '.webp';
+          poster.href = name + '.webp';
           // Same candidates and sizes as the <img> (RobotStage.jsx), so the
           // preload and the image pick the same file.
-          poster.setAttribute(
-            'imagesrcset',
-            '/img/hero/robot-' + theme + '-800.webp 800w, /img/hero/robot-' + theme + '.webp 1600w'
-          );
+          poster.setAttribute('imagesrcset', name + '-800.webp 800w, ' + name + '.webp 1600w');
           poster.setAttribute('imagesizes', '(min-width: 1024px) 55vw, 100vw');
           poster.setAttribute('fetchpriority', 'high');
           document.head.appendChild(poster);

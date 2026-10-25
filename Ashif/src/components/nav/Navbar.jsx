@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { navRoutes } from '@/routes';
 import { MenuIcon, SearchButton, Wordmark } from './BarControls';
 import MobileMenu from './MobileMenu';
+import PalettePicker from './PalettePicker';
 import ThemeToggle from './ThemeToggle';
 import { usePaletteHotkeys, usePalettePreload, useReducedMotion, useScrolled } from './hooks';
 import { loadPalette } from './loadPalette';
@@ -100,7 +101,7 @@ export default function Navbar({ route }) {
                         <MotionSpan
                           layoutId="nav-marker"
                           aria-hidden="true"
-                          className="pointer-events-none absolute inset-x-2 -bottom-px h-0.5 bg-accent xl:inset-x-3"
+                          className="pointer-events-none absolute inset-x-2 -bottom-px h-0.5 bg-mark xl:inset-x-3"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: isActive ? 1 : 0 }}
                           transition={{
@@ -124,7 +125,9 @@ export default function Navbar({ route }) {
                   openPalette();
                 }}
               />
-              <ThemeToggle className={ICON_BUTTON} />
+              <PalettePicker className={ICON_BUTTON} />
+              {/* On phones the palette panel holds the light/dark switch. */}
+              <ThemeToggle className={cn(ICON_BUTTON, 'max-sm:hidden')} />
               {/* A plain link like the pages; the negative margin puts its
                   text, not its padding, on the page's right edge. */}
               <a

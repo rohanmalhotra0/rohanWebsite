@@ -26,7 +26,7 @@ function Paper({ paper, index }) {
         className="grid gap-6 py-10 sm:py-12 md:grid-cols-12 md:gap-8"
       >
         <div className="md:col-span-7">
-          <h3
+          <h2
             id={titleId}
             className="type-heading text-balance text-[1.625rem] leading-[1.15] text-fg"
           >
@@ -36,7 +36,7 @@ function Paper({ paper, index }) {
                 {paper.subtitle}
               </span>
             ) : null}
-          </h3>
+          </h2>
           <p className="mt-3 text-sm leading-6 text-subtle">
             {[paper.authors, paper.year, paper.venue].filter(Boolean).join(' · ')}
           </p>

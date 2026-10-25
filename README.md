@@ -11,6 +11,7 @@ cd Ashif
 npm ci
 npm run dev       # http://localhost:5173
 npm run lint
+npm run contrast  # WCAG AA check of every palette
 npm run build     # outputs Ashif/dist
 ```
 
@@ -25,7 +26,18 @@ npm run build     # outputs Ashif/dist
 - Mona Sans (text) through Fontsource, and Hubot Sans (display) as two static
   cuts made by `Ashif/scripts/subset-hubot.py` (42 KB instead of the 93 KB
   variable file). Code and key caps use the system monospace font.
-- Light and dark themes. The site opens in light mode until a visitor picks one.
+- Five named palettes, each with a light and a dark theme: Spot (safety
+  yellow and graphite, the default), Terminal (phosphor green on navy),
+  Courant (NYU violet and gold), Market (teal and coral), and Paper (ink and
+  safety orange). The swatch button in the navbar switches them, the choice
+  is saved, and `index.html` applies it before first paint. Everything uses
+  semantic color tokens (`Ashif/src/styles/palettes.css`), so a palette
+  recolors the whole site, including the robot's paint, its toy and floor,
+  page headers, and the duotone photos on the About page.
+- Each page opens with a color block in its palette color, and ends with the
+  next page's block. Inside a block (`block-a`, `block-b`, `block-c`) the
+  page tokens point at the block's ink, so any component placed on one reads
+  correctly.
 - Videos (`LiteYouTube`) are a plain card until someone presses play, then a
   youtube-nocookie player loads in the same 16:9 box. Nothing is fetched from
   YouTube before that click, and with JavaScript off the card is a link.
@@ -53,7 +65,8 @@ Ashif/src
 ├── App.jsx                  # theme + router + the current page
 ├── routes.js                # every page: URL, title, description, nav label
 ├── pages/                   # one component per page (HomePage, ProjectsPage…)
-├── index.css                # design tokens (dark/light), utilities
+├── index.css                # utilities: color blocks, mesh, grain, type
+├── styles/palettes.css      # the five palettes, light and dark
 ├── data/portfolioData.js    # all content: profile, experience, projects, research…
 ├── components/
 │   ├── layout/              # SiteLayout, the "Next page" link, load progress bar
@@ -70,6 +83,23 @@ Ashif/src
 ├── services/rohangptService.js
 └── lib/ hooks/              # router, theme, small window events
 ```
+
+## Palettes
+
+Palette values live in `Ashif/src/styles/palettes.css`, one block per palette
+and theme. After changing one:
+
+- `npm run contrast` checks every text pair against WCAG AA (body text,
+  secondary text, text on each color block, form borders, thin marks, and
+  the category colors) and fails if any falls short.
+- If `--bg`, `--fg`, `--accent` or `--robot` changed, run `npm run posters`
+  to re-render the hero stills in `Ashif/public/img/hero` (needs Playwright;
+  takes about a minute), so the poster matches the live scene.
+
+To add a palette, add its two blocks to `palettes.css`, its entry to
+`PALETTES` and `THEME_COLORS` in `Ashif/src/lib/theme.js`, its id and page
+colors to the list in `index.html`'s head script, and its glow and duotone
+colors near the top of `palettes.css`; then render its posters.
 
 ## Editing content
 

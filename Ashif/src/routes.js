@@ -10,7 +10,8 @@ const pageModules = import.meta.glob('./pages/*.jsx');
  * `page` names the component file in ./pages. `label` puts a route in the
  * navbar, footer, and command palette. `title` and `description` go into the
  * prerendered <head>, and `description` is also the teaser at the bottom of
- * the page before it.
+ * the page before it. `block` picks the palette's color block (a, b or c)
+ * for the page's header, and `tagline` is the small line above its title.
  */
 export const routes = [
   {
@@ -26,6 +27,8 @@ export const routes = [
     path: '/experience/',
     page: 'ExperiencePage',
     label: 'Experience',
+    block: 'a',
+    tagline: 'Where I’ve worked',
     title: 'Experience — Rohan Malhotra',
     description:
       'Internships in robotics, quant development, machine learning, aerospace research, and data, plus my degree at NYU Courant.',
@@ -35,6 +38,8 @@ export const routes = [
     path: '/projects/',
     page: 'ProjectsPage',
     label: 'Projects',
+    block: 'b',
+    tagline: 'Things I’ve built',
     title: 'Projects — Rohan Malhotra',
     description: `${projects.length} projects, from internship work to small tools I built for myself.`,
   },
@@ -43,6 +48,8 @@ export const routes = [
     path: '/research/',
     page: 'ResearchPage',
     label: 'Research',
+    block: 'c',
+    tagline: 'What I’ve written',
     title: 'Research — Rohan Malhotra',
     description:
       'Papers on hedging income risk with prediction markets, Reddit sentiment in financial models, and Kelly-criterion capital allocation.',
@@ -52,6 +59,8 @@ export const routes = [
     path: '/about/',
     page: 'AboutPage',
     label: 'About',
+    block: 'a',
+    tagline: 'Who I am',
     title: 'About — Rohan Malhotra',
     description:
       'Who I am outside the résumé, what I’m working on now, and photos from the Alps, a lake, and a basketball court.',
@@ -61,6 +70,8 @@ export const routes = [
     path: '/chat/',
     page: 'ChatPage',
     label: 'Chat',
+    block: 'b',
+    tagline: 'Ask me anything',
     title: 'Ask about my work — Rohan Malhotra',
     description:
       'Ask about my projects, internships, research, or anything on my résumé. The answers come from my own notes.',
@@ -70,6 +81,8 @@ export const routes = [
     path: '/contact/',
     page: 'ContactPage',
     label: 'Contact',
+    block: 'c',
+    tagline: 'Say hello',
     title: 'Contact — Rohan Malhotra',
     description:
       'I’m interested in applied AI, robotics, quantitative systems, and developer tools. Send me a note if the work overlaps.',
@@ -91,6 +104,8 @@ export const notFoundRoute = {
   id: 'not-found',
   path: null,
   page: 'NotFoundPage',
+  block: 'b',
+  tagline: 'Error 404',
   title: 'Page not found — Rohan Malhotra',
   description: 'There’s no page at this address.',
 };
@@ -99,6 +114,15 @@ export const notFoundRoute = {
 export const navRoutes = routes.filter((route) => route.label);
 
 export const routeById = (id) => routes.find((route) => route.id === id) ?? null;
+
+/** "01" for the first page in the navbar, "02" for the next; null for others. */
+export function routeNumber(route) {
+  const index = navRoutes.indexOf(route);
+  return index >= 0 ? String(index + 1).padStart(2, '0') : null;
+}
+
+/** The color-block utility for a route's `block`. */
+export const BLOCK_CLASS = { a: 'block-a', b: 'block-b', c: 'block-c' };
 
 /** The page that comes after `route` in reading order, for the link at its end. */
 export function nextRoute(route) {

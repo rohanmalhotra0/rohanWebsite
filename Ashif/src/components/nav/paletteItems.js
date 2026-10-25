@@ -15,9 +15,11 @@ import {
   Mail,
   MessageSquare,
   Moon,
+  Palette,
   Sun,
 } from 'lucide-react';
 import { education, profile, projects, research, workExperience } from '@/data/portfolioData';
+import { PALETTES } from '@/lib/theme';
 import { navRoutes, routeById } from '@/routes';
 import { scoreItem } from './fuzzy';
 
@@ -126,6 +128,20 @@ const themeItem = (theme) => {
   };
 };
 
+// One row per palette; "palette", "colors" or a palette's name finds them.
+const paletteItems = (current) =>
+  PALETTES.map((option) => ({
+    id: `palette-${option.id}`,
+    group: 'actions',
+    title: `${option.name} palette`,
+    meta: option.id === current ? 'Current' : option.blurb,
+    keywords: [],
+    aliases: ['palette', 'colors', 'colours', 'color scheme', 'appearance', option.blurb.toLowerCase()],
+    icon: Palette,
+    verb: 'Apply',
+    action: { type: 'palette', id: option.id },
+  }));
+
 const actionItems = (theme) => [
   {
     id: 'action-copy-email',
@@ -197,10 +213,11 @@ const actionItems = (theme) => [
   },
 ];
 
-/** All palette items for the current theme (one title depends on it). */
-export const getPaletteItems = (theme) => [
+/** Every item, for the current theme and palette (a few rows depend on them). */
+export const getPaletteItems = (theme, palette) => [
   ...projectItems,
   ...actionItems(theme),
+  ...paletteItems(palette),
   ...researchItems,
   ...goToItems,
 ];

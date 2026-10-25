@@ -12,7 +12,7 @@ export default function RouteProgress() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5 origin-left animate-[route-progress_2.4s_cubic-bezier(0.16,1,0.3,1)_150ms_both] bg-accent"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5 origin-left animate-[route-progress_2.4s_cubic-bezier(0.16,1,0.3,1)_150ms_both] bg-mark"
     />
   );
 }

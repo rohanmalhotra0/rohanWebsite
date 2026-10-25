@@ -25,7 +25,7 @@ function ContactLinks({ className }) {
             download={download || undefined}
             className="group flex min-h-12 items-center gap-1.5 text-[15px] font-medium text-fg"
           >
-            <span className="underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] duration-150 group-hover:decoration-accent">
+            <span className="underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] duration-150 group-hover:decoration-mark">
               {label}
             </span>
             {external ? (

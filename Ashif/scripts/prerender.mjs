@@ -48,21 +48,18 @@ function splitHoisted(html) {
   }
 }
 
-// The hero poster depends on the theme, which is only known in the browser.
-// Its srcset and src are set by an inline script right after #root (before
-// first paint), so the preload scanner never fetches the wrong theme's image.
-const POSTER = /<img\b([^>]*?)\ssrc="(\/img\/hero\/robot-)light(\.webp)"([^>]*?)\ssrcSet="([^"]*)"/;
-const POSTER_SCRIPT = `<script>(function(){var i=document.querySelector('#root img[data-hero-poster]');if(!i)return;var t=document.documentElement.dataset.theme==='dark'?'dark':'light';i.srcset=i.getAttribute('data-srcset-'+t);i.src=i.getAttribute('data-src-'+t);})();</script>`;
+// The hero poster depends on the palette and theme, which are only known in
+// the browser. Its src and srcset come off the markup and are set by an
+// inline script right after #root (before first paint) from <html>'s
+// data-palette and data-theme, so the preload scanner never fetches the
+// wrong copy. Names as in RobotStage.jsx: /img/hero/robot-<palette>-<theme>.
+const POSTER = /<img\b([^>]*?)\ssrc="\/img\/hero\/robot-[a-z]+-[a-z]+\.webp"([^>]*?)\ssrcSet="[^"]*"/;
+const POSTER_SCRIPT = `<script>(function(){var i=document.querySelector('#root img[data-hero-poster]');if(!i)return;var d=document.documentElement.dataset,n='/img/hero/robot-'+(d.palette||'spot')+'-'+(d.theme==='dark'?'dark':'light');i.srcset=n+'-800.webp 800w, '+n+'.webp 1600w';i.src=n+'.webp';})();</script>`;
 
 function themePoster(markup) {
   if (!POSTER.test(markup)) throw new Error('hero poster <img> not found in the rendered markup');
   return (
-    markup.replace(
-      POSTER,
-      (_, before, base, ext, between, srcset) =>
-        `<img${before} data-hero-poster="" data-src-light="${base}light${ext}" data-src-dark="${base}dark${ext}"${between}` +
-        ` data-srcset-light="${srcset}" data-srcset-dark="${srcset.replaceAll('robot-light', 'robot-dark')}"`
-    ) + POSTER_SCRIPT
+    markup.replace(POSTER, (_, before, between) => `<img${before} data-hero-poster=""${between}`) + POSTER_SCRIPT
   );
 }
 

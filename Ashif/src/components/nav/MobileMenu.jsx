@@ -6,6 +6,7 @@ import Button from '@/components/primitives/Button';
 import { cn } from '@/lib/utils';
 import { navRoutes } from '@/routes';
 import { SearchButton, Wordmark } from './BarControls';
+import { PaletteOptions } from './PalettePicker';
 import ThemeToggle from './ThemeToggle';
 import { useFocusTrap, useModalFocus, useReducedMotion, useScrollLock } from './hooks';
 import { isPlainClick } from '@/lib/router';
@@ -149,7 +150,7 @@ function Sheet({ sheetRef, closeRef, active, onClose, onPageClick, onLeave, onSe
                   <span
                     className={cn(
                       'underline-offset-[0.3em]',
-                      isActive && 'underline decoration-accent decoration-2'
+                      isActive && 'underline decoration-mark decoration-2'
                     )}
                   >
                     {page.label}
@@ -161,8 +162,15 @@ function Sheet({ sheetRef, closeRef, active, onClose, onPageClick, onLeave, onSe
         </ul>
       </nav>
 
+      <MotionDiv {...rise(navRoutes.length)} className="container-page shrink-0 pt-8">
+        <p id="mobile-palette-title" className="text-[13px] text-subtle">
+          Palette
+        </p>
+        <PaletteOptions compact labelledBy="mobile-palette-title" className="mt-3" />
+      </MotionDiv>
+
       <MotionDiv
-        {...rise(navRoutes.length)}
+        {...rise(navRoutes.length + 1)}
         className="container-page mt-auto shrink-0 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-8"
       >
         <Button href="/resume/" variant="secondary" size="lg" onClick={onLeave} className="w-full">

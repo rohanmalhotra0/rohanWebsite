@@ -15,7 +15,9 @@ import Reveal from '@/components/primitives/Reveal';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 import ArchivePreview from './ArchivePreview';
+import CategoryDot from './CategoryDot';
 import CategoryFilter from './CategoryFilter';
+import CategoryStrip from './CategoryStrip';
 import { ProjectLinkIcons } from './ProjectLinks';
 import {
   ARCHIVE_ROWS,
@@ -102,10 +104,14 @@ const ArchiveRow = memo(function ArchiveRow({
         >
           {project.title}
         </a>
-        <span className="mt-0.5 block truncate text-[13px] text-subtle md:hidden">{meta}</span>
+        <span className="mt-0.5 flex items-center gap-2 text-[13px] text-subtle md:hidden">
+          <CategoryDot category={project.category} />
+          <span className="truncate">{meta}</span>
+        </span>
       </span>
-      <span role="cell" className="hidden truncate text-sm text-muted md:block">
-        {meta}
+      <span role="cell" className="hidden min-w-0 items-center gap-2.5 text-sm text-muted md:flex">
+        <CategoryDot category={project.category} />
+        <span className="truncate">{meta}</span>
       </span>
       <span role="cell" className="hidden truncate text-[13px] text-subtle lg:block">
         {project.tags.join(' · ')}
@@ -262,6 +268,7 @@ function ProjectArchive({ projects, onOpen, onPreload }) {
       </Reveal>
 
       <Reveal className="mt-6">
+        <CategoryStrip options={options} value={category} onChange={updateCategory} className="mb-5" />
         <CategoryFilter options={options} value={category} onChange={updateCategory} />
       </Reveal>
 

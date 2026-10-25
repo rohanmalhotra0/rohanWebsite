@@ -12,18 +12,20 @@ const STILL_LABEL = 'A four-legged robot with an arm, standing on a lab floor.';
 // Small button on desktop, a full 44 px target on touch layouts.
 const TAP = 'max-lg:h-11 max-lg:px-4';
 // The poster fills the stage width on phones and about 55vw from lg up; an
-// 800px copy covers 1x screens and most phones below 2x. Keep in sync with
-// the preload in index.html.
+// 800px copy covers 1x screens and most phones below 2x. One per palette and
+// theme (scripts/render-posters.mjs), so the still matches the scene's colors.
+// Keep in sync with the preload in index.html.
 const POSTER_SIZES = '(min-width: 1024px) 55vw, 100vw';
-const posterSrcSet = (theme) =>
-  `${assetUrl(`img/hero/robot-${theme}-800.webp`)} 800w, ${assetUrl(`img/hero/robot-${theme}.webp`)} 1600w`;
+const posterName = (palette, theme) => `img/hero/robot-${palette}-${theme}`;
+const posterSrcSet = (name) => `${assetUrl(`${name}-800.webp`)} 800w, ${assetUrl(`${name}.webp`)} 1600w`;
 
 /**
  * The robot stage: a poster still that paints immediately, cross-faded to
  * the live three.js scene once its chunk has loaded and drawn a frame.
  */
 export default function RobotStage({ className }) {
-  const { theme } = useTheme();
+  const { theme, palette } = useTheme();
+  const poster = posterName(palette, theme);
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
   const stage = useRobotScene({ reducedMotion: reduced });
   const [posterFailed, setPosterFailed] = useState(false);
@@ -42,8 +44,8 @@ export default function RobotStage({ className }) {
           {posterFailed ? null : (
             <img
               ref={stage.posterRef}
-              src={assetUrl(`img/hero/robot-${theme}.webp`)}
-              srcSet={posterSrcSet(theme)}
+              src={assetUrl(`${poster}.webp`)}
+              srcSet={posterSrcSet(poster)}
               sizes={POSTER_SIZES}
               alt=""
               width={1600}

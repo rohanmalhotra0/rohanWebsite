@@ -49,7 +49,7 @@ export default function Hero() {
                   rel={external ? 'noreferrer' : undefined}
                   className="group inline-flex min-h-11 items-center gap-1 text-fg"
                 >
-                  <span className="link group-hover:decoration-accent">{label}</span>
+                  <span className="link group-hover:decoration-mark">{label}</span>
                   {external ? (
                     <span aria-hidden="true" className="text-subtle">
                       ↗
@@ -64,6 +64,11 @@ export default function Hero() {
           </p>
         </div>
 
+        {/* The palette's glow pooled behind the robot. Decorative. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 hidden w-[62%] bg-[radial-gradient(50%_45%_at_58%_50%,color-mix(in_srgb,var(--glow-1)_26%,transparent),transparent_75%)] lg:block"
+        />
         <RobotStage className="mt-2 lg:col-span-7 lg:col-start-6 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:self-center" />
       </div>
     </section>

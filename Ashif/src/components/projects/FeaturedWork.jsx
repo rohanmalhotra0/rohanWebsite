@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
+import CategoryDot from './CategoryDot';
 import { ProjectLinks } from './ProjectLinks';
 import TypeCover from './TypeCover';
 import {
@@ -78,7 +79,10 @@ const FeaturedCard = memo(function FeaturedCard({
         {project.description}
       </p>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
-        <p className="text-sm text-subtle">{projectMeta(project)}</p>
+        <p className="flex items-center gap-2 text-sm text-subtle">
+          <CategoryDot category={project.category} />
+          {projectMeta(project)}
+        </p>
         <ProjectLinks project={project} className="relative z-10" />
       </div>
     </>

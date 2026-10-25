@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/palettes.css";
 
 /* Hubot Sans at the only two points the site uses it: display (width 125%,
    weight 800) and headings (width 112%, weight 700). Two static Latin cuts
@@ -52,8 +53,8 @@
 }
 
 /* Semantic color tokens. Use these utilities (bg-bg, text-fg, border-line,
-   bg-accent, text-accent-strong, …) instead of raw palette colors so both
-   themes work. */
+   bg-accent, text-accent-strong, bg-block-a, …) instead of raw colors, so
+   every palette and both themes work. The values live in styles/palettes.css. */
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -66,43 +67,21 @@
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-accent-strong: var(--accent-strong);
+  --color-mark: var(--mark);
   --color-input: var(--input);
-}
-
-/* Light: warm paper, ink, safety orange. */
-:root,
-[data-theme="light"] {
-  color-scheme: light;
-  --bg: #f3f2ee;
-  --surface: #faf9f6;
-  --surface-2: #e9e8e3;
-  --fg: #141414;
-  --muted: #55554f;
-  --subtle: #6e6e68;
-  --line: #dcdbd5;
-  --line-strong: #c4c3bc;
-  --accent: #ff5b14;
-  --accent-ink: #141414;
-  --accent-strong: #b83a0a;
-  /* Form-field borders: 3:1 against the page (WCAG 1.4.11). */
-  --input: #8c8c86;
-}
-
-/* Dark: graphite, not pure black. */
-[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #0e0e0d;
-  --surface: #161615;
-  --surface-2: #1e1e1c;
-  --fg: #ecebe6;
-  --muted: #a3a29b;
-  --subtle: #85847e;
-  --line: #262624;
-  --line-strong: #3a3a37;
-  --accent: #ff6a2b;
-  --accent-ink: #141414;
-  --accent-strong: #ff7a3d;
-  --input: #636360;
+  --color-accent-2: var(--accent-2);
+  --color-accent-2-ink: var(--accent-2-ink);
+  --color-block-a: var(--block-a);
+  --color-on-block-a: var(--on-block-a);
+  --color-block-b: var(--block-b);
+  --color-on-block-b: var(--on-block-b);
+  --color-block-c: var(--block-c);
+  --color-on-block-c: var(--on-block-c);
+  --color-c1: var(--c1);
+  --color-c2: var(--c2);
+  --color-c3: var(--c3);
+  --color-c4: var(--c4);
+  --color-c5: var(--c5);
 }
 
 @layer base {
@@ -195,7 +174,7 @@
   line-height: 1;
 }
 
-/* Underlined text link that warms to the accent on hover. */
+/* Underlined text link that warms to the palette's mark color on hover. */
 @utility link {
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
@@ -208,8 +187,93 @@
   /* Hover-capable devices only, so the accent doesn't stick after a tap. */
   @media (hover: hover) {
     &:hover {
-      text-decoration-color: var(--accent);
+      text-decoration-color: var(--mark);
     }
+  }
+}
+
+/* Color blocks: a palette fill with its ink. Inside one, the page tokens
+   point at the block, so any component placed on it (a list, a button, the
+   email line) takes the block's ink instead of the page's: text in the ink,
+   secondary text at 80% (AA, checked by scripts/check-contrast.mjs), lines
+   at lower strengths, and the page background is the block itself. */
+@utility block-a {
+  --block: var(--block-a);
+  --on-block: var(--on-block-a);
+  --bg: var(--block-a);
+  --surface: color-mix(in srgb, var(--on-block-a) 7%, var(--block-a));
+  --fg: var(--on-block-a);
+  --muted: color-mix(in srgb, var(--on-block-a) 80%, var(--block-a));
+  --subtle: color-mix(in srgb, var(--on-block-a) 80%, var(--block-a));
+  --line: color-mix(in srgb, var(--on-block-a) 22%, var(--block-a));
+  --line-strong: color-mix(in srgb, var(--on-block-a) 45%, var(--block-a));
+  --mark: var(--on-block-a);
+  --accent-strong: var(--on-block-a);
+  background-color: var(--block-a);
+  color: var(--on-block-a);
+}
+
+@utility block-b {
+  --block: var(--block-b);
+  --on-block: var(--on-block-b);
+  --bg: var(--block-b);
+  --surface: color-mix(in srgb, var(--on-block-b) 7%, var(--block-b));
+  --fg: var(--on-block-b);
+  --muted: color-mix(in srgb, var(--on-block-b) 80%, var(--block-b));
+  --subtle: color-mix(in srgb, var(--on-block-b) 80%, var(--block-b));
+  --line: color-mix(in srgb, var(--on-block-b) 22%, var(--block-b));
+  --line-strong: color-mix(in srgb, var(--on-block-b) 45%, var(--block-b));
+  --mark: var(--on-block-b);
+  --accent-strong: var(--on-block-b);
+  background-color: var(--block-b);
+  color: var(--on-block-b);
+}
+
+@utility block-c {
+  --block: var(--block-c);
+  --on-block: var(--on-block-c);
+  --bg: var(--block-c);
+  --surface: color-mix(in srgb, var(--on-block-c) 7%, var(--block-c));
+  --fg: var(--on-block-c);
+  --muted: color-mix(in srgb, var(--on-block-c) 80%, var(--block-c));
+  --subtle: color-mix(in srgb, var(--on-block-c) 80%, var(--block-c));
+  --line: color-mix(in srgb, var(--on-block-c) 22%, var(--block-c));
+  --line-strong: color-mix(in srgb, var(--on-block-c) 45%, var(--block-c));
+  --mark: var(--on-block-c);
+  --accent-strong: var(--on-block-c);
+  background-color: var(--block-c);
+  color: var(--on-block-c);
+}
+
+/* Secondary text on a color block: 80% of the block's ink (AA in every
+   palette; checked by scripts/check-contrast.mjs). */
+@utility text-on-block-muted {
+  color: color-mix(in srgb, var(--on-block) 80%, var(--block));
+}
+
+/* Soft light pooling in the right-hand corners of a block, in the palette's
+   two glow colors. Kept to the right so text on the left sits on the flat fill. */
+@utility mesh {
+  background-image:
+    radial-gradient(48% 70% at 100% 0%, color-mix(in srgb, var(--glow-1) 42%, transparent), transparent 72%),
+    radial-gradient(42% 62% at 90% 100%, color-mix(in srgb, var(--glow-2) 40%, transparent), transparent 72%);
+}
+
+/* Film grain over a block: tiled SVG noise, blended so it reads on any fill.
+   The element needs to be positioned; the grain sits under its content. */
+@utility grain {
+  isolation: isolate;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    opacity: 0.22;
   }
 }
 
