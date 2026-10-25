@@ -106,7 +106,9 @@ export function createToy(geometry, material) {
       toy.landed = true;
     }
 
-    // Soft walls keep it on the visible floor.
+    // Soft walls keep it on the visible floor once it has landed (the lob
+    // itself starts outside them, on the viewer's side).
+    if (!toy.landed) return spinAndSettle(h);
     if (p.x < bounds.minX || p.x > bounds.maxX) {
       p.x = clamp(p.x, bounds.minX, bounds.maxX);
       v.x *= -0.4;
@@ -127,6 +129,10 @@ export function createToy(geometry, material) {
       }
     }
 
+    spinAndSettle(h);
+  }
+
+  function spinAndSettle(h) {
     const a = toy.spin.length();
     if (a > 1e-4) {
       _dq.setFromAxisAngle(_axis.copy(toy.spin).divideScalar(a), a * h);

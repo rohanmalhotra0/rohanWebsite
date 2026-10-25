@@ -23,6 +23,7 @@ import {
   categoryOptions,
   EASE,
   matchesQuery,
+  projectHash,
   sentenceCase,
 } from './projectData';
 import { preloadImage } from './viewerDom';
@@ -93,16 +94,21 @@ const ArchiveRow = memo(function ArchiveRow({
         )}
       </span>
       <span role="cell" className="min-w-0">
-        {/* The button's ::after covers the row, so the whole row opens the viewer. */}
-        <button
-          type="button"
+        {/* Links to the project's deep link; its ::after covers the row, so the
+            whole row opens the viewer (a modified click opens a new tab). */}
+        <a
+          href={projectHash(project.slug)}
           aria-haspopup="dialog"
           data-project-trigger={`row:${project.slug}`}
-          onClick={(event) => onOpen(project.slug, event.currentTarget)}
-          className="max-w-full text-left text-[15px] font-medium text-fg decoration-fg/30 underline-offset-[0.2em] outline-none after:absolute after:inset-y-0 after:-inset-x-3 after:rounded-lg after:content-[''] focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-accent-strong group-hover:underline"
+          onClick={(event) => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            onOpen(project.slug, event.currentTarget);
+          }}
+          className="text-[15px] font-medium text-fg decoration-fg/30 underline-offset-[0.2em] outline-none after:absolute after:inset-y-0 after:-inset-x-3 after:rounded-lg after:content-[''] focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-accent-strong group-hover:underline"
         >
           {project.title}
-        </button>
+        </a>
         <span className="mt-0.5 block truncate text-[13px] text-subtle md:hidden">{category}</span>
       </span>
       <span role="cell" className="hidden truncate text-sm text-muted md:block">

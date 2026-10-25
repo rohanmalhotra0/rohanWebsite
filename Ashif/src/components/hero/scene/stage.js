@@ -34,6 +34,7 @@ uniform vec4 uFeet[4]; // x, z, contact, -
 uniform vec4 uToy;     // x, z, strength, radius
 uniform vec4 uHover;   // x, z, alpha, -
 uniform vec2 uView;    // canvas size in px
+uniform float uFeedFloor; // floor tone in the robot camera
 varying vec2 vXZ;
 
 float grid(vec2 p, float spacing, float halfWidth) {
@@ -95,9 +96,9 @@ void main() {
   float ring = abs(length(vXZ - uHover.xy) - 0.085);
   float hover = fill(ring - 0.004) * uHover.z;
 
-  vec4 col = vec4(uInk, 0.3 * fade * feed);
-  col = over(col, uInk, lines * fade * uAlpha.x * (1.0 + feed * 3.0));
-  col = over(col, uTape, tape * fade * min(uAlpha.y * (1.0 + feed * 2.5), 1.0));
+  vec4 col = vec4(uInk, uFeedFloor * fade * feed);
+  col = over(col, uInk, lines * fade * uAlpha.x * (1.0 + feed * 5.0));
+  col = over(col, uTape, tape * fade * min(uAlpha.y * (1.0 + feed * 3.5), 1.0));
   col = over(col, vec3(0.0), shade * uAlpha.z);
   col = over(col, uAccent, hover * fade * uAlpha.w);
   gl_FragColor = col;
@@ -107,8 +108,8 @@ void main() {
 // Per-theme lighting. Dark mode leans on the rim light to keep the graphite
 // silhouette readable against the page.
 const LIGHTING = {
-  light: { hemi: 1.2, key: 2.7, rim: 0.8, env: 0.62, shadow: 0.2, grid: 0.6, tape: 0.16, shade: 0.24 },
-  dark: { hemi: 0.75, key: 2.6, rim: 2.2, env: 0.5, shadow: 0.55, grid: 0.55, tape: 0.2, shade: 0.55 },
+  light: { hemi: 1.2, key: 2.7, rim: 0.8, env: 0.62, shadow: 0.2, grid: 0.6, tape: 0.16, shade: 0.24, feed: 0.52 },
+  dark: { hemi: 0.75, key: 2.6, rim: 2.2, env: 0.5, shadow: 0.55, grid: 0.55, tape: 0.2, shade: 0.55, feed: 0.2 },
 };
 
 export function createStage(renderer, scene, { mobile, home }) {
@@ -159,6 +160,7 @@ export function createStage(renderer, scene, { mobile, home }) {
     uToy: { value: new Vector4() },
     uHover: { value: new Vector4() },
     uView: { value: new Vector2(1, 1) },
+    uFeedFloor: { value: 0.5 },
   };
   const floor = new Mesh(
     plane,
@@ -199,6 +201,7 @@ export function createStage(renderer, scene, { mobile, home }) {
       uniforms.uTape.value.set(palette.fg);
       uniforms.uAccent.value.set(palette.accent);
       uniforms.uAlpha.value.set(L.grid * 0.16, L.tape, L.shade, uniforms.uAlpha.value.w);
+      uniforms.uFeedFloor.value = L.feed;
     },
 
     /** Feed the contact-shadow uniforms from the robot, feet and toy. */

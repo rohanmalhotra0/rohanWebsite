@@ -55,8 +55,8 @@ export default function RobotStage({ className }) {
         ref={stage.frameRef}
         aria-hidden="true"
         className={cn(
-          'pointer-events-none absolute right-[var(--gutter)] top-1 h-[90px] w-[160px] opacity-0 transition-opacity duration-500 sm:h-[108px] sm:w-[192px]',
-          'lg:bottom-4 lg:right-[var(--bleed)] lg:top-auto lg:h-[144px] lg:w-[256px]',
+          'pointer-events-none absolute bottom-2 right-[var(--gutter)] h-[90px] w-[160px] opacity-0 transition-opacity duration-500 sm:h-[108px] sm:w-[192px]',
+          'lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]',
           live && 'opacity-100'
         )}
       >
@@ -72,7 +72,7 @@ export default function RobotStage({ className }) {
         </div>
         <p
           ref={stage.hudRef}
-          className="absolute left-0 top-full mt-1.5 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:bottom-full lg:mb-1.5 lg:mt-0 lg:top-auto lg:text-[11px]"
+          className="absolute bottom-full left-0 mb-1.5 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:text-[11px]"
         >
           cam0 · 30 fps · idle
         </p>
@@ -81,7 +81,7 @@ export default function RobotStage({ className }) {
       {live || stage.canRun ? (
         <div
           ref={stage.controlsRef}
-          className="absolute bottom-2 left-[var(--gutter)] flex items-center gap-4 lg:bottom-4 lg:left-0"
+          className="absolute bottom-2 left-[var(--gutter)] flex flex-col-reverse items-start gap-1.5 sm:flex-row sm:items-center sm:gap-4 lg:bottom-4 lg:left-0"
         >
           {live ? (
             <>

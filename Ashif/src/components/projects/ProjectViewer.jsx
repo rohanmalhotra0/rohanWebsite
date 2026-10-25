@@ -277,9 +277,10 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
           </p>
 
           {/* Slides share one grid cell, so the leaving and arriving slides
-              overlap without either leaving the flow. No scroll container in
-              here: one would clip the image mid-flight. */}
-          <div className="grid">
+              overlap without either leaving the flow. Positioned so it paints
+              above the surface layer. No scroll container in here: one would
+              clip the image mid-flight. */}
+          <div className="relative grid">
             <AnimatePresence custom={viewer.dir} propagate>
               <Slide
                 key={project.slug}

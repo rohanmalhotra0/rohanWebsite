@@ -27,8 +27,7 @@ void main() {
   vec4 raw = texture2D(map, vUv);
   vec3 c = raw.rgb + uBack * (1.0 - raw.a);
   // Red-leaning mono mix, like a filtered sensor: orange reads bright.
-  float l = dot(c, vec3(0.55, 0.38, 0.07));
-  l = smoothstep(0.0, 1.0, pow(l / (l + 0.35) * 1.35, 0.7));
+  float l = smoothstep(0.0, 0.85, pow(dot(c, vec3(0.55, 0.38, 0.07)), 0.8));
   vec2 v = vUv - 0.5;
   l *= 1.0 - dot(v, v) * 0.55;
   vec2 p = abs((vUv - 0.5) * uSize) - (uSize * 0.5 - uRadius);
@@ -39,8 +38,8 @@ void main() {
 
 // Mono tint per theme: ink on paper in light mode, cool graphite in dark.
 const TINTS = {
-  light: { dark: 0x23211d, light: 0xf7f5ef, back: 0xc4c1b8 },
-  dark: { dark: 0x0a0b0a, light: 0xd3d6ce, back: 0x2e2f2c },
+  light: { dark: 0x24221e, light: 0xf5f3ec, back: 0xdad7cf },
+  dark: { dark: 0x0b0c0b, light: 0xd3d6ce, back: 0x1c1d1b },
 };
 
 const _box = new Box3();

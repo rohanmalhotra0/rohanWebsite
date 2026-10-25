@@ -2,14 +2,23 @@ import { memo } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { ProjectLinks } from './ProjectLinks';
-import { FLIGHT, focalPoint, imageSize, INSTANT, mediaLayoutId, projectMeta } from './projectData';
+import {
+  FLIGHT,
+  focalPoint,
+  imageSize,
+  INSTANT,
+  mediaLayoutId,
+  projectHash,
+  projectMeta,
+} from './projectData';
 import { canHover } from './viewerDom';
 
 const MotionDiv = motion.div;
 
 /**
  * One featured project: a 16:10 image with its caption beneath (or beside it,
- * for the wide rows). The title's button stretches over the whole card.
+ * for the wide rows). The title links to the project's deep link and its
+ * stretched ::after makes the whole card clickable; the image takes its own clicks.
  *
  * The image frame shares a layoutId with the viewer's image. While the viewer
  * is open its layout transition is instant, so nothing animates behind the
@@ -20,6 +29,18 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
   const { width, height } = imageSize(project);
   const wide = layout !== 'grid';
   const flipped = layout === 'end';
+  const href = projectHash(project.slug);
+
+  // A mouse click (not Enter) on a hover device means the image is zoomed.
+  const open = (event) => onOpen(index, { fromHover: event.detail > 0 && canHover() });
+
+  // The title links to the project's deep link: a modified click opens it in a
+  // new tab, a plain click opens the viewer here.
+  const openFromLink = (event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    open(event);
+  };
 
   const caption = (
     <>
@@ -29,21 +50,16 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
           wide ? 'text-2xl sm:text-3xl lg:text-[2.5rem] lg:leading-[1.05]' : 'mt-5 text-2xl sm:mt-6'
         )}
       >
-        <button
-          type="button"
+        {/* Its ::after covers the card, so the whole card is one target. */}
+        <a
+          href={href}
           aria-haspopup="dialog"
           data-project-trigger={`card:${project.slug}`}
-          onClick={(event) =>
-            onOpen(index, {
-              opener: event.currentTarget,
-              // A mouse click (not Enter) on a hover device: the image is zoomed.
-              fromHover: event.detail > 0 && canHover(),
-            })
-          }
-          className="text-left decoration-fg/30 decoration-2 underline-offset-[0.14em] outline-none after:absolute after:inset-0 after:content-[''] group-hover:underline"
+          onClick={openFromLink}
+          className="decoration-fg/30 decoration-2 underline-offset-[0.14em] outline-none after:absolute after:inset-0 after:content-[''] group-hover:underline"
         >
           {project.title}
-        </button>
+        </a>
       </h3>
       <p
         className={cn(
@@ -79,10 +95,13 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
             : 'md:row-span-4 md:grid md:grid-rows-subgrid md:gap-y-0'
         )}
       >
+        {/* Sits above the title's stretched area so the image itself takes the
+            click; the title link remains the keyboard and screen reader control. */}
         <div
           data-project-media
+          onClick={open}
           className={cn(
-            'relative rounded-lg outline-offset-4 outline-accent-strong group-has-[button:focus-visible]:outline-2',
+            'relative z-10 cursor-pointer rounded-lg outline-offset-4 outline-accent-strong group-has-[[data-project-trigger]:focus-visible]:outline-2',
             wide && 'lg:col-span-8',
             flipped && 'lg:col-start-5 lg:row-start-1'
           )}

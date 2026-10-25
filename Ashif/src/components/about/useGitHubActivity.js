@@ -4,11 +4,13 @@ import { loadActivity, readCache } from './githubActivity';
 /**
  * Latest public GitHub activity. Served from the session cache when fresh;
  * otherwise fetched once the enclosing section comes within a screen of the
- * viewport. Resolves to null (render nothing) on any failure.
+ * viewport. `activity` is null on any failure; `settled` turns true once
+ * there is an answer either way, so the caller can show a fallback.
  */
 export default function useGitHubActivity(ref) {
   const [cached] = useState(readCache);
   const [fetched, setFetched] = useState(null);
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
@@ -20,7 +22,9 @@ export default function useGitHubActivity(ref) {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         observer.disconnect();
         loadActivity().then((value) => {
-          if (active) setFetched(value);
+          if (!active) return;
+          setFetched(value);
+          setDone(true);
         });
       },
       { rootMargin: '0px 0px 100% 0px' }
@@ -34,6 +38,6 @@ export default function useGitHubActivity(ref) {
   }, [cached, ref]);
 
   return cached === undefined
-    ? { activity: fetched, fromCache: false }
-    : { activity: cached, fromCache: true };
+    ? { activity: fetched, fromCache: false, settled: done }
+    : { activity: cached, fromCache: true, settled: true };
 }

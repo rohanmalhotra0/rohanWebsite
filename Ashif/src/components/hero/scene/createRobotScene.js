@@ -23,7 +23,7 @@ import { createFeed } from './feed';
 import { clamp, damp, smooth } from './math';
 
 const HOME = { x: 0, z: 0, yaw: -0.62 };
-const TARGET = new Vector3(0, 0.4, 0.02);
+const TARGET = new Vector3(0, 0.17, 0.02);
 // Camera framing: a 3/4 view that "contains" the robot at a reference aspect,
 // matching how the poster image is fitted with object-fit: contain.
 export const VIEW = { az: 0.08, el: 0.32, dist: 3.85, fov: 27, aspect: 1 };
@@ -195,18 +195,20 @@ export function createRobotScene({
 
   const inBounds = (p) => p.x > BOUNDS.minX && p.x < BOUNDS.maxX && p.z > BOUNDS.minZ && p.z < BOUNDS.maxZ;
 
-  // A throw target must land where it stays readable: inside the canvas
-  // margins, clear of the overlays, and (on desktop) clear of the name.
+  // A throw target must keep the robot readable: not too close to the
+  // camera, inside the canvas margins, above the overlays and (on desktop)
+  // clear of the name.
   function onScreen(p) {
+    if (p.z > HOME.z + 0.95) return false;
     probe.copy(p).project(camera);
     const x = (probe.x * 0.5 + 0.5) * width;
     const y = (0.5 - probe.y * 0.5) * height;
-    const left = window.innerWidth >= 1024 ? 0.22 : 0.07;
-    if (x < width * left || x > width * 0.93 || y < height * 0.14 || y > height * 0.9) return false;
+    const left = window.innerWidth >= 1024 ? 0.24 : 0.08;
+    if (x < width * left || x > width * 0.92 || y < height * 0.14 || y > height * 0.76) return false;
     const c = canvas.getBoundingClientRect();
     for (const key of ['frame', 'controls']) {
       const r = el(key)?.getBoundingClientRect();
-      if (r && x > r.left - c.left - 32 && x < r.right - c.left + 32 && y > r.top - c.top - 32 && y < r.bottom - c.top + 32) {
+      if (r && x > r.left - c.left - 48 && x < r.right - c.left + 48 && y > r.top - c.top - 56 && y < r.bottom - c.top + 48) {
         return false;
       }
     }
