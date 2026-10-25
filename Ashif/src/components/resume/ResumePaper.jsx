@@ -43,10 +43,12 @@ function Row({ meta, children }) {
 function Section({ id, title, children }) {
   return (
     <section className="rv-section" aria-labelledby={id}>
-      <h2 id={id} className="rv-section-title type-heading">
-        {title}
-      </h2>
-      <div className="rv-section-body">{children}</div>
+      <div className="rv-section-grid">
+        <h2 id={id} className="rv-section-title type-heading">
+          {title}
+        </h2>
+        <div className="rv-section-body">{children}</div>
+      </div>
     </section>
   );
 }
