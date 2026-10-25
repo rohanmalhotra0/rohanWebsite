@@ -192,7 +192,7 @@ function buildBody(materials) {
 
   // Front sensor head: a dark face under the sloped nose, looking forward and
   // down, with two stereo pairs angled outward (Spot's "eyes").
-  const face = frame([0, -0.03, 0.366], [0.6, 0, 0]);
+  const face = frame([0, -0.032, 0.338], [0.6, 0, 0]);
   parts.dark.push(place(box(0.21, 0.1, 0.06, 0.024), ZERO, ZERO, ONE, face));
   for (const s of [1, -1]) {
     stereoPair(parts, frame([s * 0.053, 0.008, 0.032], [0, s * 0.22, 0]).premultiply(face));
@@ -219,13 +219,12 @@ function buildLeg(def, materials) {
   const thigh = new Group();
   thigh.position.x = side * DIMS.legOffset;
   root.add(thigh);
+  // The thigh's own rounded top is the hip housing; the amber cover wraps
+  // over it like Spot's upper-leg shell.
   assemble(thigh, {
-    graphite: [
-      place(cyl(0.058, 0.076, 36), ZERO, Z90),
-      place(taper(0.054, 0.032, DIMS.upper, 0.052), ZERO, X90),
-    ],
-    paint: [place(taper(0.047, 0.028, DIMS.upper - 0.075, 0.06), [0, -0.016, 0], X90)],
-    anodized: [place(cyl(0.03, 0.08, 28), ZERO, Z90)],
+    graphite: [place(taper(0.056, 0.032, DIMS.upper, 0.054), ZERO, X90)],
+    paint: [place(taper(0.05, 0.028, DIMS.upper - 0.06, 0.062), ZERO, X90)],
+    anodized: [place(cyl(0.024, 0.068, 28), ZERO, Z90)],
   }, materials);
 
   const knee = new Group();
