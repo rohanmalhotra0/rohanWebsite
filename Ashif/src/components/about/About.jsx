@@ -11,6 +11,9 @@ const [portrait] = photos;
 
 const bodyText = 'max-w-[62ch] text-pretty text-base leading-7 text-muted sm:text-[17px] sm:leading-[1.7]';
 
+// Keep one-letter words ("I", "a") from dangling at the end of a line.
+const tie = (text) => text.replace(/\b([aI]) /g, '$1 ');
+
 export default function About() {
   return (
     <Section id="about">
@@ -24,9 +27,9 @@ export default function About() {
             as="p"
             className="text-pretty text-[1.375rem] font-[450] leading-[1.42] tracking-[-0.012em] text-fg sm:text-2xl md:col-span-11 md:row-start-2 lg:col-span-6 xl:text-[1.75rem] xl:leading-[1.38]"
           >
-            I learn by building. If I get curious about prediction markets, I make a hedging
-            model. If I want to understand computer vision, I train a robot to find a toy. This
-            site is basically the trail of whatever I was trying to figure out next.
+            {tie(
+              'I learn by building. If I get curious about prediction markets, I make a hedging model. If I want to understand computer vision, I train a robot to find a toy. This site is basically the trail of whatever I was trying to figure out next.'
+            )}
           </Reveal>
 
           <Reveal
@@ -50,13 +53,14 @@ export default function About() {
             className="flex flex-col md:col-span-7 md:col-start-1 md:row-start-3 lg:col-span-6"
           >
             <p className={bodyText}>
-              I’m studying Computer Science and Mathematics at NYU Courant and finishing the
-              degree in three years. Most of my work sits somewhere between finance, robotics,
-              and software that people can actually use.
+              {tie(
+                'I’m studying Computer Science and Mathematics at NYU Courant and finishing the degree in three years. Most of my work sits somewhere between finance, robotics, and software that people can actually use.'
+              )}
             </p>
             <p className={cn(bodyText, 'mt-4')}>
-              Right now I’m finishing my last year at NYU and trying not to turn every random
-              idea into another side project.
+              {tie(
+                'Right now I’m finishing my last year at NYU and trying not to turn every random idea into another side project.'
+              )}
             </p>
             {/* Sits at the bottom of the column, in space the portrait already takes up,
                 so it can appear (or not) without moving anything. */}

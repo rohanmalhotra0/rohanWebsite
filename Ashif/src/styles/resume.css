@@ -138,14 +138,20 @@
 
 /* ---------- Sections: a hanging title column and a body column ---------- */
 
+/* The space under each rule is margin on the grid items, not padding on the
+   section: padding would be a legal page-break point, stranding a rule at the
+   foot of a page with its section on the next. */
 .rv-section {
   display: grid;
   grid-template-columns: var(--paper-label) minmax(0, 1fr);
   column-gap: var(--paper-gap);
   align-items: baseline;
   margin-top: 13px;
-  padding-top: 11px;
   border-top: 1px solid var(--paper-rule);
+}
+
+.rv-section > * {
+  margin-top: 11px;
 }
 
 .rv-head + .rv-section {
@@ -342,9 +348,15 @@
 
   .rv-section {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 12px;
     margin-top: 24px;
-    padding-top: 20px;
+  }
+
+  .rv-section > * {
+    margin-top: 20px;
+  }
+
+  .rv-section > .rv-section-body {
+    margin-top: 12px;
   }
 
   .rv-head + .rv-section {
