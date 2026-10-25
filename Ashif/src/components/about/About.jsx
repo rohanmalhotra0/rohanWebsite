@@ -70,7 +70,7 @@ export default function About() {
                 succeeds, fails or never runs, so nothing around it ever moves. Desktop:
                 pinned to the bottom of the column, level with the line under the portrait;
                 a longer sentence grows upward into the free space instead of down. */}
-            <GitHubActivity className="box-content h-24 pt-8 sm:pt-10 lg:mt-auto lg:flex lg:flex-col lg:justify-end" />
+            <GitHubActivity className="box-content h-24 pt-8 max-[359px]:h-30 sm:pt-10 lg:mt-auto lg:flex lg:flex-col lg:justify-end" />
           </Reveal>
         </div>
 
