@@ -22,7 +22,8 @@ window.cardIds = () => [...new Set([...routes, notFoundRoute].map((route) => ogC
 
 /** Render one card and wait until its fonts and images are in. */
 window.renderCard = async (id) => {
-  flushSync(() => root.render(<Card id={id} />));
+  // A fresh tree per card: fit() sets sizes inline, and React would keep them.
+  flushSync(() => root.render(<Card key={id} id={id} />));
   await document.fonts.ready;
   await Promise.all([...document.images].map((img) => img.decode().catch(() => {})));
   fit();

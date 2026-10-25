@@ -55,6 +55,8 @@ export const routes = [
     label: 'Research',
     block: 'c',
     tagline: 'What I’ve written',
+    // Its link-preview card leads with the Kelly explainer's question.
+    ogAlt: 'Research, Rohan Malhotra: “How much would you bet?” over the growth curve from his Kelly-criterion paper, peaking at a 20% bet. rohanm.org',
     title: 'Research — Rohan Malhotra',
     description:
       'Papers on hedging income risk with prediction markets, Reddit sentiment in financial models, and Kelly-criterion capital allocation.',
@@ -147,6 +149,9 @@ export function routeNumber(route) {
 /** The color-block utility for a route's `block`. */
 export const BLOCK_CLASS = { a: 'block-a', b: 'block-b', c: 'block-c' };
 
+const HOME_ALT =
+  'Rohan Malhotra, math & CS at NYU Courant, IBM, Kalshi. rohanm.org: a yellow robot dog in a graphite lab.';
+
 /**
  * A page's link-preview card (og:image): public/og/<id>.jpg, drawn from the
  * page's block by `npm run og` (scripts/og). Pages without a block of their
@@ -160,8 +165,10 @@ export function ogCard(route) {
       alt: `${project.title}, a case study by Rohan Malhotra: the robot's camera view, the pink toy boxed at 0.91.`,
     };
   }
-  if (route.label) return { id: route.id, alt: `${route.label}, Rohan Malhotra: ${route.tagline}. rohanm.org` };
-  return { id: 'home', alt: 'Rohan Malhotra, rohanm.org: a yellow robot dog in a graphite lab.' };
+  if (route.label) {
+    return { id: route.id, alt: route.ogAlt ?? `${route.label}, Rohan Malhotra: ${route.tagline}. rohanm.org` };
+  }
+  return { id: 'home', alt: HOME_ALT };
 }
 
 /** The page that comes after `route` in reading order, for the link at its end. */
