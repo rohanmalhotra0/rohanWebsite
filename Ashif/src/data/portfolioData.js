@@ -108,7 +108,7 @@ export const workExperience = [
       'Integrated banking APIs through Oracle Integration Cloud, creating JSON pipelines into ERP Financials and EPM while migrating Excel workflows to Oracle Cloud.',
       'Fine-tuned Qwen-Coder-32B on Oracle EPM implementation assets, raising form, business-rule, and report creation accuracy from 36.7% to 95.0%.',
       'Built an on-prem assistant that turns plain-language requests into reviewable EPM JSON, using RAG, MCP tools, confidence scoring, EPM Automate, and Oracle EPM APIs.',
-      'Proposed and led the intern capstone, NEXUS, integrating IBM Granite models with text-to-speech and speech-to-text, and submitted it a week early.',
+      'Led the intern capstone, NEXUS, integrating IBM Granite models with text-to-speech and speech-to-text, and submitted it a week early.',
     ],
     tags: ['Oracle EPM', 'OIC', 'XGBoost', 'RAG', 'MCP', 'Qwen', 'IBM Granite'],
   },
