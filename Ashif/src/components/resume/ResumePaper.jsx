@@ -1,7 +1,10 @@
-import { education, profile, research, skillGroups } from '@/data/portfolioData';
+import { Fragment } from 'react';
+import { education, profile, skillGroups } from '@/data/portfolioData';
 import {
   contactLines,
   displayUrl,
+  educationNote,
+  resumePapers,
   resumeProjects,
   resumeRoles,
 } from './resumeData';
@@ -30,7 +33,20 @@ function Sep() {
   );
 }
 
-/** A line with its main content on the left and dates or a place on the right. */
+/**
+ * A trailing fact and the dot before it, kept together so a line never ends
+ * on a dot. On phones each tail takes its own line and drops the dot.
+ */
+function Tail({ className = '', children }) {
+  return (
+    <span className={`rv-tail ${className}`}>
+      <Sep />
+      {children}
+    </span>
+  );
+}
+
+/** A line with its main content on the left and a date or place on the right. */
 function Row({ meta, children }) {
   return (
     <div className="rv-row">
@@ -98,18 +114,15 @@ function EducationSection() {
         <Row meta={education.location}>
           <p className="rv-sub">
             {education.degree}, {education.minor}
-            <Sep />
-            GPA {education.gpa} / {education.gpaScale}
+            <Tail>
+              GPA {education.gpa} / {education.gpaScale}
+            </Tail>
           </p>
         </Row>
-        <p className="rv-text rv-gap">{education.accelerated}</p>
         <p className="rv-text">
+          {educationNote}{' '}
           <span className="rv-key">Graduate course:</span>{' '}
           {education.graduateCourse.title}
-        </p>
-        <p className="rv-text">
-          <span className="rv-key">Coursework:</span>{' '}
-          {education.coursework.join(', ')}
         </p>
       </div>
     </Section>
@@ -124,23 +137,58 @@ function ExperienceSection() {
           <Row meta={job.date}>
             <h3 className="rv-heading">
               <span className="rv-strong">{job.company}</span>
-              <Sep />
-              {job.role}
-              {job.place ? (
-                <>
-                  <Sep />
-                  <span className="rv-note rv-nowrap">{job.place}</span>
-                </>
-              ) : null}
+              <Tail>{job.role}</Tail>
+              {job.place ? <Tail className="rv-note">{job.place}</Tail> : null}
             </h3>
           </Row>
-          {job.highlights?.length ? (
+          {job.highlights.length ? (
             <ul className="rv-bullets">
               {job.highlights.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
           ) : null}
+        </div>
+      ))}
+    </Section>
+  );
+}
+
+/** Authors as printed, with Rohan's name set apart. */
+function Byline({ authors }) {
+  return authors.map((name, index) => (
+    <Fragment key={name}>
+      {index > 0 ? ', ' : null}
+      {name === profile.name ? <span className="rv-me">{name}</span> : name}
+    </Fragment>
+  ));
+}
+
+function ResearchSection() {
+  return (
+    <Section id="rv-research" title="Research">
+      {resumePapers.map((paper) => (
+        <div key={paper.title} className="rv-entry">
+          <Row meta={paper.year}>
+            <h3 className="rv-heading rv-strong">
+              {paper.href ? (
+                <PaperLink href={paper.href}>{paper.title}</PaperLink>
+              ) : (
+                paper.title
+              )}
+            </h3>
+          </Row>
+          <p className="rv-byline">
+            <Byline authors={paper.authors} />
+            {paper.venue ? <Tail>{paper.venue}</Tail> : null}
+            {paper.record ? (
+              <Tail>
+                <PaperLink href={paper.record}>
+                  {displayUrl(paper.record)}
+                </PaperLink>
+              </Tail>
+            ) : null}
+          </p>
         </div>
       ))}
     </Section>
@@ -156,50 +204,18 @@ function ProjectsSection() {
             <div className="rv-heading">
               <h3 className="rv-strong rv-inline">{project.title}</h3>
               {project.link ? (
-                <>
-                  <Sep />
-                  <PaperLink href={project.link} className="rv-note rv-url">
+                <Tail className="rv-note rv-small">
+                  <PaperLink href={project.link}>
                     {displayUrl(project.link)}
                   </PaperLink>
-                </>
+                </Tail>
+              ) : null}
+              {project.tags.length ? (
+                <Tail className="rv-note rv-small">{project.tags.join(', ')}</Tail>
               ) : null}
             </div>
           </Row>
-          <p className="rv-text">{project.description}</p>
-          {project.tags?.length ? (
-            <p className="rv-stack">{project.tags.join(' · ')}</p>
-          ) : null}
-        </div>
-      ))}
-    </Section>
-  );
-}
-
-function ResearchSection() {
-  return (
-    <Section id="rv-research" title="Research">
-      {research.map((paper) => (
-        <div key={paper.title} className="rv-entry">
-          <Row meta={paper.year}>
-            <h3 className="rv-heading rv-strong">
-              {paper.liveUrl ? (
-                <PaperLink href={paper.liveUrl}>{paper.title}</PaperLink>
-              ) : (
-                paper.title
-              )}
-            </h3>
-          </Row>
-          <p className="rv-text">
-            {paper.description}
-            {paper.externalUrl ? (
-              <>
-                {' '}
-                <PaperLink href={paper.externalUrl} className="rv-note rv-url">
-                  {displayUrl(paper.externalUrl)}
-                </PaperLink>
-              </>
-            ) : null}
-          </p>
+          <p className="rv-text">{project.line}</p>
         </div>
       ))}
     </Section>
@@ -221,15 +237,15 @@ function SkillsSection() {
   );
 }
 
-/** The document: always white, typeset on an 8.5in sheet. */
+/** The document: always white, one US Letter page. */
 export default function ResumePaper() {
   return (
     <article className="rv-paper" aria-labelledby="rv-name">
       <Header />
       <EducationSection />
       <ExperienceSection />
-      <ProjectsSection />
       <ResearchSection />
+      <ProjectsSection />
       <SkillsSection />
     </article>
   );
