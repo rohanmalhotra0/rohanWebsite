@@ -124,7 +124,9 @@ export function loadActivity() {
   return pending;
 }
 
-const relativeTime = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+// Built on first use, not while the router preloads this module (see clock.js).
+let relative = null;
+const relativeTime = () => (relative ??= new Intl.RelativeTimeFormat('en', { numeric: 'auto' }));
 const UNITS = [
   ['year', 365 * 24 * 60 * MINUTE],
   ['month', 30 * 24 * 60 * MINUTE],
@@ -142,9 +144,9 @@ export function timeAgo(time, now) {
   const value = Math.round(elapsed / size);
   // Rounding up into the next unit: 23.6 hours reads as "yesterday", not "24 hours ago".
   if (index > 0 && value * size >= UNITS[index - 1][1]) {
-    return relativeTime.format(-1, UNITS[index - 1][0]);
+    return relativeTime().format(-1, UNITS[index - 1][0]);
   }
-  return relativeTime.format(-value, unit);
+  return relativeTime().format(-value, unit);
 }
 
 export const repoUrl = (repo) => `https://github.com/${repo}`;
