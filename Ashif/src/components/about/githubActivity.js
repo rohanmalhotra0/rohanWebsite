@@ -20,10 +20,13 @@ export function repoFromUrl(url) {
   }
 }
 
-// Only repos the site itself links to (a project's repoUrl) are ever named, so
-// coursework, practice and scratch repos never show up. Case-insensitive, like GitHub.
+// Only repos the site itself links to (a project's repoUrl, or this site's own
+// source) are ever named, so coursework, practice and scratch repos never show
+// up. Case-insensitive, like GitHub.
 const LINKED_REPOS = new Set(
-  projects.map(({ repoUrl }) => repoFromUrl(repoUrl)?.toLowerCase()).filter(Boolean)
+  [...projects.map(({ repoUrl }) => repoUrl), profile.siteRepo]
+    .map((url) => repoFromUrl(url)?.toLowerCase())
+    .filter(Boolean)
 );
 const isLinked = (repo) => typeof repo === 'string' && LINKED_REPOS.has(repo.toLowerCase());
 
