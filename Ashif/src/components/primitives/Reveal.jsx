@@ -21,9 +21,19 @@ export default function Reveal({
   const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const Component = motion[as] ?? motion.div;
 
+  // data-reveal lets print styles show content that hasn't scrolled into view.
   if (reduceMotion) {
+    // Snap to visible: this also covers reduced motion switching on after an
+    // element mounted hidden and before it was revealed.
     return (
-      <Component className={className} {...rest}>
+      <Component
+        data-reveal=""
+        initial={false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0 }}
+        className={className}
+        {...rest}
+      >
         {children}
       </Component>
     );
@@ -31,6 +41,7 @@ export default function Reveal({
 
   return (
     <Component
+      data-reveal=""
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount }}
