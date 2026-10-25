@@ -2,8 +2,11 @@
 //
 // A query matches when its characters appear in order in the text. Among all
 // such alignments we keep the best-scoring one, which rewards characters that
-// start words ("gh" -> GitHub) and runs of consecutive characters, and lightly
-// penalizes gaps. The matched indices drive the highlight in the UI.
+// start words ("gh" -> GitHub) and runs of consecutive characters, and
+// penalizes gaps. A run that starts in the middle of a word costs extra, so
+// letters scattered through a long title ("spot" in "SPY Gradient Boosting")
+// fall below the cut, while a plain substring ("board" in "Dashboard") still
+// matches. The matched indices drive the highlight in the UI.
 
 const SCORE_MATCH = 16;
 const BONUS_BOUNDARY = 10;
@@ -12,6 +15,7 @@ const BONUS_CONSECUTIVE = 8;
 const PENALTY_GAP_START = 3;
 const PENALTY_GAP_EXTEND = 1;
 const PENALTY_LEADING_MAX = 3;
+const PENALTY_MIDWORD_START = 12;
 // Below this average per character the alignment is mostly noise
 // (scattered letters across a long title), so we drop it.
 const MIN_SCORE_PER_CHAR = 13;
