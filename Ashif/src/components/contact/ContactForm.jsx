@@ -7,6 +7,7 @@ import { Kbd, ModKey } from '@/components/primitives/Tag';
 import { formspreeUrl } from '@/data/portfolioData';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
+import Stamp from './Stamp';
 import useFormDraft from './useFormDraft';
 import {
   EMAIL_PATTERN,
@@ -25,20 +26,21 @@ const MotionSpan = motion.span;
 const EMPTY = { name: '', email: '', message: '' };
 const TIMEOUT_MS = 15000;
 
+// Lines on the postcard: a faint fill over a 3:1 rule. accent-strong keeps the
+// focused rule at 3:1+ on every surface, and it doubles in weight.
 const inputClass = cn(
-  'block w-full rounded-lg border border-input bg-surface px-3.5 text-base text-fg',
-  'transition-[border-color,box-shadow] duration-150 ease-out placeholder:text-subtle',
-  // accent-strong keeps the focused border at 3:1+ on paper; the soft ring carries the brand orange.
-  'hover:border-fg/60 focus-visible:outline-hidden focus:border-accent-strong focus:ring-3 focus:ring-accent/25',
+  'block w-full rounded-t-md border-0 border-b-2 border-input bg-fg/[0.035] px-3 text-base text-fg',
+  'transition-[border-color,box-shadow,background-color] duration-150 ease-out placeholder:text-subtle',
+  'hover:border-fg/70 focus-visible:outline-hidden focus:border-accent-strong focus:bg-fg/[0.06] focus:shadow-[0_2px_0_0_var(--accent-strong)]',
   'aria-[invalid=true]:border-accent-strong',
   // Keep browser autofill from painting its own background over the theme.
   'autofill:inset-shadow-[0_0_0_100px_var(--surface)] autofill:[-webkit-text-fill-color:var(--fg)]'
 );
 
-function Field({ id, label, error, children }) {
+function Field({ id, label, error, className, children }) {
   const reduceMotion = useReducedMotion();
   return (
-    <div className="pb-4">
+    <div className={cn('pb-4', className)}>
       <label htmlFor={id} className="mb-2 block text-sm font-medium text-fg">
         {label}
       </label>
@@ -72,7 +74,8 @@ function Success({ onReset }) {
   }, []);
 
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 sm:gap-x-4">
+    // Clear of the stamp, and at least as tall, so the postmark lands on the card.
+    <div className="grid min-h-[5.25rem] grid-cols-[auto_minmax(0,1fr)] gap-x-3 pr-[5.5rem] sm:min-h-[7.5rem] sm:gap-x-4 sm:pr-[7.75rem]">
       <Check
         aria-hidden="true"
         strokeWidth={2.5}
@@ -98,7 +101,10 @@ function Success({ onReset }) {
   );
 }
 
-/** Contact form. Posts to Formspree with fetch so the page never redirects. */
+/**
+ * Contact form. Posts to Formspree with fetch so the page never redirects.
+ * Drawn on a postcard (Contact's Postcard), with the stamp in its corner.
+ */
 export default function ContactForm() {
   const id = useId();
   const reduceMotion = useReducedMotion();
@@ -215,6 +221,10 @@ export default function ContactForm() {
 
   return (
     <>
+      <Stamp
+        sent={status === 'success'}
+        className="absolute right-5 top-5 h-[5.25rem] w-[4.375rem] sm:right-8 sm:top-8 sm:h-[7.5rem] sm:w-[6.25rem]"
+      />
       <AnimatePresence mode="wait" initial={false}>
         {status === 'success' ? (
           <MotionDiv key="success" {...swap} transition={{ duration: 0.25, ease: EASE }}>
@@ -230,9 +240,17 @@ export default function ContactForm() {
               aria-label="Send a message"
               aria-busy={sending}
             >
-              {/* Side by side below lg, split on the page's 32px gutter. */}
-              <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-1">
-                <Field id={fieldId('name')} label={FIELD_LABELS.name} error={errors.name}>
+              {/* The sender's lines and the stamp. Where the card is narrow (phones,
+                  and beside the tiles from lg) the name sits next to the stamp and
+                  the email runs full width under both; on the full-width card
+                  between, the two lines share the row beside the stamp. */}
+              <div className="grid gap-x-6 sm:grid-cols-2 sm:pr-[7.75rem] lg:grid-cols-1 lg:pr-0">
+                <Field
+                  id={fieldId('name')}
+                  label={FIELD_LABELS.name}
+                  error={errors.name}
+                  className="pr-[5.5rem] sm:pr-0 lg:pr-[7.75rem]"
+                >
                   <input
                     {...fieldProps('name')}
                     ref={(node) => {
@@ -275,7 +293,7 @@ export default function ContactForm() {
                   placeholder="What are you working on?"
                   onKeyDown={handleMessageKeyDown}
                   aria-keyshortcuts="Control+Enter Meta+Enter"
-                  className={cn(inputClass, 'min-h-36 resize-y py-3 leading-6')}
+                  className={cn(inputClass, 'postcard-ruled min-h-[12.75rem] resize-y py-2 leading-7')}
                 />
               </Field>
 

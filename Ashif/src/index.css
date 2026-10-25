@@ -465,3 +465,147 @@ img[data-hero-poster]:not([src]) {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Contact page (components/contact): the link tiles' arrows, and the message
+   form as a postcard, with a stamp (the home page's robot, in the current
+   palette) and the postmark it gets when the message goes out. */
+
+/* Each tile's big outlined arrow says where the link goes. On hover or
+   focus it leaves that way (--dx, --dy) and a second one comes in behind
+   it. */
+.contact-tile {
+  --dx: 75%;
+  --dy: -75%;
+}
+.contact-tile[data-move="right"] {
+  --dx: 90%;
+  --dy: 0%;
+}
+.contact-tile[data-move="down"] {
+  --dx: 0%;
+  --dy: 90%;
+}
+.contact-tile .tile-arrow {
+  opacity: 0.45;
+  transition:
+    translate 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.contact-tile .tile-arrow-next {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  translate: calc(-1 * var(--dx)) calc(-1 * var(--dy));
+}
+.contact-tile:is(:hover, :focus-visible) .tile-arrow {
+  translate: var(--dx) var(--dy);
+  opacity: 0;
+}
+.contact-tile:is(:hover, :focus-visible) .tile-arrow-next {
+  translate: 0 0;
+  opacity: 1;
+}
+
+/* Airmail stripes around the postcard: the palette's accent and its fourth
+   chart colour, with the card's paper between them. */
+.airmail {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--accent) 0 14px,
+    var(--surface) 14px 21px,
+    var(--c4) 21px 35px,
+    var(--surface) 35px 42px
+  );
+}
+
+/* The postcard's writing lines: one under each line of text (leading-7,
+   from the top padding down), scrolling with what's written. */
+.postcard-ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(1.75rem - 1px),
+    var(--line-strong) calc(1.75rem - 1px) 1.75rem
+  );
+  background-position: 0 0.5rem;
+  background-repeat: no-repeat;
+  background-attachment: local;
+}
+
+/* The stamp: paper with a perforated edge (holes every 3 × --r, centred on
+   the edge), and the home page's robot inside it. Always cream paper, in
+   both themes, like a real stamp on a dark card. */
+.stamp {
+  --r: 3.5px;
+  --paper: #fbf7ec;
+  padding: calc(2.25 * var(--r));
+  background:
+    radial-gradient(var(--r), #0000 98%, var(--paper)) round calc(-1.5 * var(--r)) calc(-1.5 * var(--r)) /
+      calc(3 * var(--r)) calc(3 * var(--r)),
+    linear-gradient(var(--paper) 0 0) no-repeat 50% / calc(100% - 3 * var(--r)) calc(100% - 3 * var(--r));
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.25));
+}
+.stamp-art {
+  height: 100%;
+  background: var(--surface-2) no-repeat 52% 34% / 240%;
+}
+/* The lab posters from the home page (scripts/posters), one per palette and
+   theme. Only the one that matches is fetched. */
+[data-palette="spot"][data-theme="light"] .stamp-art {
+  background-image: url("/img/hero/robot-spot-light-800.webp");
+}
+[data-palette="spot"][data-theme="dark"] .stamp-art {
+  background-image: url("/img/hero/robot-spot-dark-800.webp");
+}
+[data-palette="terminal"][data-theme="light"] .stamp-art {
+  background-image: url("/img/hero/robot-terminal-light-800.webp");
+}
+[data-palette="terminal"][data-theme="dark"] .stamp-art {
+  background-image: url("/img/hero/robot-terminal-dark-800.webp");
+}
+[data-palette="courant"][data-theme="light"] .stamp-art {
+  background-image: url("/img/hero/robot-courant-light-800.webp");
+}
+[data-palette="courant"][data-theme="dark"] .stamp-art {
+  background-image: url("/img/hero/robot-courant-dark-800.webp");
+}
+[data-palette="market"][data-theme="light"] .stamp-art {
+  background-image: url("/img/hero/robot-market-light-800.webp");
+}
+[data-palette="market"][data-theme="dark"] .stamp-art {
+  background-image: url("/img/hero/robot-market-dark-800.webp");
+}
+[data-palette="paper"][data-theme="light"] .stamp-art {
+  background-image: url("/img/hero/robot-paper-light-800.webp");
+}
+[data-palette="paper"][data-theme="dark"] .stamp-art {
+  background-image: url("/img/hero/robot-paper-dark-800.webp");
+}
+
+/* The postmark lands on the stamp like a rubber stamp: big and turned, then
+   pressed flat. */
+.postmark {
+  animation: postmark-press 420ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+}
+@keyframes postmark-press {
+  from {
+    opacity: 0;
+    scale: 1.6;
+    rotate: -34deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-tile .tile-arrow {
+    transition: none;
+  }
+  .contact-tile:is(:hover, :focus-visible) .tile-arrow {
+    translate: none;
+    opacity: 1;
+  }
+  .contact-tile .tile-arrow-next {
+    display: none;
+  }
+  .postmark {
+    animation: none;
+  }
+}
