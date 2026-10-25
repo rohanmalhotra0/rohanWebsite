@@ -8,6 +8,8 @@ import useRobotScene from './useRobotScene';
 const LIVE_LABEL =
   'Interactive 3D model of a four-legged robot with an arm. Throw it a toy and it walks over, picks it up with its gripper and brings it back.';
 const STILL_LABEL = 'A four-legged robot with an arm, standing on a lab floor.';
+// Small button on desktop, a full 44 px target on touch layouts.
+const TAP = 'max-lg:h-11 max-lg:px-4';
 
 /**
  * The robot stage: a poster still that paints immediately, cross-faded to
@@ -17,7 +19,7 @@ export default function RobotStage({ className }) {
   const { theme } = useTheme();
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
   const coarse = useMediaQuery('(pointer: coarse)');
-  const stage = useRobotScene({ enabled: !reduced, theme });
+  const stage = useRobotScene({ reducedMotion: reduced, theme });
   const { live, touched } = stage;
 
   return (
@@ -76,22 +78,30 @@ export default function RobotStage({ className }) {
         </p>
       </div>
 
-      {live ? (
+      {live || stage.canRun ? (
         <div
           ref={stage.controlsRef}
           className="absolute bottom-2 left-[var(--gutter)] flex items-center gap-4 lg:bottom-4 lg:left-0"
         >
-          <Button variant="secondary" size="sm" onClick={stage.throwToy} className="max-lg:h-11 max-lg:px-4">
-            Throw a toy
-          </Button>
-          <p
-            className={cn(
-              'text-[13px] leading-5 text-subtle transition-opacity duration-500',
-              touched && 'opacity-0'
-            )}
-          >
-            {coarse ? 'Tap' : 'Click'} the floor to throw a toy.
-          </p>
+          {live ? (
+            <>
+              <Button variant="secondary" size="sm" onClick={stage.throwToy} className={TAP}>
+                Throw a toy
+              </Button>
+              <p
+                className={cn(
+                  'text-[13px] leading-5 text-subtle transition-opacity duration-500',
+                  touched && 'opacity-0'
+                )}
+              >
+                {coarse ? 'Tap' : 'Click'} the floor to throw a toy.
+              </p>
+            </>
+          ) : (
+            <Button variant="secondary" size="sm" onClick={stage.runDemo} className={TAP}>
+              Run demo
+            </Button>
+          )}
         </div>
       ) : null}
 

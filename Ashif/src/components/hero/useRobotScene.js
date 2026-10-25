@@ -1,6 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { readPalette } from './palette';
 
+/** WebGL 2 check on a throwaway canvas, so no renderer is built (or logs) without it. */
+function supportsWebGL2() {
+  try {
+    const gl = document.createElement('canvas').getContext('webgl2');
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    return Boolean(gl);
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Resolves once the poster has loaded (or failed, or 2.5 s passed) and the
  * browser has painted and gone idle, so three.js never competes with the
@@ -33,8 +44,11 @@ function whenSettled(img, signal) {
  * Owns the lazily loaded robot scene: loads the three.js chunk after first
  * paint, mounts it into `hostRef`, keeps its colours in sync with the theme
  * and disposes it on unmount.
+ *
+ * `mode` is 'auto' (run unless the user prefers reduced motion), 'paused'
+ * (the device was too slow) or 'forced' (the user pressed "Run demo").
  */
-export default function useRobotScene({ enabled, theme }) {
+export default function useRobotScene({ reducedMotion, theme }) {
   const hostRef = useRef(null);
   const posterRef = useRef(null);
   const frameRef = useRef(null);
@@ -43,6 +57,8 @@ export default function useRobotScene({ enabled, theme }) {
   const hudRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
+  const [webgl, setWebgl] = useState(null);
+  const [mode, setMode] = useState('auto');
   const [live, setLive] = useState(false);
   const [message, setMessage] = useState('');
   const [touched, setTouched] = useState(false);
@@ -51,7 +67,13 @@ export default function useRobotScene({ enabled, theme }) {
   );
 
   useEffect(() => {
-    if (!enabled) return undefined;
+    setWebgl(supportsWebGL2());
+  }, []);
+
+  const active = webgl === true && (mode === 'forced' || (mode === 'auto' && !reducedMotion));
+
+  useEffect(() => {
+    if (!active) return undefined;
     const controller = new AbortController();
     let scene = null;
 
@@ -64,11 +86,14 @@ export default function useRobotScene({ enabled, theme }) {
           overlay: { frame: frameRef, box: boxRef, label: labelRef, hud: hudRef, controls: controlsRef },
           palette: readPalette(),
           mobile,
+          forced: mode === 'forced',
           onReady: () => setLive(true),
           onLost: () => setLive(false),
+          onSlow: () => setMode('paused'),
           onAnnounce: setMessage,
           onInteract: () => setTouched(true),
         });
+        if (!scene) setWebgl(false);
         sceneRef.current = scene;
       })
       .catch(() => {
@@ -81,7 +106,7 @@ export default function useRobotScene({ enabled, theme }) {
       sceneRef.current = null;
       setLive(false);
     };
-  }, [enabled, mobile]);
+  }, [active, mode, mobile]);
 
   // Layout effect so the canvas recolours in the same frame as the page
   // (the theme switch is a view transition).
@@ -90,6 +115,7 @@ export default function useRobotScene({ enabled, theme }) {
   }, [theme]);
 
   const throwToy = useCallback(() => sceneRef.current?.throwRandom(), []);
+  const runDemo = useCallback(() => setMode('forced'), []);
 
   return {
     hostRef,
@@ -103,5 +129,8 @@ export default function useRobotScene({ enabled, theme }) {
     message,
     touched,
     throwToy,
+    // Offer a manual start when the demo isn't running on its own.
+    canRun: webgl === true && !active,
+    runDemo,
   };
 }

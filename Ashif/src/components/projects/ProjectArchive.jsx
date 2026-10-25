@@ -125,6 +125,7 @@ const ArchiveRow = memo(function ArchiveRow({
  */
 function ProjectArchive({ projects, onOpen }) {
   const bodyId = useId();
+  const headingId = useId();
   const searchId = useId();
   const reduceMotion = useReducedMotion();
   const canPreview = useMediaQuery('(hover: hover) and (pointer: fine) and (min-width: 768px)');
@@ -214,7 +215,9 @@ function ProjectArchive({ projects, onOpen }) {
   return (
     <div id="projects-archive" className="mt-24 border-t border-line pt-12 sm:mt-32 sm:pt-16">
       <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-8">
-        <h3 className="type-heading text-[1.75rem] text-fg sm:text-3xl">All projects</h3>
+        <h3 id={headingId} className="type-heading text-[1.75rem] text-fg sm:text-3xl">
+          All projects
+        </h3>
         <div className="relative w-full md:w-72">
           <label htmlFor={searchId} className="sr-only">
             Search projects
@@ -247,7 +250,7 @@ function ProjectArchive({ projects, onOpen }) {
               type="button"
               onClick={() => updateQuery('')}
               aria-label="Clear search"
-              className="absolute right-0.5 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-md text-subtle transition-colors hover:text-fg sm:size-9"
+              className="absolute right-0 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-subtle transition-colors hover:text-fg sm:size-10"
             >
               <X aria-hidden="true" className="size-4" strokeWidth={1.75} />
             </button>
@@ -264,7 +267,7 @@ function ProjectArchive({ projects, onOpen }) {
           {filtering ? `${results.length} ${results.length === 1 ? 'project' : 'projects'}` : ''}
         </p>
 
-        <div role="table" aria-label="All projects">
+        <div role="table" aria-labelledby={headingId}>
           <div role="rowgroup">
             <div
               role="row"
@@ -308,7 +311,8 @@ function ProjectArchive({ projects, onOpen }) {
         </div>
 
         {results.length === 0 ? (
-          <div className="border-b border-line py-14 sm:pl-[calc(4.5rem+1.5rem)]">
+          // Indented to the Project column (year column + gap) at every size.
+          <div className="border-b border-line py-14 pl-16 sm:pl-24">
             <p className="text-pretty text-[15px] text-muted">
               No projects match &ldquo;<span className="text-fg">{deferredQuery.trim()}</span>&rdquo;
               {category !== 'all' ? ' in this category' : ''}.
