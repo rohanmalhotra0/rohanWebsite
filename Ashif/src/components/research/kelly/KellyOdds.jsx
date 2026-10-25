@@ -4,8 +4,8 @@ import { multiple, percent } from './format';
 import { betsFor, STEPS, STRATEGIES } from './strategies';
 
 // The race, run a thousand times: for each bettor, the typical result and
-// how often it loses half from a peak or is ruined. Worked out a beat after
-// the sliders move (deferred), so dragging them stays smooth.
+// how often it ever drops to half of its starting money or is ruined. Worked
+// out a beat after the sliders move (deferred), so dragging them stays smooth.
 
 const RUNS = 1000;
 
@@ -32,8 +32,8 @@ export default function KellyOdds({ price, chance }) {
       <div className="max-w-2xl">
         <h3 className="type-heading text-balance text-2xl text-fg sm:text-3xl">Now run it a thousand times</h3>
         <p className="mt-3 text-pretty text-base leading-7 text-muted">
-          One race is luck. These are the same four bettors over {RUNS.toLocaleString('en-US')} runs of {STEPS} bets, at
-          the price and chance you set above.
+          One race is luck. These are the same bettors over {RUNS.toLocaleString('en-US')} runs of {STEPS} bets each, at the
+          price and chance you set above.
         </p>
       </div>
       {/* Phones: one card per bettor. */}
@@ -55,13 +55,13 @@ export default function KellyOdds({ price, chance }) {
                 </dd>
               </div>
               <div>
-                <dt className="text-muted">Loses half from a peak</dt>
+                <dt className="text-muted">Ever drops to half your money</dt>
                 <dd className="mt-1">
                   <Share value={rows[i].halved} tone="var(--spot)" />
                 </dd>
               </div>
               <div>
-                <dt className="text-muted">Ruined</dt>
+                <dt className="text-muted">Ruined (down 99%)</dt>
                 <dd className="mt-1">
                   <Share value={rows[i].ruined} tone="var(--toy)" />
                 </dd>
@@ -88,7 +88,7 @@ export default function KellyOdds({ price, chance }) {
                 Typical result
               </th>
               <th scope="col" className="px-3 py-3 font-medium">
-                Loses half from a peak
+                Ever drops to half your money
               </th>
               <th scope="col" className="px-5 py-3 font-medium">
                 Ruined (down 99%)
@@ -120,7 +120,8 @@ export default function KellyOdds({ price, chance }) {
         </table>
       </div>
       <p className="mt-3 text-pretty text-[13px] leading-5 text-subtle">
-        Typical result is the median bankroll at the end, starting from ×1.
+        Shares are out of {RUNS.toLocaleString('en-US')} runs. Typical result is the median bankroll after {STEPS} bets,
+        starting from ×1.
       </p>
     </div>
   );

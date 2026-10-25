@@ -90,8 +90,8 @@ export const RUIN = 0.01;
  * ones. Plain multiplication only, so every engine gets identical numbers.
  *
  * Returns, for each bet: the first run's path (for the race) and, over all
- * runs, the median final bankroll and the shares that end behind, lose half
- * from a peak, and are ever ruined.
+ * runs, the median final bankroll and the shares that end behind, ever drop
+ * to half of the starting money, and are ever ruined.
  */
 export function simulate({ p, c, bets, runs = 1000, steps = 200, seed = 7 }) {
   const next = random(seed);
@@ -101,17 +101,15 @@ export function simulate({ p, c, bets, runs = 1000, steps = 200, seed = 7 }) {
   const down = bets.map((f) => 1 - f);
   const finals = bets.map(() => new Float64Array(runs));
   const behind = new Array(n).fill(0);
-  const halved = new Array(n).fill(0);
+  const halved = new Array(n).fill(0); // ever at or below half the start
   const ruined = new Array(n).fill(0);
   const paths = bets.map(() => new Float64Array(steps + 1));
   const w = new Float64Array(n);
-  const peak = new Float64Array(n);
   const cut = new Uint8Array(n);
   const broke = new Uint8Array(n);
 
   for (let r = 0; r < runs; r++) {
     w.fill(1);
-    peak.fill(1);
     cut.fill(0);
     broke.fill(0);
     if (r === 0) for (let i = 0; i < n; i++) paths[i][0] = 1;
@@ -120,8 +118,7 @@ export function simulate({ p, c, bets, runs = 1000, steps = 200, seed = 7 }) {
       for (let i = 0; i < n; i++) {
         const v = w[i] * (win ? up[i] : down[i]);
         w[i] = v;
-        if (v > peak[i]) peak[i] = v;
-        else if (!cut[i] && v <= peak[i] * 0.5) cut[i] = 1;
+        if (v <= 0.5) cut[i] = 1;
         if (!broke[i] && v <= RUIN) broke[i] = 1;
         if (r === 0) paths[i][t] = v;
       }

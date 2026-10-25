@@ -3,7 +3,7 @@ import { breakEven, kelly, perBet } from './kelly';
 import { signedPercent } from './format';
 
 // Growth per bet against bet size, for one edge: a hump that peaks at the
-// Kelly bet and dives below zero past break-even, with the race's four
+// Kelly bet and dives below zero past break-even, with the race's
 // bettors marked on it. Drag along it to try your own bet (the slider beside
 // it is the keyboard control for the same value).
 

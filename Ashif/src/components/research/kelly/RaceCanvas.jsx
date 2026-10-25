@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { RUIN } from './kelly';
 import { multiple, powerLabel } from './format';
 
-// The race: four bankrolls betting on the same coin flips, drawn live on a
+// The race: the bankrolls betting on the same coin flips, drawn live on a
 // log scale, one bet at a time. The floor is ruin (1% of where it started):
 // a line that reaches it stops at an ✕. The top grows with the bankrolls as
 // the race goes, so it doesn't give the ending away. New numbers reshape the
@@ -25,11 +25,11 @@ function rangeOf(paths, upto) {
 /** The bet at which a bankroll is first ruined, or -1. */
 const ruinedAt = (path) => path.findIndex((w) => w <= RUIN);
 
-export default function RaceCanvas({ paths, colors, names, runKey, paused, onStep, onFinish, label, className }) {
+export default function RaceCanvas({ paths, colors, names, dashes = [], runKey, paused, onStep, onFinish, label, className }) {
   const canvasRef = useRef(null);
   const view = useRef({ paths, range: null, goal: null, step: 0, started: false, done: false, raf: 0, last: 0 });
-  const callbacks = useRef({ onStep, onFinish, paused, colors, names });
-  callbacks.current = { onStep, onFinish, paused, colors, names };
+  const callbacks = useRef({ onStep, onFinish, paused, colors, names, dashes });
+  callbacks.current = { onStep, onFinish, paused, colors, names, dashes };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -86,7 +86,7 @@ export default function RaceCanvas({ paths, colors, names, runKey, paused, onSte
       ctx.fillText(`${steps} bets`, PAD.left + plotW, height - PAD.bottom + 9);
 
       // The bankrolls so far.
-      const { colors: tones, names: labels } = callbacks.current;
+      const { colors: tones, names: labels, dashes: patterns } = callbacks.current;
       const heads = [];
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
@@ -96,10 +96,12 @@ export default function RaceCanvas({ paths, colors, names, runKey, paused, onSte
         const end = ruin >= 0 ? Math.min(shown, ruin) : shown;
         ctx.strokeStyle = tone;
         ctx.lineWidth = 2.25;
+        ctx.setLineDash(patterns[i] ?? []);
         ctx.beginPath();
         ctx.moveTo(x(0), y(path[0]));
         for (let t = 1; t <= end; t++) ctx.lineTo(x(t), y(Math.max(path[t], RUIN)));
         ctx.stroke();
+        ctx.setLineDash([]);
         const isOut = ruin >= 0 && shown >= ruin;
         const hx = x(end);
         const hy = y(Math.max(path[end], RUIN));

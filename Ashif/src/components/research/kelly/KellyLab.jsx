@@ -7,7 +7,7 @@ import { multiple, signedPercent } from './format';
 import { betsFor, STEPS, STRATEGIES } from './strategies';
 
 // The lab, always drawn in the dark theme: set a contract's price and your
-// probability, watch four bettors race on the same coin flips, then try any
+// probability, watch five bettors race on the same coin flips, then try any
 // bet size on the growth curve.
 
 const pct = (f) => `${Math.round(f * 100)}%`;
@@ -29,11 +29,15 @@ function outcome(paths) {
   let best = -1;
   paths.forEach((path, i) => {
     const at = path.findIndex((w) => w <= RUIN);
-    if (at >= 0) ruined.push(`${STRATEGIES[i].label} went broke at bet ${at}`);
+    if (at >= 0) ruined.push({ at, label: STRATEGIES[i].label });
     else if (best < 0 || path[STEPS] > paths[best][STEPS]) best = i;
   });
+  // Earliest first: "3× Kelly went broke at bet 71, 2× Kelly at bet 107."
+  ruined.sort((a, b) => a.at - b.at);
   const lead = best >= 0 ? `${STRATEGIES[best].label} finished ahead at ${multiple(paths[best][STEPS])}.` : '';
-  const broke = ruined.length ? `${ruined.join(', ')}. ` : 'Nobody went broke this time. ';
+  const broke = ruined.length
+    ? `${ruined.map((r, i) => `${r.label} ${i === 0 ? 'went broke ' : ''}at bet ${r.at}`).join(', ')}. `
+    : 'Nobody went broke this time. ';
   return `${broke}${lead} New flips change the winner; the odds below don’t.`;
 }
 
@@ -98,7 +102,7 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
   const bets = betsFor(fStar);
   const edge = Math.round((p - c) * 100);
 
-  // The race: one run of the four bettors. `restart` replays the same flips.
+  // The race: one run of the bettors. `restart` replays the same flips.
   const [seed, setSeed] = useState(7);
   const [restart, setRestart] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -137,7 +141,7 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
             max={95}
             onChange={setPrice}
             display={`${price}¢`}
-            valueText={`${price} cents. ${kellyText}`}
+            valueText={`Price ${price} cents. ${kellyText}`}
           />
         </div>
         <div className="lg:col-span-4">
@@ -149,7 +153,7 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
             max={99}
             onChange={setChance}
             display={`${chance}%`}
-            valueText={`${chance}% chance. ${kellyText}`}
+            valueText={`Chance ${chance}%. ${kellyText}`}
           />
         </div>
         <p className="text-pretty text-[15px] leading-6 text-muted md:col-span-2 lg:col-span-4">
@@ -169,11 +173,19 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
       <div className="border-b border-line p-5 sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <div>
-            <h3 className="type-heading text-xl text-fg">Four bettors, the same coin flips</h3>
+            <h3 className="type-heading text-xl text-fg">Five bettors, the same coin flips</h3>
             <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted">
               {STRATEGIES.map((s, i) => (
                 <li key={s.key} className="inline-flex items-center gap-1.5">
-                  <span aria-hidden="true" className="h-[3px] w-4 rounded-full" style={{ background: s.color }} />
+                  <span
+                    aria-hidden="true"
+                    className="h-[3px] w-4 rounded-full"
+                    style={{
+                      background: s.dash
+                        ? `repeating-linear-gradient(90deg, ${s.color} 0 5px, transparent 5px 8px)`
+                        : s.color,
+                    }}
+                  />
                   {s.label} <span className="font-mono text-subtle">{pct(bets[i])}</span>
                 </li>
               ))}
@@ -208,6 +220,7 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
           paths={paths}
           colors={STRATEGIES.map((s) => s.color)}
           names={STRATEGIES.map((s) => s.label)}
+          dashes={STRATEGIES.map((s) => s.dash)}
           runKey={`${seed}:${restart}`}
           paused={paused}
           onStep={(step) => {
@@ -219,6 +232,10 @@ export default function KellyLab({ price, setPrice, chance, setChance }) {
         />
         <p aria-live="polite" className="mt-3 min-h-12 text-pretty text-[15px] leading-6 text-fg">
           {finished ? outcome(paths) : ''}
+        </p>
+        <p className="mt-1 text-pretty text-[13px] leading-5 text-muted">
+          At 2× Kelly your edge is gone: long-run growth is about zero. Past 2×, you lose money in the long run, even with
+          an edge. Simulated coin flips; illustration, not advice.
         </p>
       </div>
 
