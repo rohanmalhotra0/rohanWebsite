@@ -35,7 +35,8 @@ export default function CategoryFilter({ options, value, onChange, className }) 
         // faded edges as the hint. Positioned, so segment offsets are relative to it.
         className="relative -mx-4 overflow-x-auto px-4 [mask-image:linear-gradient(to_right,transparent,var(--fg)_16px,var(--fg)_calc(100%-24px),transparent)] [scrollbar-width:none] lg:mx-0 lg:px-0 lg:[mask-image:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div className="inline-flex gap-0.5 rounded-lg bg-surface-2 p-1 dark:bg-surface">
+        {/* Paper with a hairline in light mode, so subtle counts keep 4.5:1. */}
+        <div className="inline-flex gap-0.5 rounded-lg bg-bg p-1 ring-1 ring-inset ring-line dark:bg-surface">
           {options.map((option) => {
             const checked = option.value === value;
             return (
@@ -64,10 +65,7 @@ export default function CategoryFilter({ options, value, onChange, className }) 
                 >
                   {option.label}
                   <span
-                    className={cn(
-                      'text-[13px] tabular-nums',
-                      option.count ? 'text-subtle' : 'text-subtle/50'
-                    )}
+                    className={cn('text-[13px] tabular-nums', checked ? 'text-muted' : 'text-subtle')}
                   >
                     {option.count}
                   </span>

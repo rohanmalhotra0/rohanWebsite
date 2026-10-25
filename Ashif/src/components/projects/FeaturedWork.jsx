@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { ProjectLinks } from './ProjectLinks';
+import TypeCover from './TypeCover';
 import {
   FLIGHT,
   focalPoint,
@@ -25,7 +26,14 @@ const MotionDiv = motion.div;
  * scrim; once it closes, the frame flies back into place. Memoized so cards
  * re-render only when the viewer opens or closes.
  */
-const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewerOpen, onOpen }) {
+const FeaturedCard = memo(function FeaturedCard({
+  project,
+  index,
+  layout,
+  viewerOpen,
+  onOpen,
+  onPreload,
+}) {
   const { width, height } = imageSize(project);
   const wide = layout !== 'grid';
   const flipped = layout === 'end';
@@ -91,6 +99,8 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
     >
       <article
         data-project-card={project.slug}
+        onPointerEnter={onPreload}
+        onFocus={onPreload}
         className={cn(
           'group relative',
           wide
@@ -115,17 +125,21 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
             style={{ borderRadius: 8 }}
             className="relative aspect-[16/10] overflow-hidden bg-surface-2 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:ring-1 after:ring-inset after:ring-fg/10"
           >
-            <img
-              src={project.imageUrl}
-              alt={project.imageAlt || ''}
-              width={width}
-              height={height}
-              loading="lazy"
-              decoding="async"
-              draggable="false"
-              className="size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.02]"
-              style={{ objectPosition: focalPoint(project) }}
-            />
+            {project.imageUrl ? (
+              <img
+                src={project.imageUrl}
+                alt={project.imageAlt || ''}
+                width={width}
+                height={height}
+                loading="lazy"
+                decoding="async"
+                draggable="false"
+                className="size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.02]"
+                style={{ objectPosition: focalPoint(project) }}
+              />
+            ) : (
+              <TypeCover project={project} />
+            )}
           </MotionDiv>
         </div>
 
@@ -151,7 +165,7 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
  * caption beside it, then a two-column grid. When the grid would leave an
  * orphan, the last project closes the set as a mirrored wide row.
  */
-function FeaturedWork({ projects, viewerOpen, onOpen }) {
+function FeaturedWork({ projects, viewerOpen, onOpen, onPreload }) {
   const endWide = (projects.length - 1) % 2 === 1;
 
   return (
@@ -164,6 +178,7 @@ function FeaturedWork({ projects, viewerOpen, onOpen }) {
           layout={i === 0 ? 'lead' : endWide && i === projects.length - 1 ? 'end' : 'grid'}
           viewerOpen={viewerOpen}
           onOpen={onOpen}
+          onPreload={onPreload}
         />
       ))}
     </ul>

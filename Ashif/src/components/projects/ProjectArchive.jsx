@@ -83,7 +83,7 @@ const ArchiveRow = memo(function ArchiveRow({
     >
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 -inset-x-3 -z-10 rounded-lg bg-fg/[0.035] opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-y-0 -inset-x-3 -z-10 rounded-lg bg-surface opacity-0 transition-opacity duration-150 group-hover:opacity-100"
       />
       <span role="cell" className="text-sm tabular-nums text-subtle">
         {project.year ?? (
@@ -129,7 +129,7 @@ const ArchiveRow = memo(function ArchiveRow({
  * that shows 10 rows until expanded. Rows open the viewer; on desktop a small
  * cover follows the cursor over them.
  */
-function ProjectArchive({ projects, onOpen }) {
+function ProjectArchive({ projects, onOpen, onPreload }) {
   const bodyId = useId();
   const headingId = useId();
   const searchId = useId();
@@ -203,6 +203,9 @@ function ProjectArchive({ projects, onOpen }) {
     [results, onOpen]
   );
 
+  // Only rows with a real cover get a preview.
+  const hoverRow = useCallback((project) => setHovered(project.imageUrl ? project : null), []);
+
   // The preview belongs to the row under a still cursor; scrolling moves rows away.
   useEffect(() => {
     if (!hovered) return undefined;
@@ -213,9 +216,10 @@ function ProjectArchive({ projects, onOpen }) {
 
   // Warm every cover on the first hover so previews appear without a wait.
   const warmPreviews = () => {
+    onPreload();
     if (preloadedRef.current || !canPreview) return;
     preloadedRef.current = true;
-    for (const p of projects) preloadImage(p.imageUrl);
+    for (const p of projects) if (p.imageUrl) preloadImage(p.imageUrl);
   };
 
   return (
@@ -298,6 +302,7 @@ function ProjectArchive({ projects, onOpen }) {
             id={bodyId}
             className="relative"
             onPointerEnter={warmPreviews}
+            onFocus={onPreload}
             onPointerLeave={() => setHovered(null)}
           >
             <AnimatePresence initial={false} mode="popLayout" custom={change}>
@@ -309,7 +314,7 @@ function ProjectArchive({ projects, onOpen }) {
                   filterKey={filterKey}
                   reduceMotion={reduceMotion}
                   onOpen={openRow}
-                  onHover={setHovered}
+                  onHover={hoverRow}
                 />
               ))}
             </AnimatePresence>
@@ -346,7 +351,7 @@ function ProjectArchive({ projects, onOpen }) {
           >
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 -inset-x-3 -z-10 rounded-lg bg-fg/[0.035] opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+              className="pointer-events-none absolute inset-y-0 -inset-x-3 -z-10 rounded-lg bg-surface opacity-0 transition-opacity duration-150 group-hover:opacity-100"
             />
             <span aria-hidden="true" />
             <span className="inline-flex items-center gap-1.5">

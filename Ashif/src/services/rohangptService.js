@@ -598,7 +598,7 @@ const RECRUITING = [
     terms: [
       'are you available', 'you available', 'your availability', 'availability', 'available for', 'available to start',
       'when can you start', 'can you start', 'start date', 'how soon',
-      'when do you graduate', 'when will you graduate', 'when are you graduating', 'graduation date', 'expected graduation', 'what year do you graduate', 'class of',
+      'when do you graduate', 'when will you graduate', 'when are you graduating', 'are you graduating', 'graduation date', 'graduation year', 'expected graduation', 'year do you graduate', 'class of',
       'finish school', 'finish your degree', 'after graduation', 'after you graduate', 'new grad',
       'internship or full time', 'internships or full time', 'full time', 'fulltime', 'part time',
       'open to work', 'open to opportunities', 'open to new', 'open to roles', 'open to internships',
