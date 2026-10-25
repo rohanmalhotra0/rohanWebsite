@@ -45,14 +45,13 @@ function Postmark({ className }) {
 /**
  * The postcard's stamp: the home page's robot in the current palette (its lab
  * poster, from scripts/posters), postmarked once sent. The poster loads once
- * the stamp nears the screen, so it never competes with the page's first
- * paint. Without JavaScript, CSS shows Spot's (the Contact section of
- * index.css).
+ * the stamp is on screen, so it never competes with the page's first paint.
+ * Without JavaScript, CSS shows Spot's (the Contact section of index.css).
  */
 export default function Stamp({ sent, className }) {
   const { theme, palette } = useTheme();
   const ref = useRef(null);
-  const [near, setNear] = useState(false);
+  const [onScreen, setOnScreen] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
@@ -61,9 +60,11 @@ export default function Stamp({ sent, className }) {
       ([entry]) => {
         if (!entry.isIntersecting) return;
         seen.disconnect();
-        setNear(true);
+        setOnScreen(true);
       },
-      { rootMargin: '400px 0px' }
+      // Only once it's actually on screen: on a phone it's below the fold, and
+      // a fetch any earlier lands among the page's first-paint requests.
+      { rootMargin: '0px' }
     );
     seen.observe(element);
     return () => seen.disconnect();
@@ -74,7 +75,7 @@ export default function Stamp({ sent, className }) {
       <div className="stamp size-full rotate-3">
         <div
           className="stamp-art"
-          style={near ? { backgroundImage: `url("${assetUrl(`img/hero/robot-${palette}-${theme}-800.webp`)}")` } : undefined}
+          style={onScreen ? { backgroundImage: `url("${assetUrl(`img/hero/robot-${palette}-${theme}-800.webp`)}")` } : undefined}
         />
       </div>
       {sent ? (
