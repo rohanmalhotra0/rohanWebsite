@@ -50,6 +50,18 @@ try {
 
   let index = await readFile(indexPath, 'utf8');
   if (!index.includes('<div id="root"></div>')) throw new Error('empty #root not found in dist/index.html');
+
+  // With the markup already in the page, the stylesheet is the last request
+  // standing between the HTML and first paint, so inline it. Its relative
+  // url()s pointed into assets/; rebase them on the page.
+  const stylesheet = index.match(/<link rel="stylesheet"[^>]*href="\.\/(assets\/[^"]+\.css)"[^>]*>/);
+  if (stylesheet) {
+    const css = (await readFile(path.join(root, 'dist', stylesheet[1]), 'utf8')).replace(
+      /url\(\.\//g,
+      'url(./assets/'
+    );
+    index = index.replace(stylesheet[0], () => `<style>${css}</style>`);
+  }
   index = index
     .replace('<div id="root"></div>', `<div id="root" data-prerendered="">${app}</div>${POSTER_SCRIPT}`)
     // The prerendered page replaces the plain no-JavaScript fallback.
