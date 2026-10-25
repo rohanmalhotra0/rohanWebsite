@@ -1,3 +1,4 @@
+import LiteYouTube from '@/components/primitives/LiteYouTube';
 import { TechList } from '@/components/primitives/Tag';
 import { cn } from '@/lib/utils';
 import CompanyLogo from './CompanyLogo';
@@ -70,7 +71,7 @@ export function RoleHeader({ company, imageUrl, title, subtitle, className }) {
   );
 }
 
-/** Summary, highlights, and tools for one role. */
+/** Summary, an optional video, highlights, and tools for one role. */
 export function RoleBody({ role, className }) {
   return (
     <div className={className}>
@@ -79,11 +80,12 @@ export function RoleBody({ role, className }) {
           {role.summary}
         </p>
       ) : null}
+      {role.video ? <LiteYouTube {...role.video} className="mt-6 max-w-[38rem]" /> : null}
       <Highlights
         items={role.highlights}
         visible={visibleHighlights(role.index, role.highlights?.length ?? 0)}
         label={`${role.role} at ${role.company}`}
-        className="mt-4"
+        className={role.video ? 'mt-6' : 'mt-4'}
       />
       <TechList items={role.tags} className="mt-5" />
     </div>

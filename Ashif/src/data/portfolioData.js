@@ -120,6 +120,7 @@ export const workExperience = [
     logoClassName: 'h-[68px] w-auto max-w-[72%]',
     summary:
       'I trained the vision system for a Boston Dynamics Spot demo and connected real-time detection to the robot.',
+    video: { id: 'ba-QHNwbSI4', title: 'Spot dog-toy detection', source: 'Dev Club IBM' },
     highlights: [
       'Trained YOLO11 models on 898 manually labeled images, reaching about 99.4% precision, 99.4% recall, and 99.5% mAP@50.',
       'Connected real-time inference to the Spot SDK with Python, OpenCV, gRPC, multithreading, and lock-free inference queues.',

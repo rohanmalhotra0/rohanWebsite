@@ -26,6 +26,9 @@ npm run build     # outputs Ashif/dist
   cuts made by `Ashif/scripts/subset-hubot.py` (42 KB instead of the 93 KB
   variable file). Code and key caps use the system monospace font.
 - Light and dark themes. The site opens in light mode until a visitor picks one.
+- Videos (`LiteYouTube`) are a plain card until someone presses play, then a
+  youtube-nocookie player loads in the same 16:9 box. Nothing is fetched from
+  YouTube before that click, and with JavaScript off the card is a link.
 - `npm run build` also renders the page on the server
   (`Ashif/src/entry-server.jsx`) and writes that HTML into `dist/index.html`
   (`Ashif/scripts/prerender.mjs`), so the page paints before any JavaScript
