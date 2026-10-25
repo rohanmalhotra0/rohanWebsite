@@ -247,7 +247,7 @@ export default function SpotStory({ steps, safety }) {
 
   return (
     <section ref={sectionRef} aria-labelledby="story-title" className="lg:grid lg:grid-cols-12 lg:gap-x-12">
-      <header className="max-w-2xl pb-8 lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:pb-0 lg:pt-[18svh]">
+      <header className="max-w-2xl pb-8 lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:pb-0">
         <p className="text-sm text-subtle">How it works</p>
         <h2 id="story-title" className="type-heading mt-3 text-balance text-3xl text-fg sm:text-4xl">
           Teaching Spot to fetch
@@ -272,7 +272,7 @@ export default function SpotStory({ steps, safety }) {
         </div>
       </div>
 
-      <ol className="pt-[40svh] lg:col-span-5 lg:col-start-1 lg:row-start-2 lg:pt-[22svh]">
+      <ol className="pt-[40svh] lg:col-span-5 lg:col-start-1 lg:row-start-2 lg:pt-[40svh]">
         {story.map((step, i) => (
           <li
             key={step.title}
