@@ -1,5 +1,5 @@
 import { Matrix4, Quaternion, Vector3 } from 'three';
-import { DIMS } from './model';
+import { DIMS, EYE_TILT } from './model';
 import { solveArm, solveLeg } from './ik';
 import { approach, clamp, damp, dampAngle, lerp, smooth, springTo, wrap } from './math';
 
@@ -17,8 +17,9 @@ const TURN_ACCEL = 5;
 const STANCE_X = DIMS.hipX + DIMS.legOffset;
 const SHOULDER = new Vector3(DIMS.armBase.x, DIMS.armBase.y + DIMS.shoulder, DIMS.armBase.z);
 const JOINTS = ['sh', 'el', 'wr'];
-// Arm folded flat along the back with the gripper resting over the nose.
-const STOW = { yaw: 0, sh: Math.PI + 0.06, el: -(Math.PI - 0.24), wr: -0.4 };
+// Arm folded flat along the back, the gripper over the nose looking down at
+// the floor ahead (so its camera sees the floor at rest).
+const STOW = { yaw: 0, sh: Math.PI + 0.06, el: -(Math.PI - 0.24), wr: -0.75 };
 
 /** Drives the rig: locomotion, gait, body pose, leg IK and the arm. */
 export function createController({ root, body, legs, arm }) {
@@ -205,7 +206,8 @@ export function createController({ root, body, legs, arm }) {
     const sy = Math.sin(yaw);
     const cy = Math.cos(yaw);
     const ahead = (v.x - SHOULDER.x - sy * reach) * sy + (v.z - SHOULDER.z - cy * reach) * cy;
-    const pitch = clamp(Math.atan2(v.y - SHOULDER.y - up, Math.max(ahead, 0.1)), -1.4, 0.8);
+    // Aim the palm camera, not the jaw, at the target.
+    const pitch = clamp(Math.atan2(v.y - SHOULDER.y - up, Math.max(ahead, 0.1)) + EYE_TILT, -1.4, 0.8);
     pose(out, yaw, reach, up, pitch);
   }
 

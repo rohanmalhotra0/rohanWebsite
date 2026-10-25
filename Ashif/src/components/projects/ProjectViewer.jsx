@@ -2,7 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef } from 'react';
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from 'lucide-react';
 import Button from '@/components/primitives/Button';
-import { Kbd, TechList } from '@/components/primitives/Tag';
+import { TechList } from '@/components/primitives/Tag';
 import {
   EASE,
   FLIGHT,
@@ -45,13 +45,15 @@ const DETAILS = {
   exit: { opacity: 0, transition: { duration: 0.12, ease: 'easeIn' } },
 };
 
-function IconButton({ label, onClick, children }) {
+/** Toolbar icon button; `shortcut` is the key that does the same thing. */
+function IconButton({ label, shortcut, hint, onClick, children }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
-      title={label}
+      aria-keyshortcuts={shortcut}
+      title={`${label} (${hint})`}
       className="inline-flex size-11 items-center justify-center rounded-lg text-muted transition-colors duration-150 hover:bg-fg/[0.06] hover:text-fg"
     >
       {children}
@@ -72,6 +74,8 @@ function ViewerMedia({ project, paired, first, fromHover, custom }) {
     return (
       <MotionDiv
         layoutId={paired ? mediaLayoutId(project.slug) : undefined}
+        // Fly as one solid image: the card hides instead of crossfading.
+        layoutCrossfade={false}
         transition={FLIGHT}
         style={{ borderRadius: 8 }}
         custom={custom}
@@ -122,15 +126,21 @@ function ViewerMedia({ project, paired, first, fromHover, custom }) {
   );
 }
 
-function Slide({ project, viewer, titleId, reduceMotion }) {
+// `ref` comes from AnimatePresence's popLayout, which measures the leaving
+// slide to take it out of the flow while the next one comes in.
+function Slide({ ref, project, viewer, titleId, reduceMotion }) {
   const isPresent = useIsPresent();
   const first = viewer.step === 0;
   const custom = { first, dir: viewer.dir, reduce: reduceMotion };
   const links = projectLinks(project);
 
   return (
-    <MotionArticle className="grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8">
-      <div className="lg:col-span-7 xl:col-span-8">
+    <MotionArticle
+      ref={ref}
+      className="grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8"
+    >
+      {/* Above the details, so the flying image passes over the text. */}
+      <div className="relative z-10 lg:col-span-7 xl:col-span-8">
         <ViewerMedia
           project={project}
           paired={viewer.paired}
@@ -202,7 +212,7 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
     <>
       <MotionDiv
         aria-hidden="true"
-        className="fixed inset-0 bg-bg/90"
+        className="fixed inset-0 bg-bg/[0.97]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: FADE_IN }}
         exit={{ opacity: 0, transition: { duration: 0.25, ease: EASE } }}
@@ -240,28 +250,19 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
             <p className="text-sm tabular-nums text-subtle">
               {index + 1} of {count}
             </p>
-            {count > 1 ? (
-              <p
-                aria-hidden="true"
-                className="hidden items-center gap-1 [@media(hover:hover)_and_(pointer:fine)]:flex"
-              >
-                <Kbd>&larr;</Kbd>
-                <Kbd>&rarr;</Kbd>
-              </p>
-            ) : null}
             <div className="ml-auto flex items-center">
               {count > 1 ? (
                 <>
-                  <IconButton label="Previous project" onClick={() => onNavigate(-1)}>
+                  <IconButton label="Previous project" shortcut="ArrowLeft" hint="←" onClick={() => onNavigate(-1)}>
                     <ArrowLeft aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
                   </IconButton>
-                  <IconButton label="Next project" onClick={() => onNavigate(1)}>
+                  <IconButton label="Next project" shortcut="ArrowRight" hint="→" onClick={() => onNavigate(1)}>
                     <ArrowRight aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
                   </IconButton>
                   <span aria-hidden="true" className="mx-1.5 h-5 w-px bg-line" />
                 </>
               ) : null}
-              <IconButton label="Close" onClick={() => onClose()}>
+              <IconButton label="Close" shortcut="Escape" hint="Esc" onClick={() => onClose()}>
                 <X aria-hidden="true" className="size-5" strokeWidth={1.75} />
               </IconButton>
             </div>

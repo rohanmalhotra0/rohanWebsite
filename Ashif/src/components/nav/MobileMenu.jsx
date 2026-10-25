@@ -141,7 +141,7 @@ function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, o
                   href={`#${section.id}`}
                   onClick={onSectionClick(section.id)}
                   aria-current={isActive ? 'true' : undefined}
-                  className="type-heading flex min-h-14 items-center text-[1.75rem] text-fg transition-opacity active:opacity-60"
+                  className="type-heading flex min-h-14 items-center text-[1.75rem] text-fg transition-opacity active:opacity-60 md:min-h-20 md:text-[2.75rem]"
                 >
                   <span
                     className={cn(

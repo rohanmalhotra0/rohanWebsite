@@ -61,9 +61,11 @@ vec4 over(vec4 dst, vec3 color, float a) {
 }
 
 void main() {
+  // Robot camera (main view off): solid floor, wider extent, bolder marks.
+  float feed = 1.0 - uAlpha.w;
   vec2 rel = vXZ - uHome.xy;
   float r = length(rel);
-  float fade = 1.0 - smoothstep(1.0, 2.6, r);
+  float fade = 1.0 - smoothstep(mix(1.0, 2.2, feed), mix(2.6, 5.0, feed), r);
   if (uAlpha.w > 0.5) {
     vec2 uv = gl_FragCoord.xy / uView;
     vec2 edge = min(uv, 1.0 - uv) * uView / min(uView.x, uView.y);
@@ -93,11 +95,9 @@ void main() {
   float ring = abs(length(vXZ - uHover.xy) - 0.085);
   float hover = fill(ring - 0.004) * uHover.z;
 
-  // The robot camera sees a solid floor with stronger markings.
-  float feed = 1.0 - uAlpha.w;
-  vec4 col = vec4(uInk, 0.14 * fade * feed);
+  vec4 col = vec4(uInk, 0.16 * fade * feed);
   col = over(col, uInk, lines * fade * uAlpha.x * (1.0 + feed * 3.0));
-  col = over(col, uTape, tape * fade * uAlpha.y);
+  col = over(col, uTape, tape * fade * min(uAlpha.y * (1.0 + feed * 2.5), 1.0));
   col = over(col, vec3(0.0), shade * uAlpha.z);
   col = over(col, uAccent, hover * fade * uAlpha.w);
   gl_FragColor = col;
@@ -107,8 +107,8 @@ void main() {
 // Per-theme lighting. Dark mode leans on the rim light to keep the graphite
 // silhouette readable against the page.
 const LIGHTING = {
-  light: { hemi: 1.2, key: 2.7, rim: 0.8, env: 0.62, shadow: 0.2, grid: 0.6, tape: 0.5, shade: 0.24 },
-  dark: { hemi: 0.75, key: 2.6, rim: 2.2, env: 0.5, shadow: 0.55, grid: 0.55, tape: 0.55, shade: 0.55 },
+  light: { hemi: 1.2, key: 2.7, rim: 0.8, env: 0.62, shadow: 0.2, grid: 0.6, tape: 0.16, shade: 0.24 },
+  dark: { hemi: 0.75, key: 2.6, rim: 2.2, env: 0.5, shadow: 0.55, grid: 0.55, tape: 0.2, shade: 0.55 },
 };
 
 export function createStage(renderer, scene, { mobile, home }) {

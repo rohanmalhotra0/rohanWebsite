@@ -26,7 +26,8 @@ varying vec2 vUv;
 void main() {
   vec4 raw = texture2D(map, vUv);
   vec3 c = raw.rgb + uBack * (1.0 - raw.a);
-  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  // Red-leaning mono mix, like a filtered sensor: orange reads bright.
+  float l = dot(c, vec3(0.55, 0.38, 0.07));
   l = smoothstep(0.0, 1.0, pow(l / (l + 0.35) * 1.35, 0.7));
   vec2 v = vUv - 0.5;
   l *= 1.0 - dot(v, v) * 0.55;

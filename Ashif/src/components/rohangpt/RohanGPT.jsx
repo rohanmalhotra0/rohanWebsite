@@ -63,7 +63,7 @@ export default function RohanGPT() {
             >
               Suggested questions
             </h3>
-            <SuggestionList labelledBy={SUGGESTIONS_TITLE_ID} onAsk={(question) => ask(question)} />
+            <SuggestionList labelledBy={SUGGESTIONS_TITLE_ID} onAsk={ask} />
           </Reveal>
 
           <Reveal delay={0.06} className="lg:col-span-8">
@@ -71,7 +71,7 @@ export default function RohanGPT() {
               chat={chat}
               inputRef={inputRef}
               panelRef={panelRef}
-              onAsk={(question) => ask(question)}
+              onAsk={ask}
               finePointer={finePointer}
             />
           </Reveal>

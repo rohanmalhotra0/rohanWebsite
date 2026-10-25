@@ -13,22 +13,23 @@ const ANNOUNCEMENT = {
 /**
  * The email as one large mailto link with a copy button beside it. The type
  * scales with its column (cqi), so address and button share one line from a
- * 375px phone to the desktop column; narrower, it breaks after the local part.
+ * 320px phone to the desktop column. If a larger minimum font size forces it,
+ * the button wraps below and the address stays whole.
  */
 export default function EmailLine({ className }) {
   const { status, copy } = useCopyToClipboard();
-  const [local, domain] = profile.email.split('@');
   const copied = status === 'copied';
 
   return (
     <div className={cn('@container', className)}>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
+        {/* One text node: split nodes get separately drawn underlines with visible seams.
+            The 0.22em offset clears descenders, so skip-ink never cuts the line. */}
         <a
           href={`mailto:${profile.email}`}
-          className="type-heading -my-3 min-w-0 py-3 text-[length:clamp(1.125rem,6.2cqi,2.75rem)] leading-[1.1] text-fg underline decoration-line-strong decoration-[length:0.06em] underline-offset-[0.16em] transition-[text-decoration-color] duration-150 [overflow-wrap:anywhere] hover:decoration-accent sm:text-[length:clamp(1.125rem,6.6cqi,2.75rem)]"
+          className="type-heading -my-3.5 min-w-0 py-3.5 text-[length:clamp(1rem,6cqi,2.75rem)] leading-[1.1] text-fg underline decoration-line-strong decoration-[length:0.05em] underline-offset-[0.22em] transition-[text-decoration-color] duration-150 [overflow-wrap:anywhere] hover:decoration-accent sm:text-[length:clamp(1.125rem,6.6cqi,2.75rem)]"
         >
-          {local}
-          <wbr />@{domain}
+          {profile.email}
         </a>
         <button
           type="button"
@@ -59,7 +60,7 @@ export default function EmailLine({ className }) {
           <span
             aria-hidden="true"
             className={cn(
-              // Right-aligned on phones, where the button can sit at the screen edge.
+              // Right-aligned on phones, where the button can sit near the screen edge.
               'pointer-events-none absolute bottom-full right-1 z-10 mb-1 translate-y-1 whitespace-nowrap rounded-md bg-fg px-2 py-1 text-xs font-medium text-bg opacity-0 transition-[opacity,translate] duration-150 ease-out sm:right-auto sm:left-1/2 sm:mb-2 sm:-translate-x-1/2',
               'group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100',
               status !== 'idle' && 'translate-y-0 opacity-100'

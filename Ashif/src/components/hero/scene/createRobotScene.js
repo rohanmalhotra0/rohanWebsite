@@ -553,7 +553,7 @@ export function createRobotScene({
   };
 
   // Test hook for the Playwright checks; stripped from production builds.
-  if (import.meta.env.DEV) canvas.robot = { ctl, brain, toys, camera, orbit, feed, throwTo };
+  if (import.meta.env.DEV) canvas.robot = { ctl, brain, toys, camera, orbit, feed, throwTo, renderer, scene };
 
   return api;
 }

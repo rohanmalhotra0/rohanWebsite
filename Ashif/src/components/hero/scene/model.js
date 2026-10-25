@@ -35,6 +35,9 @@ export const DIMS = {
   grasp: 0.19,
 };
 
+/** Downward tilt of the palm camera relative to the jaw axis. */
+export const EYE_TILT = 0.21;
+
 export const LEGS = [
   { side: 1, end: 1, pair: 0 },
   { side: -1, end: 1, pair: 1 },
@@ -296,10 +299,10 @@ function buildArm(materials) {
   grasp.position.z = DIMS.grasp;
   roll.add(grasp);
 
-  // Palm camera mount, looking out between the jaws.
+  // Palm camera mount, looking out between the jaws, tilted slightly down.
   const eye = new Object3D();
   eye.position.set(0, 0, 0.132);
-  eye.rotation.y = Math.PI;
+  eye.rotation.set(EYE_TILT, Math.PI, 0);
   roll.add(eye);
   roll.traverse((o) => o.layers.set(1));
 

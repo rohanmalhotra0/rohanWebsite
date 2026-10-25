@@ -160,8 +160,11 @@
     color 150ms ease,
     text-decoration-color 150ms ease;
 
-  &:hover {
-    text-decoration-color: var(--accent);
+  /* Hover-capable devices only, so the accent doesn't stick after a tap. */
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-color: var(--accent);
+    }
   }
 }
 
