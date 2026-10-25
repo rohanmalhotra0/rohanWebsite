@@ -38,6 +38,11 @@ npm run build     # outputs Ashif/dist
   next page's block. Inside a block (`block-a`, `block-b`, `block-c`) the
   page tokens point at the block's ink, so any component placed on one reads
   correctly.
+- On Home, in the light themes, the robot stands in a dark "lab": the
+  palette's deepest block (`.hero-lab` in `palettes.css`), with its floor
+  lines in that block's bright ink. The end of the name that runs onto it
+  switches to the same ink, and the main button is in the palette's accent.
+  Paper keeps the plain look.
 - Videos (`LiteYouTube`) are a plain card until someone presses play, then a
   youtube-nocookie player loads in the same 16:9 box. Nothing is fetched from
   YouTube before that click, and with JavaScript off the card is a link.
@@ -94,9 +99,10 @@ and theme. After changing one:
 - `npm run contrast` checks every text pair against WCAG AA (body text,
   secondary text, text on each color block, form borders, thin marks, and
   the category colors) and fails if any falls short.
-- If `--bg`, `--fg`, `--accent` or `--robot` changed, run `npm run posters`
-  to re-render the hero stills in `Ashif/public/img/hero` (needs Playwright;
-  takes about a minute), so the poster matches the live scene.
+- If `--bg`, `--fg`, `--mark`, `--robot`, `--robot-toy` or a light theme's
+  lab block changed, run `npm run posters` to re-render the hero stills in
+  `Ashif/public/img/hero` (needs Playwright; takes about a minute), so the
+  poster matches the live scene.
 
 To add a palette, add its two blocks to `palettes.css`, its entry to
 `PALETTES` and `THEME_COLORS` in `Ashif/src/lib/theme.js`, its id and page

@@ -3,8 +3,8 @@
  * by <html data-palette="…" data-theme="…">. index.html sets both before
  * first paint from the visitor's saved choice (Spot and light by default).
  * Components only use the semantic tokens, so a palette recolors the whole
- * site, the robot included (hero/palette.js reads --bg, --fg, --accent and
- * --robot).
+ * site, the robot included (hero/palette.js reads --bg, --fg, --mark,
+ * --robot and --robot-toy).
  *
  * Text pairs are checked by scripts/check-contrast.mjs (npm run contrast):
  * fg, muted and subtle on bg and surface, accent-strong on bg, each ink on
@@ -23,7 +23,10 @@
  *   glow-1, glow-2           light pooling on color blocks (decorative)
  *   duo-dark, duo-light      duotone for the photos under the pile
  *   robot                    the hero robot's paint
- *   toy                      its toy, where the accent won't show (else accent)
+ *   robot-toy                its toy, where the accent won't show (else accent)
+ *
+ * The home hero's lab panel (.hero-lab, below) and the Spot story's fixed
+ * object colors (the end of this file) are set here too.
  */
 
 /* The palette's swatch (the navbar button, drawn from CSS so it is right at
@@ -170,7 +173,7 @@
   --c4: #2563c9;
   --c5: #3f7d20;
   --robot: #ffc400;
-  /* A yellow toy would vanish on the cream floor; safety orange stands out. */
+  /* Safety orange, so the toy reads apart from the yellow robot. */
   --robot-toy: #ff6a1f;
 }
 
@@ -298,6 +301,8 @@
   --c4: #1f6fb2;
   --c5: #2e7d4f;
   --robot: #e3a92f;
+  /* The accent violet would vanish in the violet lab panel. */
+  --robot-toy: #b98aff;
 }
 
 [data-palette="courant"][data-theme="dark"] {
@@ -392,6 +397,53 @@
   --c4: #8ea2ff;
   --c5: #c79bff;
   --robot: #22b8a8;
+}
+
+/* The home hero's robot stage. In the light themes the robot stands in a
+   dark lab: the palette's deepest block, its floor lines in that block's
+   bright ink (Spot graphite and yellow, Terminal navy and green, Courant
+   violet and gold, Market deep teal and coral). Dark themes already are one,
+   and Paper keeps the plain page. Inside it the page tokens point at the
+   block (index.css), and hero/palette.js reads them there, so the scene's
+   floor, lighting and posters follow. --lab-ink colors the part of the
+   hero's name that runs onto the panel (Hero.jsx). */
+[data-palette="spot"][data-theme="light"] {
+  --lab-ink: var(--on-block-b);
+}
+
+[data-palette="spot"][data-theme="light"] .hero-lab {
+  @apply block-b mesh grain;
+}
+
+[data-palette="terminal"][data-theme="light"] {
+  --lab-ink: var(--on-block-a);
+}
+
+[data-palette="terminal"][data-theme="light"] .hero-lab {
+  @apply block-a mesh grain;
+}
+
+[data-palette="courant"][data-theme="light"] {
+  --lab-ink: var(--on-block-c);
+}
+
+[data-palette="courant"][data-theme="light"] .hero-lab {
+  @apply block-c mesh grain;
+}
+
+[data-palette="market"][data-theme="light"] {
+  --lab-ink: var(--on-block-c);
+}
+
+[data-palette="market"][data-theme="light"] .hero-lab {
+  @apply block-c mesh grain;
+}
+
+/* The home hero's main button (an ink button, Hero.jsx) is in the palette's
+   accent; Paper, the plain look, keeps the ink. */
+:root:not([data-palette="paper"]) .hero-cta {
+  --fg: var(--accent);
+  --bg: var(--accent-ink);
 }
 
 /* The Spot story's objects (components/projects/spot): the robot's yellow

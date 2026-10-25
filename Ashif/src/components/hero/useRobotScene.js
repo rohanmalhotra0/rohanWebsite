@@ -140,7 +140,7 @@ export default function useRobotScene({ reducedMotion }) {
         scene = createRobotScene({
           host: hostRef.current,
           overlay: { frame: frameRef, box: boxRef, hud: hudRef, controls: controlsRef, handle: handleRef },
-          palette: readPalette(),
+          palette: readPalette(hostRef.current),
           mobile,
           forced: mode === 'forced',
           onReady: () => setLive(true),

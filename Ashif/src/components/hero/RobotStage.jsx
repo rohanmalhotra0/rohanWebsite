@@ -36,8 +36,10 @@ export default function RobotStage({ className }) {
   return (
     <div
       className={cn(
-        'relative -mx-[var(--gutter)] [--gutter:clamp(1rem,4vw,2.5rem)]',
-        'lg:mx-0 lg:-mr-[var(--bleed)] lg:h-[min(calc(100svh-7rem),54rem)] lg:[--bleed:calc(max(0px,(100vw_-_78rem)/2)_+_var(--gutter)_-_1rem)]',
+        // .hero-lab: a dark panel in most light themes (palettes.css). It
+        // bleeds off the right edge from lg, and is a full-width band below.
+        'hero-lab relative -mx-[var(--gutter)] [--gutter:clamp(1rem,4vw,2.5rem)] max-lg:pb-4',
+        'lg:mx-0 lg:-mr-[var(--bleed)] lg:h-[min(calc(100svh-7rem),54rem)] lg:rounded-l-[2.25rem] lg:[--bleed:calc(max(0px,(100vw_-_78rem)/2)_+_var(--gutter)_-_1rem)]',
         className
       )}
     >
@@ -120,7 +122,7 @@ export default function RobotStage({ className }) {
         ref={stage.controlsRef}
         className={cn(
           'mt-3 flex items-center gap-4 px-[var(--gutter)] transition-opacity duration-300 max-lg:min-h-11 sm:mt-5',
-          'lg:absolute lg:bottom-4 lg:left-0 lg:mt-0 lg:flex-col-reverse lg:items-start lg:gap-1.5 lg:px-0',
+          'lg:absolute lg:bottom-6 lg:left-8 lg:mt-0 lg:flex-col-reverse lg:items-start lg:gap-1.5 lg:px-0',
           !(live || canRun) && 'invisible opacity-0'
         )}
       >

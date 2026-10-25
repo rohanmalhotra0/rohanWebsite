@@ -22,7 +22,8 @@ const CHIP = { x: 300, y: 42 };
 const VIEWFINDER = { x0: 356, y0: 150, x1: 616, y1: 304 };
 const TAG_W = 106;
 const TAG_H = 26;
-const TONES = ['var(--toy)', 'var(--spot)', 'var(--accent)', 'var(--fg)'];
+// Confetti in the palette's own colors, plus Spot's yellow and the pink toy.
+const TONES = ['var(--toy)', 'var(--accent)', 'var(--c1)', 'var(--spot)', 'var(--c3)', 'var(--c4)'];
 const METER_MARK = METER.x0 + THRESHOLD * (METER.x1 - METER.x0);
 
 const f1 = (n) => (Math.round(n * 10) / 10).toString();
