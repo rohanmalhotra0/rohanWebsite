@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 import { AssistantMessage, Greeting, TypingIndicator, UserMessage } from './ChatMessage';
 import Composer from './Composer';
 import { GREETING } from './prompts';
@@ -38,7 +39,14 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
   return (
     <div
       ref={panelRef}
-      className="flex h-[70svh] max-h-[640px] min-h-[440px] flex-col overflow-hidden rounded-xl border border-line bg-surface lg:h-[560px] lg:max-h-none"
+      className={cn(
+        'flex flex-col overflow-hidden rounded-xl border border-line bg-surface',
+        // Empty, the panel is only as tall as its greeting and question box;
+        // it takes its scrolling height once the conversation starts.
+        hasMessages
+          ? 'h-[70svh] max-h-[640px] min-h-[440px] lg:h-[560px] lg:max-h-none'
+          : 'lg:min-h-[17.5rem]'
+      )}
     >
       <style href="rohangpt-typewriter" precedence="default">
         {TYPEWRITER_CSS}

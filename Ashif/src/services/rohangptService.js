@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   education,
+  photos,
   profile,
   projects,
   research,
@@ -26,8 +27,8 @@ const REQUEST_TIMEOUT_MS = 20000;
 const HISTORY_LIMIT = 8;
 const MAX_CONTENT_CHARS = 2000;
 export const MAX_INPUT_CHARS = 1000;
-/** A short beat before local answers so a reply never lands mid-keystroke. */
-const LOCAL_REPLY_DELAY_MS = 360;
+/** A short beat before local answers, so a reply doesn't land mid-keystroke. */
+const LOCAL_REPLY_DELAY_MS = 240;
 
 /** Absolute http(s) URLs or same-origin paths; anything else is a typo. */
 function resolveEndpoint(value) {
@@ -56,6 +57,14 @@ const countWord = (n) => NUMBER_WORDS[n] ?? String(n);
 const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /** "Casen: Consulting Casebook" -> "Casen". */
 const shortTitle = (title) => title.split(':')[0].trim();
+/** "Applications Developer Intern" -> "applications developer intern"; acronyms stay. */
+const lowerRole = (role) =>
+  role
+    .split(' ')
+    .map((word) => (/^[A-Z0-9&.-]{2,}$/.test(word) ? word : word.toLowerCase()))
+    .join(' ');
+/** "Dallas, TX" -> "Dallas": people say the city, not the postal code. */
+const cityOf = (location) => String(location || '').split(',')[0].trim();
 
 function joinAnd(items) {
   if (items.length < 3) return items.join(' and ');
@@ -67,6 +76,12 @@ function mdLink(label, url) {
   const safeLabel = String(label).replace(/[[\]]/g, '');
   const safeUrl = String(url).replace(/\(/g, '%28').replace(/\)/g, '%29');
   return `[${safeLabel}](${safeUrl})`;
+}
+
+/** End a sentence once: no period after a title that already ends in "?" or "!". */
+function endStop(text) {
+  const visible = text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').trimEnd();
+  return /[.!?…][”’")]*$/.test(visible) ? text : `${text}.`;
 }
 
 const EMAIL_LINK = mdLink(profile.email, `mailto:${profile.email}`);
@@ -129,25 +144,23 @@ const inProse = (name) => {
 const withoutLead = (summary, company) =>
   capitalize(summary.replace(new RegExp(`^At ${escapeRegExp(company)},\\s*`, 'i'), ''));
 
-/** "I was a Quantitative Developer at Kalshi (Jan 2026 – May 2026)." */
+/** "I was a quantitative developer at Kalshi from January to May 2026." */
 function roleSentence(job) {
   const verb = hasEnded(job.date) ? 'was' : 'am';
-  const when = hasRealDate(job.date) ? ` (${job.date})` : '';
-  return `I ${verb} ${article(job.role)} ${job.role} at ${inProse(job.company)}${when}.`;
+  const role = lowerRole(job.role);
+  return `I ${verb} ${article(role)} ${role} at ${inProse(job.company)}${spanOf([job])}.`;
 }
 
+/** The role once, then what I did there. The summary would only repeat the bullets. */
 function describeRole(job) {
-  return paragraphs(
-    `${roleSentence(job)} ${withoutLead(job.summary, job.company)}`,
-    bullets(job.highlights)
-  );
+  return paragraphs(roleSentence(job), bullets(job.highlights));
 }
 
 function describeCompany(company, jobs) {
   if (jobs.length === 1) return describeRole(jobs[0]);
   return paragraphs(
     `I had ${countWord(jobs.length)} roles at ${inProse(company)}.`,
-    jobs.map((job) => `**${job.role}**\n${withoutLead(job.summary, company)}`)
+    jobs.map((job) => `As ${article(lowerRole(job.role))} ${lowerRole(job.role)}, ${lowerFirst(withoutLead(job.summary, company))}`)
   );
 }
 
@@ -159,21 +172,22 @@ function improvementSentence(metric) {
   return `${capitalize(label[2])} raised ${label[1]} from ${values[1]} to ${values[2]}.`;
 }
 
-function projectLinks(project) {
-  const links = [];
-  if (project.liveUrl) links.push(mdLink('Open site', project.liveUrl));
-  if (project.repoUrl) {
-    const isProfile = project.repoUrl.replace(/\/$/, '') === profile.github;
-    links.push(mdLink(isProfile ? 'GitHub' : 'Source', project.repoUrl));
-  }
-  return links.join(' · ');
+/** A real repository, not the bare GitHub profile. */
+const repoOf = (project) =>
+  project.repoUrl && project.repoUrl.replace(/\/$/, '') !== profile.github ? project.repoUrl : null;
+
+/** The project's name as a plain link: the live site, else its repository. */
+function projectLink(project, label = project.title) {
+  const url = project.liveUrl || repoOf(project);
+  return url ? mdLink(label, url) : label;
 }
 
 function describeProject(project) {
   const meta = [project.category, project.year].filter(Boolean).join(' · ');
+  const code = project.liveUrl && repoOf(project) ? `The code is on ${mdLink('GitHub', repoOf(project))}.` : '';
   return paragraphs(
-    `**${project.title}**${meta ? ` · ${meta}` : ''}\n${project.description}`,
-    [project.tags?.join(' · '), projectLinks(project)].filter(Boolean).join('\n')
+    `${projectLink(project)}${meta ? ` · ${meta}` : ''}\n${project.description}`,
+    [project.tags?.join(' · '), code].filter(Boolean).join('\n')
   );
 }
 
@@ -183,7 +197,6 @@ const ibmJobs = workExperience.filter((job) => job.company === 'IBM');
 const kalshi = workExperience.find((job) => job.company === 'Kalshi');
 const hume = workExperience.find((job) => job.company === 'Virginia Tech Hume Center');
 const hedgingPaper = research.find((paper) => /income risk/i.test(paper.title));
-const hedgingEngine = findProject('income-risk-hedging');
 const epmProjects = projects.filter((project) => /\bepm\b/i.test(project.title));
 
 const ANSWERS = {
@@ -194,10 +207,11 @@ const ANSWERS = {
     const modelResult = robotics.metric
       ? `The model reached ${robotics.metric.value} ${robotics.metric.label}.`
       : '';
+    const as = (job) => `As ${article(lowerRole(job.role))} ${lowerRole(job.role)},`;
     return paragraphs(
-      `I did two internships at IBM${sameCity ? ` in ${appDev.location}${span ? ',' : ''}` : ''}${span}.`,
-      `**${appDev.role}**\n${withoutLead(appDev.summary, 'IBM')} ${improvementSentence(appDev.metric)}`.trim(),
-      `**${robotics.role}**\n${withoutLead(robotics.summary, 'IBM')} ${modelResult}`.trim(),
+      `I did two internships at IBM${sameCity ? ` in ${cityOf(appDev.location)}${span ? ',' : ''}` : ''}${span}.`,
+      `${as(appDev)} ${lowerFirst(withoutLead(appDev.summary, 'IBM'))} ${improvementSentence(appDev.metric)}`.trim(),
+      `${as(robotics)} ${lowerFirst(withoutLead(robotics.summary, 'IBM'))} ${modelResult}`.trim(),
       'Ask about the EPM work or the Spot robot for more.'
     );
   },
@@ -209,7 +223,7 @@ const ANSWERS = {
       ? paragraphs(
           describeRole(appDev),
           epmProjects.length
-            ? `Related projects: ${joinAnd(epmProjects.map((project) => `**${project.title}**`))}.`
+            ? endStop(`I also built ${countWord(epmProjects.length)} EPM projects: ${joinAnd(epmProjects.map((project) => projectLink(project)))}`)
             : ''
         )
       : '',
@@ -218,27 +232,18 @@ const ANSWERS = {
     kalshi
       ? paragraphs(
           describeRole(kalshi),
-          hedgingPaper
-            ? `You can read the paper here: ${mdLink(hedgingPaper.title, hedgingPaper.liveUrl)}.`
-            : '',
-          hedgingEngine
-            ? `I also turned the model into a simulator, **${hedgingEngine.title}**.`
-            : ''
+          hedgingPaper ? endStop(`The paper is ${mdLink(hedgingPaper.title, hedgingPaper.liveUrl)}`) : ''
         )
       : '',
 
   research: () =>
     paragraphs(
-      'My research so far:',
-      bullets(
-        research.map((paper) => {
-          const links = [
-            mdLink('PDF', paper.liveUrl),
-            paper.externalUrl ? mdLink('Handle', paper.externalUrl) : '',
-          ].filter(Boolean);
-          return `**${paper.title}.** ${paper.description} ${links.join(' · ')}`;
-        })
-      ),
+      `I’ve worked on ${countWord(research.length)} papers.`,
+      research.map((paper) => {
+        const record = paper.externalUrl ? mdLink(paper.venue || 'VTechWorks', paper.externalUrl) : paper.venue;
+        const meta = [paper.year, record].filter(Boolean).join(' · ');
+        return `${mdLink(paper.title, paper.liveUrl)}${meta ? ` · ${meta}` : ''}\n${paper.description}`;
+      }),
       hume ? `At ${inProse(hume.company)}, ${lowerFirst(withoutLead(hume.summary, hume.company))}` : ''
     ),
 
@@ -249,19 +254,22 @@ const ANSWERS = {
     ),
 
   skills: () =>
-    paragraphs(
-      'The languages and tools I work with:',
-      bullets(skillGroups.map((group) => `**${group.label}:** ${group.items.join(', ')}`))
-    ),
+    skillGroups
+      .map((group) =>
+        /^languages$/i.test(group.label)
+          ? `I program in ${joinAnd(group.items)}.`
+          : `For ${group.label.replace(/\s*&\s*/g, ' and ').replace(/^([A-Z][a-z])/, (m) => m.toLowerCase())} work I use ${joinAnd(group.items)}.`
+      )
+      .join('\n'),
 
   contact: () =>
     paragraphs(
       `You can email me at ${EMAIL_LINK}.`,
-      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}. You can read my résumé ${mdLink('here', '#/resume')} or download the ${mdLink('PDF', profile.resumeUrl)}.`
+      `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}, and you can ${mdLink('read my résumé', '#/resume')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`
     ),
 
   resume: () =>
-    `You can read my résumé ${mdLink('here', '#/resume')} or download it as a ${mdLink('PDF', profile.resumeUrl)}.`,
+    `You can ${mdLink('read my résumé', '#/resume')} or ${mdLink('download it as a PDF', profile.resumeUrl)}.`,
 
   // Recruiting answers say only what the data says: no start dates, role
   // types, availability, or job-search status beyond graduation.
@@ -271,7 +279,7 @@ const ANSWERS = {
   interests: () => `${INTERESTS} Send me a note at ${EMAIL_LINK} if the work overlaps.`,
 
   location: () =>
-    `I’m based in ${profile.location}${education.location === profile.location ? `, where I study at ${profile.school}` : ''}.`,
+    `I’m based in ${cityOf(profile.location)}${education.location === profile.location ? `, where I study at ${profile.school}` : ''}.`,
 
   /** What he does now: a student; past roles stay in the past tense. */
   current: () => {
@@ -289,15 +297,31 @@ const ANSWERS = {
     const { end } = parseRange(latest[0].date);
     const what =
       latest.length === 1
-        ? `role was ${article(latest[0].role)} ${latest[0].role}`
+        ? `role was ${article(lowerRole(latest[0].role))} ${lowerRole(latest[0].role)}`
         : latest.every((job) => /intern/i.test(job.role))
           ? `roles were ${countWord(latest.length)} internships`
-          : `roles were ${joinAnd(latest.map((job) => job.role))}`;
+          : `roles were ${joinAnd(latest.map((job) => lowerRole(job.role)))}`;
     const companies = joinAnd([...new Set(latest.map((job) => inProse(job.company)))]);
     return paragraphs(
       student,
       `My most recent ${what} at ${companies}, which ended in ${MONTHS[end.month]} ${end.year}.`
     );
+  },
+
+  /** Only what the About photos show, in Rohan's caption where there is one. */
+  fun: () => {
+    const photo = (id) => photos.find((item) => item.id === id);
+    const activities = ['paragliding', 'kayaking', 'basketball'].map(photo).filter(Boolean);
+    if (!activities.length) return '';
+    const captioned = activities.find((item) => item.caption);
+    const switzerland = photo('switzerland');
+    return [
+      endStop(`Some things I do away from work: ${joinAnd(activities.map((item) => item.label.toLowerCase()))}`),
+      captioned ? endStop(`${captioned.label} is ${lowerFirst(captioned.caption).replace(/[.!]$/, '')}`) : '',
+      `There are photos in the ${mdLink('About', '#about')} section${switzerland ? `, including one from ${switzerland.label}` : ''}.`,
+    ]
+      .filter(Boolean)
+      .join(' ');
   },
 
   bestProject: () => {
@@ -309,35 +333,34 @@ const ANSWERS = {
     ]
       .map(([slug, reason]) => {
         const project = findProject(slug);
-        return project ? `**${project.title}** ${reason}` : null;
+        return project ? `${projectLink(project)} ${reason}` : null;
       })
       .filter(Boolean);
     return paragraphs(
       'I’d start with these:',
       bullets(picks),
-      `All ${projects.length} are in the ${mdLink('Projects', '#projects')} section. Ask about any of them by name.`
+      `All ${projects.length} are in the ${mdLink('Projects', '#projects')} section.`
     );
   },
 
   projectCount: () =>
-    `There are ${projects.length} projects on this site, and ${countWord(featuredProjects.length)} are featured: ${joinAnd(featuredProjects.map((project) => `**${shortTitle(project.title)}**`))}. They’re all in the ${mdLink('Projects', '#projects')} section.`,
+    `There are ${projects.length} projects on this site, and ${countWord(featuredProjects.length)} are featured: ${endStop(joinAnd(featuredProjects.map((project) => projectLink(project, shortTitle(project.title)))))} They’re all in the ${mdLink('Projects', '#projects')} section.`,
 
   experience: () =>
     paragraphs(
       'These are the roles on my résumé:',
       bullets(
-        workExperience.map(
-          (job) =>
-            `**${job.company}**, ${job.role}${hasRealDate(job.date) ? ` (${job.date})` : ''}`
-        )
-      ),
-      'Ask about any of them by name.'
+        workExperience.map((job) => {
+          const when = spanOf([job]).trim().replace(/^from /, '');
+          return `${capitalize(lowerRole(job.role))} at ${inProse(job.company)}${when ? `, ${when}` : ''}`;
+        })
+      )
     ),
 
   intro: () =>
     paragraphs(
       profile.intro.replace(/^I’m an? /, `I’m ${profile.name}, a `),
-      `I’m based in ${profile.location}, and I graduate in ${profile.graduation}.`
+      `I’m based in ${cityOf(profile.location)}, and I graduate in ${profile.graduation}.`
     ),
 
   meta: () =>
@@ -364,10 +387,7 @@ const ANSWERS = {
 /** Work authorization, visas, sponsorship, pay, offers: never answered from data. */
 const DIRECT_REPLY = `I’d rather discuss that directly. You can email me at ${EMAIL_LINK}.`;
 
-const UNKNOWN_REPLY = paragraphs(
-  'I don’t have anything about that in my résumé or project notes, so I won’t guess.',
-  `I can tell you about my internships at IBM, my Kalshi research, my projects, school, or skills. For anything else, email me at ${EMAIL_LINK}.`
-);
+const UNKNOWN_REPLY = `That isn’t in my résumé or project notes, and this chat only answers from those. You can ask about my internships at IBM, my Kalshi research, my projects, school, or skills. For anything else, email me at ${EMAIL_LINK} and I’ll answer it myself.`;
 
 /* ------------------------------------------------------------------ */
 /* Matching                                                            */
@@ -381,7 +401,7 @@ export function normalize(text) {
   return String(text || '')
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/c\+\+/g, ' cpp ')
     .replace(/c#/g, ' csharp ')
     .replace(/\.js\b/g, 'js')
@@ -543,32 +563,32 @@ const projectEntries = projects.map((project) =>
 const PROJECT_GROUPS = [
   {
     id: 'quant',
-    intro: 'My quant projects:',
+    intro: 'My quant projects are',
     terms: ['quant project*', 'quantitative project*', 'finance project*', 'trading project*', 'market project*'],
     test: (project) => project.category === 'Quant',
   },
   {
     id: 'ai',
-    intro: 'My AI projects:',
+    intro: 'My AI projects are',
     terms: ['ai project*', 'machine learning project*', 'ml project*', 'llm project*'],
     test: (project) => /\bAI\b/.test(project.category),
   },
   {
     id: 'robotics',
-    intro: 'My robotics, vision, and hardware projects:',
+    intro: 'My robotics, vision, and hardware projects are',
     terms: ['robotics project*', 'robot project*', 'vision project*', 'hardware project*'],
     test: (project) =>
       /robot|vision|opencv|spot|hardware|embedded/i.test([project.title, ...project.tags].join(' ')),
   },
   {
     id: 'web',
-    intro: 'My web projects:',
+    intro: 'My web projects are',
     terms: ['web project*', 'web app*', 'website*', 'full stack'],
     test: (project) => project.category === 'Web',
   },
   {
     id: 'study',
-    intro: 'Projects I made for school and studying:',
+    intro: 'The projects I made for school and studying are',
     terms: ['study tool*', 'education project*', 'school project*', 'learning tool*'],
     test: (project) => project.category === 'Education',
   },
@@ -579,13 +599,7 @@ const groupEntries = PROJECT_GROUPS.map((group) =>
     id: `projects:${group.id}`,
     terms: group.terms,
     answer: () =>
-      paragraphs(
-        group.intro,
-        bullets(
-          projects.filter(group.test).map((project) => `**${project.title}.** ${project.description}`)
-        ),
-        'Ask about any of them for links and details.'
-      ),
+      endStop(`${group.intro} ${joinAnd(projects.filter(group.test).map((project) => projectLink(project)))}`),
   })
 );
 
@@ -674,6 +688,14 @@ const OVERVIEWS = [
     terms: ['experience', 'work history', 'worked', 'jobs', 'internships', 'employers', 'companies', 'roles'],
     answer: ANSWERS.experience,
   }),
+  entry({
+    id: 'fun',
+    terms: [
+      'for fun', 'hobby', 'hobbies', 'free time', 'spare time', 'outside of work', 'outside work', 'away from work',
+      'what do you like to do', 'what do you enjoy', 'weekend*', 'paraglid*', 'kayak*', 'basketball', 'sport*', 'travel*', 'switzerland', 'outdoors',
+    ],
+    answer: ANSWERS.fun,
+  }),
   // Below topics, companies, and projects so "what are you working on at IBM" stays about IBM.
   entry({
     id: 'intro',
@@ -750,7 +772,7 @@ export function findFollowUp(input, lastId) {
   }
   const project = lastId.startsWith('project:') && findProject(lastId.slice('project:'.length));
   if (project?.longDescription) {
-    return { id: `${lastId}:more`, answer: paragraphs(project.longDescription, projectLinks(project)) };
+    return { id: `${lastId}:more`, answer: project.longDescription };
   }
   return {
     id: 'follow-up',
@@ -813,11 +835,11 @@ async function requestLiveReply({ history, input, signal }) {
     });
   } catch (error) {
     if (error?.name === 'AbortError') throw error;
-    throw new Error('Couldn’t reach the chat service. Check your connection and try again.');
+    throw new Error('Couldn’t reach the chat service. Check your connection.');
   }
 
   if (!response.ok) {
-    throw new Error('The chat service isn’t responding right now. Try again in a moment.');
+    throw new Error('The chat service isn’t responding right now.');
   }
 
   let data;
@@ -825,11 +847,11 @@ async function requestLiveReply({ history, input, signal }) {
     data = await response.json();
   } catch (error) {
     if (error?.name === 'AbortError') throw error;
-    throw new Error('The chat service sent back something unreadable. Try again.');
+    throw new Error('The chat service sent back something unreadable.');
   }
   const content = data?.response ?? data?.content ?? data?.message;
   if (typeof content !== 'string' || !content.trim()) {
-    throw new Error('The chat service sent back an empty answer. Try again.');
+    throw new Error('The chat service sent back an empty answer.');
   }
   return content.trim();
 }
@@ -944,10 +966,10 @@ export function useRohanGPTChat() {
         if (caught?.name === 'AbortError' && !timedOut) return;
         setError(
           timedOut
-            ? 'That took too long. Try again in a moment.'
+            ? 'That took too long.'
             : caught instanceof Error
               ? caught.message
-              : 'Something went wrong. Try again.'
+              : 'Something went wrong.'
         );
       } finally {
         if (!isStale()) {

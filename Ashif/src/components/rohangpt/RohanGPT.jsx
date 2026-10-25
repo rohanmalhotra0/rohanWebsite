@@ -10,7 +10,7 @@ import ChatPanel from './ChatPanel';
 import SuggestionList from './SuggestionList';
 
 const DESCRIPTION =
-  'Answers come from my résumé and project notes. If it doesn’t know something, it says so.';
+  'This chat answers from my résumé and project notes. If something isn’t in them, it says so.';
 const SUGGESTIONS_TITLE_ID = 'rohangpt-suggestions-title';
 
 export default function RohanGPT() {
