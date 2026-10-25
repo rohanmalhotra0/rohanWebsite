@@ -63,7 +63,7 @@ def section(title, *blocks):
 # ---------------------------------------------------------------- education
 
 NYU = "New York University, Courant Institute of Mathematical Sciences"
-DEGREE = "B.A. in Computer Science, Minor in Mathematics"
+DEGREE = "B.A. in Mathematics and Computer Science (Double Major)"
 GPA = "**GPA:** 3.7/4.0  |  Accelerated three-year degree  |  **Graduate course:** Mathematical Techniques for CS Applications"
 
 COURSES = {
@@ -266,7 +266,7 @@ RESUMES = {}
 
 # ===== General (LinkedIn) =====
 RESUMES["General"] = [
-    para("NYU Computer Science student (accelerated, May 2027) building quantitative, AI, and robotics systems: LLM tools "
+    para("NYU Math and Computer Science double major (accelerated, May 2027) building quantitative, AI, and robotics systems: LLM tools "
          "and Spot robot vision at IBM, prediction-market risk research at Kalshi, and imaging tests for an ISS-deployed CubeSat."),
     education(),
     section("Experience",

@@ -2,13 +2,13 @@
 
 ## Headline (paste as-is)
 
-CS @ NYU Courant | Quant, AI & Robotics | Prev: IBM, Kalshi, Virginia Tech Hume Center | I build LLM tools, trading systems, and robot vision
+Math & CS @ NYU Courant | Quant, AI & Robotics | Prev: IBM, Kalshi, Virginia Tech Hume Center | I build LLM tools, trading systems, and robot vision
 
 ## About
 
 I learn by building. When I got curious about prediction markets, I built a hedging model at Kalshi. When I wanted to understand computer vision, I trained a Boston Dynamics Spot robot to find a dog toy at IBM.
 
-I'm finishing an accelerated Computer Science degree (Math minor) at NYU Courant and graduate in May 2027.
+I'm finishing an accelerated Math and Computer Science double major at NYU Courant and graduate in May 2027.
 
 Recent work:
 • IBM: fine-tuned an LLM that raised Oracle EPM build accuracy from 36.7% to 95.0%, and built a YOLO11 vision system for Spot (99.5% mAP@50).
