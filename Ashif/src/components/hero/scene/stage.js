@@ -113,13 +113,7 @@ const LIGHTING = {
 };
 
 export function createStage(renderer, scene, { mobile, home }) {
-  // Soft studio reflections, baked once.
-  const pmrem = new PMREMGenerator(renderer);
-  const room = new RoomEnvironment();
-  const envTarget = pmrem.fromScene(room, 0.04);
-  scene.environment = envTarget.texture;
-  room.dispose();
-  pmrem.dispose();
+  let envTarget = null;
 
   const hemi = new HemisphereLight(0xffffff, 0x808080, 1);
   const key = new DirectionalLight(0xfffaf2, 2.6);
@@ -173,6 +167,17 @@ export function createStage(renderer, scene, { mobile, home }) {
   return {
     uniforms,
 
+    /** Soft studio reflections, baked once (a separate boot step: it compiles and renders). */
+    bakeEnvironment() {
+      if (envTarget) return;
+      const pmrem = new PMREMGenerator(renderer);
+      const room = new RoomEnvironment();
+      envTarget = pmrem.fromScene(room, 0.04);
+      scene.environment = envTarget.texture;
+      room.dispose();
+      pmrem.dispose();
+    },
+
     /** Smaller shadow maps for slower devices (no shader recompiles). */
     setShadowSize(px) {
       if (key.shadow.mapSize.x === px) return;
@@ -213,7 +218,7 @@ export function createStage(renderer, scene, { mobile, home }) {
     },
 
     dispose() {
-      envTarget.dispose();
+      envTarget?.dispose();
       plane.dispose();
       floor.material.dispose();
       catcher.material.dispose();

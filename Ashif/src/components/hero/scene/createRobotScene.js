@@ -20,14 +20,15 @@ import { createBrain, STATUS } from './brain';
 import { boneGeometry, createToy, TOY_REST } from './toy';
 import { createStage } from './stage';
 import { createFeed } from './feed';
-import { clamp, damp, smooth } from './math';
+import { approach, clamp, damp, smooth } from './math';
 import { readPalette } from '../palette';
 
 const HOME = { x: 0, z: 0, yaw: -0.62 };
-const TARGET = new Vector3(0, 0.17, 0.02);
-// Camera framing: a 3/4 view that "contains" the robot at a reference aspect,
-// matching how the poster image is fitted with object-fit: contain.
-export const VIEW = { az: 0.08, el: 0.32, dist: 3.85, fov: 27, aspect: 1 };
+const TARGET = new Vector3(0, 0.24, 0.02);
+// Camera framing: a 3/4 view of a square reference frame (the poster). Wide
+// stages crop its top and bottom by up to `crop`, narrow ones fit its width;
+// the poster is sized in CSS with the same rule (see RobotStage).
+export const VIEW = { az: 0.08, el: 0.32, dist: 3.85, fov: 27, crop: 0.72 };
 const BOUNDS = { minX: -1.7, maxX: 1.7, minZ: -1.25, maxZ: 1.4 };
 // Where the gripper camera looks on frame one (and in the poster).
 const FIRST_LOOK = new Vector3(-0.95, 0.1, 1.15);
@@ -42,6 +43,12 @@ const QUALITY = [
   { ratio: 0.5, min: 0.75, shadow: 512, feed: 1 / 12 },
 ];
 
+// The camera inset shows only while there is something to watch: from a
+// throw until a moment after the toy is back on the floor.
+const WATCH = new Set(['track', 'approach', 'reach', 'lift', 'return', 'present']);
+const LINGER = 2.2;
+const FEED_FADE = 0.3; // seconds; matches the frame's CSS opacity transition
+
 const yieldToPage = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 /**
@@ -49,9 +56,10 @@ const yieldToPage = () => new Promise((resolve) => setTimeout(resolve, 0));
  * stays responsive. Returns null when a WebGL 2 renderer can't be created.
  *
  * `overlay` holds React refs to the DOM over the canvas (camera inset frame,
- * detection box, HUD line, controls). `onSlow` fires when the
- * device can't keep up even at the lowest quality (unless `forced`). In
- * poster mode it renders one still frame and exposes `capture()`.
+ * detection box, HUD line, controls); the scene sets the frame's opacity.
+ * Slow frames step quality down; a second or so of frames over 100 ms stops
+ * the loop and calls `onSlow` (unless `forced`). In poster mode it renders
+ * one still frame and exposes `capture()`.
  */
 export function createRobotScene({
   host,
@@ -61,7 +69,6 @@ export function createRobotScene({
   poster = false,
   forced = false,
   onReady,
-  onStatus,
   onAnnounce,
   onInteract,
   onLost,
@@ -116,6 +123,7 @@ export function createRobotScene({
   let disposed = false;
   let first = true;
   let manual = false;
+  let gaveUp = false;
   let lastEvent = 0;
   let raf = 0;
   let last = 0;
@@ -136,6 +144,35 @@ export function createRobotScene({
     camera.updateMatrixWorld();
   }
 
+  // Auto-framing: `zoom` is the fraction of the reference frame's height in
+  // view. It sits at the stage's default and widens just enough to keep the
+  // raised arm and the body's ends inside the frame, then eases back.
+  const TAN = Math.tan((VIEW.fov * Math.PI) / 360);
+  const corner = new Vector3();
+  let baseZoom = 1;
+  let zoom = 1;
+
+  function frameRobot(dt) {
+    let need = baseZoom;
+    const s = ctl.state;
+    const fit = (p, pad) => {
+      p.applyMatrix4(camera.matrixWorldInverse);
+      if (p.z > -0.1) return;
+      need = Math.max(
+        need,
+        (p.y / -p.z / TAN + pad) / 0.88,
+        (Math.abs(p.x / -p.z) / TAN + pad) / (0.94 * camera.aspect)
+      );
+    };
+    for (const o of [rig.arm.elbow, rig.arm.wrist, rig.arm.grasp]) fit(o.getWorldPosition(corner), 0.06);
+    for (const end of [0.5, -0.5]) {
+      fit(corner.set(s.x + Math.sin(s.yaw) * end, 0.5, s.z + Math.cos(s.yaw) * end), 0.04);
+    }
+    zoom = dt > 0 ? damp(zoom, need, need > zoom ? 5 : 1.2, dt) : need;
+    camera.fov = (Math.atan(TAN * zoom) * 360) / Math.PI;
+    camera.updateProjectionMatrix();
+  }
+
   const baseRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
   let quality = 0;
   let pixelRatio = baseRatio;
@@ -151,13 +188,14 @@ export function createRobotScene({
     height = h;
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(w, h, false);
-    const aspect = w / h;
-    camera.aspect = aspect;
-    camera.fov =
-      aspect >= VIEW.aspect
-        ? VIEW.fov
-        : (Math.atan(Math.tan((VIEW.fov * Math.PI) / 360) * (VIEW.aspect / aspect)) * 360) / Math.PI;
-    camera.updateProjectionMatrix();
+    camera.aspect = w / h;
+    baseZoom = Math.max(1 / camera.aspect, VIEW.crop);
+    if (ctl) frameRobot(0);
+    else {
+      zoom = baseZoom;
+      camera.fov = (Math.atan(TAN * zoom) * 360) / Math.PI;
+      camera.updateProjectionMatrix();
+    }
     const inset = el('frame');
     if (feed && inset) {
       const f = inset.getBoundingClientRect();
@@ -211,7 +249,7 @@ export function createRobotScene({
     const c = canvas.getBoundingClientRect();
     for (const key of ['frame', 'controls']) {
       const r = el(key)?.getBoundingClientRect();
-      if (r && x > r.left - c.left - 48 && x < r.right - c.left + 48 && y > r.top - c.top - 56 && y < r.bottom - c.top + 48) {
+      if (r?.width && x > r.left - c.left - 48 && x < r.right - c.left + 48 && y > r.top - c.top - 56 && y < r.bottom - c.top + 48) {
         return false;
       }
     }
@@ -386,6 +424,23 @@ export function createRobotScene({
   let feedClock = Infinity;
   let hudText = '';
   let boxShown = false;
+  let clock = 0;
+  let watchUntil = -1;
+  let feedFade = 0;
+  let feedShown = false;
+
+  /** Fade the inset in for a fetch and out a moment after (WebGL quad and DOM frame together). */
+  function updateInset(dt) {
+    clock += dt;
+    if (WATCH.has(brain.state)) watchUntil = clock + LINGER;
+    const want = Boolean(feed?.rect.w) && clock < watchUntil;
+    feedFade = approach(feedFade, want ? 1 : 0, dt / FEED_FADE);
+    if (want === feedShown) return;
+    feedShown = want;
+    if (want) feedClock = Infinity;
+    const frameEl = el('frame');
+    if (frameEl) frameEl.style.opacity = want ? '1' : '0';
+  }
 
   function step(dt) {
     if (!poster) updatePointer(dt);
@@ -402,6 +457,8 @@ export function createRobotScene({
     }
     stage.update(ctl, toyWorld, strength, hover);
     scene.updateMatrixWorld();
+    frameRobot(dt);
+    if (feed) updateInset(dt);
   }
 
   // The "detection" is the toy's real projected bounds in the robot camera;
@@ -433,7 +490,8 @@ export function createRobotScene({
 
   function draw(dt) {
     renderer.shadowMap.needsUpdate = true;
-    if (feed) {
+    const inset = feed && feedFade > 0;
+    if (inset) {
       feedClock += dt;
       if (feedClock >= feedInterval) {
         feedClock = feedClock === Infinity ? 0 : feedClock % feedInterval;
@@ -444,7 +502,7 @@ export function createRobotScene({
     }
     stage.setView(width * pixelRatio, height * pixelRatio, true);
     renderer.render(scene, camera);
-    feed?.draw(width, height);
+    if (inset) feed.draw(width, height, feedFade);
   }
 
   function frame(dt) {
@@ -458,14 +516,29 @@ export function createRobotScene({
 
   // Loop, visibility and adaptive quality ----------------------------------
 
-  const perf = { skip: 8, samples: [] };
+  const perf = { skip: 3, samples: [], slow: 0, slowMs: 0 };
 
-  // Median frame interval over 30 frames: step quality down above ~30 fps
-  // budget, and give up (poster + "Run demo") if it is hopeless.
+  // Frames over 100 ms several times in a row (about a second of real jank,
+  // where one long task elsewhere counts once) mean no usable GPU: stop now
+  // and hand back to the poster + "Run demo". Otherwise the median of 30
+  // frames steps quality down above a ~30 fps budget.
   function measure(ms) {
     if (perf.skip > 0) {
       perf.skip--;
       return;
+    }
+    if (ms > 100) {
+      perf.slow += 1;
+      perf.slowMs += Math.min(ms, 400);
+      if (!forced && perf.slow >= 4 && perf.slowMs >= 1000) {
+        gaveUp = true;
+        sync();
+        onSlow?.();
+        return;
+      }
+    } else {
+      perf.slow = 0;
+      perf.slowMs = 0;
     }
     perf.samples.push(ms);
     if (perf.samples.length < 30) return;
@@ -473,8 +546,7 @@ export function createRobotScene({
     const median = perf.samples[15];
     perf.samples.length = 0;
     perf.skip = 6;
-    if (median > 100 && !forced) onSlow?.();
-    else if (median > 34 && quality < QUALITY.length - 1) setQuality(quality + 1);
+    if (median > 34 && quality < QUALITY.length - 1) setQuality(quality + 1);
   }
 
   function tick(now) {
@@ -492,7 +564,13 @@ export function createRobotScene({
 
   function sync() {
     const should =
-      ready && visible && !document.hidden && !lost && !disposed && !(import.meta.env.DEV && manual);
+      ready &&
+      visible &&
+      !document.hidden &&
+      !lost &&
+      !disposed &&
+      !gaveUp &&
+      !(import.meta.env.DEV && manual);
     if (should && !running) {
       running = true;
       last = 0;
@@ -519,12 +597,14 @@ export function createRobotScene({
    * screen and for the camera's offscreen target, yielding in between.
    */
   async function warmUp() {
+    const target = feed?.rect.w ? feed.target : null;
     if (renderer.extensions.has('KHR_parallel_shader_compile')) {
       const jobs = [renderer.compileAsync(scene, camera)];
-      if (feed) {
-        renderer.setRenderTarget(feed.target);
+      if (target) {
+        renderer.setRenderTarget(target);
         jobs.push(renderer.compileAsync(scene, camera));
         renderer.setRenderTarget(null);
+        jobs.push(feed.warm());
       }
       await Promise.all(jobs).catch(() => {});
       return;
@@ -543,8 +623,8 @@ export function createRobotScene({
       for (const m of list) m.visible = true;
       renderer.shadowMap.needsUpdate = true;
       renderer.render(scene, camera);
-      if (feed) {
-        renderer.setRenderTarget(feed.target);
+      if (target) {
+        renderer.setRenderTarget(target);
         renderer.render(scene, camera);
         renderer.setRenderTarget(null);
       }
@@ -552,7 +632,7 @@ export function createRobotScene({
       if (disposed) return;
     }
     for (const [m, v] of shown) m.visible = v;
-    feed?.draw(width, height);
+    if (target) feed.draw(width, height, 0);
   }
 
   async function boot() {
@@ -578,7 +658,6 @@ export function createRobotScene({
       onChange(state, message) {
         lastEvent = performance.now();
         status = STATUS[state];
-        onStatus?.(status);
         if (message) onAnnounce?.(message);
       },
     });
@@ -587,11 +666,14 @@ export function createRobotScene({
     await yieldToPage();
     if (disposed) return;
     stage = createStage(renderer, scene, { mobile, home: HOME });
-    stage.setShadowSize(mobile ? 1024 : 2048);
     applyPalette(palette);
-    resize();
     placeCamera();
     scene.updateMatrixWorld();
+    resize();
+    // The reflection bake compiles and renders on its own; give it a task.
+    await yieldToPage();
+    if (disposed) return;
+    stage.bakeEnvironment();
 
     if (poster) {
       frame(0);
@@ -694,6 +776,8 @@ export function createRobotScene({
       window.removeEventListener('pointercancel', onPointerCancel);
       document.documentElement.removeEventListener('pointerleave', onPointerLeave);
       document.removeEventListener('visibilitychange', sync);
+      const frameEl = el('frame');
+      if (frameEl) frameEl.style.opacity = '';
       scene.traverse((o) => o.geometry?.dispose());
       for (const m of Object.values(materials)) m.dispose();
       toyMaterial.dispose();

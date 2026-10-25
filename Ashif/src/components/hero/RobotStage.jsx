@@ -19,10 +19,9 @@ const TAP = 'max-lg:h-11 max-lg:px-4';
 export default function RobotStage({ className }) {
   const { theme } = useTheme();
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
-  const coarse = useMediaQuery('(pointer: coarse)');
   const stage = useRobotScene({ reducedMotion: reduced });
   const [posterFailed, setPosterFailed] = useState(false);
-  const { live, touched } = stage;
+  const { live, touched, canRun } = stage;
 
   return (
     <div
@@ -32,7 +31,7 @@ export default function RobotStage({ className }) {
         className
       )}
     >
-      <div className="relative h-[40svh] max-h-[440px] min-h-[280px] lg:absolute lg:inset-0 lg:h-auto lg:max-h-none lg:min-h-0">
+      <div className="relative h-[40svh] max-h-[440px] min-h-[280px] [container-type:size] lg:absolute lg:inset-0 lg:h-auto lg:max-h-none lg:min-h-0">
         <div role="img" aria-label={live ? LIVE_LABEL : STILL_LABEL} className="absolute inset-0">
           {posterFailed ? null : (
             <img
@@ -44,10 +43,12 @@ export default function RobotStage({ className }) {
               fetchPriority="high"
               draggable={false}
               onError={() => setPosterFailed(true)}
-              // The poster is the scene's first frame: it stays opaque under
-              // the canvas while that fades in, then drops out (no ghosting).
+              // The poster is the scene's first frame, sized like the camera
+              // frames it (square, cropped at most 28% on wide stages). It
+              // stays opaque under the canvas while that fades in, then drops
+              // out, so the swap never ghosts.
               className={cn(
-                'absolute inset-0 size-full select-none object-contain transition-opacity duration-0',
+                'absolute left-1/2 top-1/2 size-[min(100cqw,138.9cqh)] max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-0',
                 live && 'opacity-0 delay-300'
               )}
             />
@@ -58,15 +59,13 @@ export default function RobotStage({ className }) {
           />
         </div>
 
-        {/* Inset for the robot's camera; the canvas draws its view into this rect. */}
+        {/* Inset for the robot's camera: the canvas draws its view into this
+            rect and fades it in (opacity set by the scene) only during a
+            fetch. Phones skip it; the stage is too short to share. */}
         <div
           ref={stage.frameRef}
           aria-hidden="true"
-          className={cn(
-            'pointer-events-none absolute bottom-2 right-[var(--gutter)] h-[72px] w-[128px] opacity-0 transition-opacity duration-500 sm:h-[90px] sm:w-[160px]',
-            'lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]',
-            live && 'opacity-100'
-          )}
+          className="pointer-events-none absolute bottom-2 right-[var(--gutter)] h-[90px] w-[160px] opacity-0 transition-opacity duration-300 ease-linear max-sm:hidden lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]"
         >
           <div className="absolute inset-0 overflow-hidden rounded-lg ring-1 ring-inset ring-fg/10">
             <div ref={stage.boxRef} className="absolute left-0 top-0 rounded-[3px] border border-accent opacity-0">
@@ -75,9 +74,11 @@ export default function RobotStage({ className }) {
               </span>
             </div>
           </div>
+          {/* Below lg the robot fills the short stage and walks behind anything
+              above the inset, so the readout sits under it. */}
           <p
             ref={stage.hudRef}
-            className="absolute bottom-full right-0 mb-1.5 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:text-[11px]"
+            className="absolute right-0 top-full mt-1 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:bottom-full lg:top-auto lg:mb-1.5 lg:mt-0 lg:text-[11px]"
           >
             cam0 · simulated · idle
           </p>
@@ -88,32 +89,32 @@ export default function RobotStage({ className }) {
         </p>
       </div>
 
-      {live || stage.canRun ? (
-        <div
-          ref={stage.controlsRef}
-          className="mt-3 flex items-center gap-4 px-[var(--gutter)] lg:absolute lg:bottom-4 lg:left-0 lg:mt-0 lg:flex-col-reverse lg:items-start lg:gap-1.5 lg:px-0"
-        >
-          {live ? (
-            <>
-              <Button variant="secondary" size="sm" onClick={stage.throwToy} className={TAP}>
-                Throw a toy
-              </Button>
-              <p
-                className={cn(
-                  'text-[13px] leading-5 text-subtle transition-opacity duration-500',
-                  touched && 'opacity-0'
-                )}
-              >
-                {coarse ? 'Tap' : 'Click'} the floor to throw a toy.
-              </p>
-            </>
-          ) : (
-            <Button variant="secondary" size="sm" onClick={stage.runDemo} className={TAP}>
-              Run demo
+      {/* Always rendered, so the row's height is reserved from first paint
+          (no layout shift when the scene comes up); hidden until usable. */}
+      <div
+        ref={stage.controlsRef}
+        className={cn(
+          'mt-3 flex items-center gap-4 px-[var(--gutter)] transition-opacity duration-300 max-lg:min-h-11 sm:mt-5',
+          'lg:absolute lg:bottom-4 lg:left-0 lg:mt-0 lg:flex-col-reverse lg:items-start lg:gap-1.5 lg:px-0',
+          !(live || canRun) && 'invisible opacity-0'
+        )}
+      >
+        {canRun ? (
+          <Button variant="secondary" size="sm" onClick={stage.runDemo} className={TAP}>
+            Run demo
+          </Button>
+        ) : (
+          <>
+            <Button variant="secondary" size="sm" onClick={stage.throwToy} className={TAP}>
+              Throw a toy
             </Button>
-          )}
-        </div>
-      ) : null}
+            <p className={cn('text-[13px] leading-5 text-subtle transition-opacity duration-500', touched && 'opacity-0')}>
+              <span className="pointer-coarse:hidden">Click</span>
+              <span className="hidden pointer-coarse:inline">Tap</span> the floor to throw a toy.
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }

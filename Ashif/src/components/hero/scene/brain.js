@@ -195,7 +195,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
         ctl.stop();
         const fx = Math.sin(s.yaw);
         const fz = Math.cos(s.yaw);
-        goal.set(s.x + fx * 0.66, 0.62, s.z + fz * 0.66);
+        goal.set(s.x + fx * 0.46, 0.6, s.z + fz * 0.46);
         dir.set(fx * 0.94, -0.34, fz * 0.94);
         if (time < 1.45) {
           const k = easeInOut(time / 0.8);

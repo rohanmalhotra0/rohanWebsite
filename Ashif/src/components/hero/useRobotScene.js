@@ -1,15 +1,52 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { readPalette } from './palette';
 
-/** WebGL 2 check on a throwaway canvas, so no renderer is built (or logs) without it. */
-function supportsWebGL2() {
+const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render driver|microsoft basic/i;
+
+/** QA override for tools that render on software GL on purpose. */
+function forceWebGL() {
   try {
-    const gl = document.createElement('canvas').getContext('webgl2');
-    gl?.getExtension('WEBGL_lose_context')?.loseContext();
-    return Boolean(gl);
+    if (window.localStorage.getItem('rm-webgl') === 'force') return true;
   } catch {
-    return false;
+    // Storage blocked: fall through to the URL flag.
   }
+  return new URLSearchParams(window.location.search).get('webgl') === 'force';
+}
+
+function context(options) {
+  try {
+    return document.createElement('canvas').getContext('webgl2', options);
+  } catch {
+    return null;
+  }
+}
+
+function rendererName(gl) {
+  const name = gl.getParameter(gl.RENDERER) || '';
+  // Chromium and Safari mask RENDERER; Firefox reports the real one (and
+  // warns about the debug extension), so only ask the extension when masked.
+  if (!/^webkit webgl$/i.test(name)) return name;
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  return (info && gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) || name;
+}
+
+/**
+ * Probe WebGL 2 on throwaway canvases, so no renderer is built (or logs)
+ * without it: 'none', 'software' (no GPU: SwiftShader, llvmpipe, a basic
+ * display driver) or 'gpu'.
+ */
+function probeWebGL() {
+  const force = forceWebGL();
+  const fast = context({ failIfMajorPerformanceCaveat: true });
+  if (fast) {
+    const software = SOFTWARE.test(rendererName(fast));
+    fast.getExtension('WEBGL_lose_context')?.loseContext();
+    return software && !force ? 'software' : 'gpu';
+  }
+  const slow = context();
+  if (!slow) return 'none';
+  slow.getExtension('WEBGL_lose_context')?.loseContext();
+  return force ? 'gpu' : 'software';
 }
 
 /**
@@ -46,7 +83,8 @@ function whenSettled(img, signal) {
  * itself) and disposes it on unmount.
  *
  * `mode` is 'auto' (run unless the user prefers reduced motion), 'paused'
- * (the device was too slow) or 'forced' (the user pressed "Run demo").
+ * (software rendering, or frames too slow) or 'forced' (the user pressed
+ * "Run demo").
  */
 export default function useRobotScene({ reducedMotion }) {
   const hostRef = useRef(null);
@@ -67,7 +105,11 @@ export default function useRobotScene({ reducedMotion }) {
   );
 
   useEffect(() => {
-    setWebgl(supportsWebGL2());
+    const gl = probeWebGL();
+    setWebgl(gl !== 'none');
+    // Without a GPU the scene would block the main thread for seconds: keep
+    // the poster and let the visitor opt in.
+    if (gl === 'software') setMode('paused');
   }, []);
 
   const active = webgl === true && (mode === 'forced' || (mode === 'auto' && !reducedMotion));
