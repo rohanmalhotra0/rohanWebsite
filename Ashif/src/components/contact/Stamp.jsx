@@ -1,13 +1,5 @@
-import { useId } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-
-// The lab posters from the home page (scripts/posters), one per palette and
-// theme. CSS shows the one that matches (the Contact section of index.css);
-// the hidden ones are lazy, so they're never fetched, and the shown one waits
-// for layout instead of competing with the page's first paint.
-const POSTERS = ['spot', 'terminal', 'courant', 'market', 'paper'].flatMap((palette) =>
-  ['light', 'dark'].map((theme) => `${palette}-${theme}`)
-);
 
 /**
  * The postmark: two rings with the site's address around them, the day the
@@ -48,23 +40,40 @@ function Postmark({ className }) {
   );
 }
 
-/** The postcard's stamp: the home page's robot in the current palette, postmarked once sent. */
+/**
+ * The postcard's stamp: the home page's robot in the current palette (CSS
+ * picks the poster; see the Contact section of index.css), postmarked once
+ * sent. The poster loads once the stamp nears the screen (data-near), so it
+ * never competes with the page's first paint.
+ */
 export default function Stamp({ sent, className }) {
+  const ref = useRef(null);
+  const [near, setNear] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !('IntersectionObserver' in window)) return undefined;
+    const seen = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        seen.disconnect();
+        setNear(true);
+      },
+      { rootMargin: '400px 0px' }
+    );
+    seen.observe(element);
+    return () => seen.disconnect();
+  }, []);
+
   return (
-    <div aria-hidden="true" className={cn('pointer-events-none select-none', className)}>
+    <div
+      ref={ref}
+      aria-hidden="true"
+      data-near={near || undefined}
+      className={cn('pointer-events-none select-none', className)}
+    >
       <div className="stamp size-full rotate-3">
-        <div className="stamp-art">
-          {POSTERS.map((poster) => (
-            <img
-              key={poster}
-              src={`/img/hero/robot-${poster}-800.webp`}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              data-poster={poster}
-            />
-          ))}
-        </div>
+        <div className="stamp-art" />
       </div>
       {sent ? (
         <Postmark className="absolute -left-[118%] top-[18%] w-[230%] -rotate-12 opacity-90" />
