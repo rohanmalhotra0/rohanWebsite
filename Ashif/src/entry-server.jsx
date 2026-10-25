@@ -1,9 +1,9 @@
 import { renderToString } from 'react-dom/server';
 import App from './App.jsx';
 import HomePage from './pages/HomePage';
-import { definePage, findRoute, loadRoute, notFoundRoute, routes } from './routes';
+import { definePage, findRoute, loadRoute, notFoundRoute, ogCard, routes } from './routes';
 
-export { notFoundRoute, routes };
+export { notFoundRoute, ogCard, routes };
 
 // As in main.jsx, the home page is part of the entry, not a lazy chunk.
 definePage('home', HomePage);
