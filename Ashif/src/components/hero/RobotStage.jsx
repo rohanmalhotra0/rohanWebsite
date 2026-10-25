@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { assetUrl } from '@/data/portfolioData';
 import Button from '@/components/primitives/Button';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import { useTheme } from '@/lib/theme';
+import { DEFAULT_PALETTE, useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import useRobotScene from './useRobotScene';
 
@@ -20,6 +20,10 @@ const TAP = 'max-lg:h-11 max-lg:px-4';
 const POSTER_SIZES = '(min-width: 1024px) 55vw, 100vw';
 const posterName = (palette, theme) => `img/hero/robot-${palette}-${theme}`;
 const posterSrcSet = (name) => `${assetUrl(`${name}-800.webp`)} 800w, ${assetUrl(`${name}.webp`)} 1600w`;
+// A square that keeps --fit-w of the stage's width and --fit-h of its height
+// in view, like the camera frames the scene.
+const POSTER_BOX =
+  'absolute left-1/2 top-1/2 size-[min(calc(100cqw/var(--fit-w)),calc(100cqh/var(--fit-h)))] max-w-none -translate-x-1/2 -translate-y-1/2 select-none';
 
 /**
  * The robot stage: a poster still that paints immediately, cross-faded to
@@ -47,7 +51,13 @@ export default function RobotStage({ className }) {
           (read by the scene too). Desktop keeps the whole width; phones crop
           a little more so the robot is bigger on a short stage. */}
       <div className="relative h-[40svh] max-h-[440px] min-h-[280px] [--fit-h:0.72] [--fit-w:1] [container-type:size] max-lg:[--fit-h:0.64] max-lg:[--fit-w:0.86] lg:absolute lg:inset-0 lg:h-auto lg:max-h-none lg:min-h-0">
-        <div role="img" aria-label={live ? LIVE_LABEL : STILL_LABEL} className="absolute inset-0">
+        {/* Clipped to the stage and its rounded corners: in a lab panel the
+            stills are opaque, and the square is bigger than the stage. */}
+        <div
+          role="img"
+          aria-label={live ? LIVE_LABEL : STILL_LABEL}
+          className="absolute inset-0 overflow-hidden lg:rounded-l-[2.25rem]"
+        >
           {posterFailed ? null : (
             <img
               ref={stage.posterRef}
@@ -60,17 +70,25 @@ export default function RobotStage({ className }) {
               fetchPriority="high"
               draggable={false}
               onError={() => setPosterFailed(true)}
-              // The poster is the scene's first frame, sized like the camera
-              // frames it: a square that keeps --fit-w of its width and
-              // --fit-h of its height in view. It stays opaque under the
-              // canvas while that fades in, then drops out, so the swap never
-              // ghosts.
-              className={cn(
-                'absolute left-1/2 top-1/2 size-[min(calc(100cqw/var(--fit-w)),calc(100cqh/var(--fit-h)))] max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-0',
-                live && 'opacity-0 delay-300'
-              )}
+              // The poster is the scene's first frame, framed the same way. It
+              // stays under the canvas while that fades in, then drops out, so
+              // the swap never ghosts.
+              className={cn(POSTER_BOX, 'transition-opacity duration-0', live && 'opacity-0 delay-300')}
             />
           )}
+          {/* Without JavaScript the poster above gets no src (an inline script
+              picks the visitor's palette), and the page is in the default one. */}
+          <noscript>
+            <img
+              src={assetUrl(`${posterName(DEFAULT_PALETTE, 'light')}.webp`)}
+              srcSet={posterSrcSet(posterName(DEFAULT_PALETTE, 'light'))}
+              sizes={POSTER_SIZES}
+              alt=""
+              width={1600}
+              height={1600}
+              className={POSTER_BOX}
+            />
+          </noscript>
           <div
             ref={stage.hostRef}
             className={cn('absolute inset-0 opacity-0 transition-opacity duration-250 ease-out', live && 'opacity-100')}
@@ -92,7 +110,7 @@ export default function RobotStage({ className }) {
         <div
           ref={stage.frameRef}
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-2 right-[var(--gutter)] h-[90px] w-[160px] opacity-0 transition-opacity duration-300 ease-linear max-sm:hidden lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]"
+          className="pointer-events-none absolute bottom-2 right-[var(--gutter)] z-[2] h-[90px] w-[160px] opacity-0 transition-opacity duration-300 ease-linear max-sm:hidden lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]"
         >
           <div className="absolute inset-0 overflow-hidden rounded-lg ring-1 ring-inset ring-fg/10">
             <div ref={stage.boxRef} className="absolute left-0 top-0 rounded-[3px] border border-accent opacity-0">
@@ -121,7 +139,8 @@ export default function RobotStage({ className }) {
       <div
         ref={stage.controlsRef}
         className={cn(
-          'mt-3 flex items-center gap-4 px-[var(--gutter)] transition-opacity duration-300 max-lg:min-h-11 sm:mt-5',
+          // Above the lab panel's glow (palettes.css).
+          'relative z-[2] mt-3 flex items-center gap-4 px-[var(--gutter)] transition-opacity duration-300 max-lg:min-h-11 sm:mt-5',
           'lg:absolute lg:bottom-6 lg:left-8 lg:mt-0 lg:flex-col-reverse lg:items-start lg:gap-1.5 lg:px-0',
           !(live || canRun) && 'invisible opacity-0'
         )}

@@ -27,11 +27,17 @@
       import { createRobotScene } from '/src/components/hero/scene/createRobotScene.js';
       import { readPalette } from '/src/components/hero/palette.js';
 
-      const webp = (canvas, size) => {
+      // On a lab panel (palettes.css) the still is opaque, on the panel's
+      // color: a fraction of the size of a transparent one.
+      const webp = (canvas, size, fill) => {
         const out = document.createElement('canvas');
         out.width = size;
         out.height = size;
         const context = out.getContext('2d');
+        if (fill) {
+          context.fillStyle = fill;
+          context.fillRect(0, 0, size, size);
+        }
         context.imageSmoothingQuality = 'high';
         context.drawImage(canvas, 0, 0, size, size);
         // 0.75 looks the same as 0.86 here and saves ~15%: the still is the
@@ -56,7 +62,9 @@
         canvas.width = image.width;
         canvas.height = image.height;
         canvas.getContext('2d').drawImage(image, 0, 0);
-        return { full: webp(canvas, 1600), small: webp(canvas, 800) };
+        const panel = getComputedStyle(host.parentElement).backgroundColor;
+        const fill = panel === 'rgba(0, 0, 0, 0)' ? null : panel;
+        return { full: webp(canvas, 1600, fill), small: webp(canvas, 800, fill) };
       };
       window.postersReady = true;
     </script>
