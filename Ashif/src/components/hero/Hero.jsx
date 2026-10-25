@@ -15,7 +15,11 @@ export default function Hero() {
     <section id="top" className="relative overflow-x-clip">
       <div className="container-page grid min-h-svh grid-cols-1 content-start pb-12 pt-20 sm:pt-24 lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-8 lg:pb-10">
         <div className="relative z-10 lg:col-span-5 lg:row-start-2">
-          <h1 className="type-display text-[clamp(3.25rem,8vw,7.5rem)] text-fg">{profile.name}</h1>
+          {/* "Malhotra" is ~5.2em wide in Hubot Sans: on phones size it to the
+              gutters (with margin to spare); from lg it is a fixed display size. */}
+          <h1 className="type-display text-[length:min(calc((100vw_-_2rem)/5.6),4.5rem)] text-fg lg:text-[length:clamp(3.25rem,8vw,7.5rem)]">
+            {profile.name}
+          </h1>
           <p className="mt-5 max-w-[34rem] text-pretty text-base leading-[1.65] text-muted sm:text-[17px] lg:mt-7">
             {profile.summary}
           </p>
