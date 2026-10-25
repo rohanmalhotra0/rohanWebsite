@@ -29,39 +29,59 @@ npm run build     # outputs Ashif/dist
 - Videos (`LiteYouTube`) are a plain card until someone presses play, then a
   youtube-nocookie player loads in the same 16:9 box. Nothing is fetched from
   YouTube before that click, and with JavaScript off the card is a link.
-- `npm run build` also renders the page on the server
-  (`Ashif/src/entry-server.jsx`) and writes that HTML into `dist/index.html`
-  (`Ashif/scripts/prerender.mjs`), so the page paints before any JavaScript
-  runs; React then hydrates it. Anything the first render shows has to come out
-  the same on the server and in the browser, so values only the browser knows
-  (theme, time, saved drafts) are read after mount or through
-  `useSyncExternalStore` with a server snapshot.
+- Separate pages with real URLs: `/`, `/experience/`, `/projects/`,
+  `/research/`, `/about/`, `/chat/`, `/contact/`, and `/resume/`. A small
+  router (`Ashif/src/lib/router.js`, `RouterProvider.jsx`) turns clicks on
+  plain `<a href="/projects/">` links into in-place page changes with a short
+  crossfade, remembers scroll positions for Back, and moves focus to the new
+  page's heading. Each page's code is its own chunk, fetched on hover and
+  when the browser is idle. Old one-page links (`/#projects`, `/#/resume`,
+  `/#project/<slug>`) are redirected by `index.html`.
+- `npm run build` also renders every page on the server
+  (`Ashif/src/entry-server.jsx`) and writes each one to its own HTML file with
+  its own title and description (`Ashif/scripts/prerender.mjs`), plus
+  `404.html` and `sitemap.xml`. Pages paint before any JavaScript runs; React
+  then hydrates them. Anything the first render shows has to come out the same
+  on the server and in the browser, so values only the browser knows (theme,
+  time, saved drafts) are read after mount or through `useSyncExternalStore`
+  with a server snapshot.
 
 ## Structure
 
 ```
 Ashif/src
-├── App.jsx                  # page shell + #/resume route
+├── App.jsx                  # theme + router + the current page
+├── routes.js                # every page: URL, title, description, nav label
+├── pages/                   # one component per page (HomePage, ProjectsPage…)
 ├── index.css                # design tokens (dark/light), utilities
 ├── data/portfolioData.js    # all content: profile, experience, projects, research…
 ├── components/
-│   ├── primitives/          # Section, SectionHeader, Reveal, Button, TechList
+│   ├── layout/              # SiteLayout, the "Next page" link, load progress bar
+│   ├── primitives/          # Section, PageHeader, SectionHeader, Reveal, Button
 │   ├── theme/               # ThemeProvider (light/dark, circular reveal toggle)
-│   ├── nav/                 # navbar + ⌘K command palette
+│   ├── nav/                 # navbar, mobile menu, ⌘K command palette
 │   ├── hero/                # three.js robot fetch demo
-│   ├── experience/  projects/  research/  about/  education/
+│   ├── home/                # home page previews: numbers, selected work, …
+│   ├── about/               # About intro + PhotoDeck (the draggable photo pile)
+│   ├── experience/  projects/  research/  education/
 │   ├── rohangpt/            # chat UI
 │   ├── contact/  footer/
-│   └── resume/              # printable résumé view at #/resume
+│   └── resume/              # printable résumé view at /resume/
 ├── services/rohangptService.js
-└── lib/ hooks/
+└── lib/ hooks/              # router, theme, small window events
 ```
 
 ## Editing content
 
-Almost everything on the page comes from `Ashif/src/data/portfolioData.js`.
-Add a project there and it shows up in the projects section, the archive, the
-command palette, and RohanGPT's quick answers.
+Almost everything on the site comes from `Ashif/src/data/portfolioData.js`.
+Add a project there and it shows up on the Projects page, the archive, the
+command palette, and RohanGPT's quick answers. `selectedWork` picks the three
+projects on the home page, and the photos in `photos` (after the portrait)
+make up the pile on the About page.
+
+To add a page, create `Ashif/src/pages/<Name>Page.jsx` and add an entry to
+`Ashif/src/routes.js`; the build prerenders it, and a `label` puts it in the
+navbar, footer, and command palette.
 
 Images live in `Ashif/public/img` as optimized WebP. Full-size originals are
 kept, undeployed, in `Ashif/source-images`. Papers are in `Ashif/public/papers`

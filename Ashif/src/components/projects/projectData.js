@@ -109,8 +109,8 @@ export function categoryOptions(all, matching) {
   ];
 }
 
-// Deep links: #project/<slug>. App owns #/resume; plain #section anchors are
-// left alone.
+// Deep links on the Projects page: /projects/#project/<slug>. Plain
+// #anchors are left alone.
 const HASH = /^#project\/([a-z0-9-]+)$/i;
 
 export const projectHash = (slug) => `#project/${slug}`;

@@ -6,8 +6,8 @@ import ResumeToolbar from './ResumeToolbar';
 export default function ResumeView() {
   const mainRef = useRef(null);
 
-  // The app routes on the URL hash, so following "#resume-content" would
-  // leave the résumé. Move focus by hand instead.
+  // Move focus by hand: a fragment link alone only moves the starting point
+  // for the next Tab, and screen readers should land on the résumé itself.
   const skipToContent = (event) => {
     event.preventDefault();
     mainRef.current?.focus();
@@ -29,6 +29,7 @@ export default function ResumeView() {
         id="resume-content"
         ref={mainRef}
         tabIndex={-1}
+        data-page-focus=""
         className="rv-main rv-frame pb-16 pt-4 outline-none sm:pb-24 sm:pt-10"
       >
         <ResumePaper />

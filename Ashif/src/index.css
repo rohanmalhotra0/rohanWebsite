@@ -221,16 +221,29 @@
 }
 
 /* Circular theme-switch reveal (see ThemeProvider). */
-::view-transition-old(root),
-::view-transition-new(root) {
+html[data-vt="theme"]::view-transition-old(root),
+html[data-vt="theme"]::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-/* The prerendered portfolio stays hidden when the page opens on #/resume
-   (index.html sets the class); main.jsx then renders the résumé instead. */
-.route-resume #root[data-prerendered] {
-  display: none;
+/* Page changes (see lib/router.jsx): the browser's crossfade, quicker. */
+html[data-vt="page"]::view-transition-old(root),
+html[data-vt="page"]::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* The bar along the top while a page's code loads (RouteProgress). */
+@keyframes route-progress {
+  from {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(0.85);
+  }
 }
 
 /* The prerendered hero poster gets its theme's src from an inline script

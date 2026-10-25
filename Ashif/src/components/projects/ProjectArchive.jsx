@@ -218,9 +218,9 @@ function ProjectArchive({ projects, onOpen, onPreload }) {
   return (
     <div id="projects-archive" className="mt-24 border-t border-line pt-12 sm:mt-32 sm:pt-16">
       <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-8">
-        <h3 id={headingId} className="type-heading text-[1.75rem] text-fg sm:text-3xl">
+        <h2 id={headingId} className="type-heading text-[1.75rem] text-fg sm:text-3xl">
           All projects
-        </h3>
+        </h2>
         <div className="relative w-full md:w-72">
           <label htmlFor={searchId} className="sr-only">
             Search projects

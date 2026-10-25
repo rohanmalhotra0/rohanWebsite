@@ -1,29 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { sections } from '@/data/portfolioData';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
+import { navRoutes } from '@/routes';
 import { MenuIcon, SearchButton, Wordmark } from './BarControls';
 import MobileMenu from './MobileMenu';
 import ThemeToggle from './ThemeToggle';
-import {
-  usePaletteHotkeys,
-  usePalettePreload,
-  useReducedMotion,
-  useScrolled,
-  useScrollSpy,
-} from './hooks';
+import { usePaletteHotkeys, usePalettePreload, useReducedMotion, useScrolled } from './hooks';
 import { loadPalette } from './loadPalette';
-import { goToSection, isPlainClick } from './navigation';
 import { BAR_ROW, ICON_BUTTON, NAV_LINK } from './styles';
 
 const MotionSpan = motion.span;
-const SECTION_IDS = sections.map((section) => section.id);
 const MARKER_SLIDE = { duration: 0.35, ease: [0.16, 1, 0.3, 1] };
 
-export default function Navbar() {
+/** `route` is the page on screen; its link is marked. */
+export default function Navbar({ route }) {
   const scrolled = useScrolled();
-  const { active, last, lockTo } = useScrollSpy(SECTION_IDS);
+  const active = navRoutes.includes(route) ? route.id : null;
+  // The marker stays mounted on the last page's link so it can fade out in
+  // place when you go to a page without one (home, 404).
+  const [last, setLast] = useState(active);
+  if (active && active !== last) setLast(active);
   const [menuOpen, setMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   // The palette component, once its chunk has loaded.
@@ -65,22 +62,6 @@ export default function Navbar() {
   const closePalette = useCallback(() => setPaletteOpen(false), []);
   const openPalette = useCallback(() => setPalette(true), [setPalette]);
 
-  const navigateTo = useCallback(
-    (id) => {
-      lockTo(id);
-      goToSection(id);
-    },
-    [lockTo]
-  );
-
-  // Plain anchors do the scrolling; this keeps the marker from sweeping
-  // across every section on the way there.
-  const onAnchorClick = (id) => (event) => {
-    if (isPlainClick(event)) lockTo(id);
-  };
-
-  // The marker stays mounted on the last section so it can fade out in place
-  // when you scroll back up into the hero.
   const markerOn = active ?? last;
 
   return (
@@ -100,23 +81,22 @@ export default function Navbar() {
               'lg:grid lg:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)]'
             )}
           >
-            <Wordmark onClick={onAnchorClick('top')} className="justify-self-start" />
+            <Wordmark className="justify-self-start" />
 
             <nav aria-label="Primary" className="hidden h-full lg:block">
               <ul className="flex h-full items-center">
-                {sections.map((section) => {
-                  const isActive = active === section.id;
+                {navRoutes.map((page) => {
+                  const isActive = active === page.id;
                   return (
-                    <li key={section.id} className="relative flex h-full items-center">
+                    <li key={page.id} className="relative flex h-full items-center">
                       <a
-                        href={`#${section.id}`}
-                        onClick={onAnchorClick(section.id)}
-                        aria-current={isActive ? 'true' : undefined}
+                        href={page.path}
+                        aria-current={isActive ? 'page' : undefined}
                         className={cn(NAV_LINK, isActive ? 'text-fg' : 'text-muted hover:text-fg')}
                       >
-                        {section.label}
+                        {page.label}
                       </a>
-                      {markerOn === section.id ? (
+                      {markerOn === page.id ? (
                         <MotionSpan
                           layoutId="nav-marker"
                           aria-hidden="true"
@@ -145,10 +125,10 @@ export default function Navbar() {
                 }}
               />
               <ThemeToggle className={ICON_BUTTON} />
-              {/* A plain link like the sections; the negative margin puts its
+              {/* A plain link like the pages; the negative margin puts its
                   text, not its padding, on the page's right edge. */}
               <a
-                href="#/resume"
+                href="/resume/"
                 className={cn(NAV_LINK, '-mr-2 hidden text-muted hover:text-fg lg:flex xl:-mr-3')}
               >
                 Résumé
@@ -174,14 +154,11 @@ export default function Navbar() {
         open={menuOpen && !isDesktop}
         onClose={closeMenu}
         active={active}
-        onNavigate={lockTo}
         onSearch={openPalette}
         onSearchIntent={preloadPalette}
         triggerRef={menuButtonRef}
       />
-      {Palette ? (
-        <Palette open={paletteOpen} onClose={closePalette} onNavigate={navigateTo} />
-      ) : null}
+      {Palette ? <Palette open={paletteOpen} onClose={closePalette} /> : null}
     </>
   );
 }

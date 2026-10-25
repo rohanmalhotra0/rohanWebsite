@@ -1,18 +1,15 @@
 import { ArrowUpRight } from 'lucide-react';
 import Reveal from '@/components/primitives/Reveal';
-import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import { profile } from '@/data/portfolioData';
+import { cn } from '@/lib/utils';
 import ContactForm from './ContactForm';
 import EmailLine from './EmailLine';
-
-const INTRO =
-  'I’m interested in applied AI, robotics, quantitative systems, and developer tools. Send me a note if the work overlaps.';
 
 const LINKS = [
   { label: 'LinkedIn', href: profile.linkedin, external: true },
   { label: 'GitHub', href: profile.github, external: true },
   // The pair reads as "the page" and "the file".
-  { label: 'Résumé', href: '#/resume' },
+  { label: 'Résumé', href: '/resume/' },
   { label: 'Download résumé (PDF)', href: profile.resumeUrl, download: true },
 ];
 
@@ -47,23 +44,19 @@ function ContactLinks({ className }) {
   );
 }
 
-export default function Contact() {
+/** The email address, other links, and the message form. */
+export default function Contact({ className }) {
   return (
-    <Section id="contact">
-      <Container>
-        <SectionHeader title="Contact" description={INTRO} />
-        {/* Everything ends on a column line. md: stacked, the list stops at column 7 (one gutter
-            before the description) and the form spans the full grid. lg: form from column 8. */}
-        <div className="mt-12 grid gap-14 sm:mt-16 md:grid-cols-12 md:gap-x-8">
-          <Reveal className="md:col-span-12 md:grid md:grid-cols-subgrid md:content-start lg:col-span-7">
-            <EmailLine className="md:col-span-12 lg:col-span-7" />
-            <ContactLinks className="mt-8 sm:mt-10 md:col-span-7 lg:col-span-4" />
-          </Reveal>
-          <Reveal delay={0.08} className="md:col-span-12 lg:col-span-5 lg:col-start-8">
-            <ContactForm />
-          </Reveal>
-        </div>
-      </Container>
-    </Section>
+    // Everything ends on a column line. md: stacked, the list stops at column 7 and
+    // the form spans the full grid. lg: form from column 8.
+    <div className={cn('grid gap-14 md:grid-cols-12 md:gap-x-8', className)}>
+      <Reveal className="md:col-span-12 md:grid md:grid-cols-subgrid md:content-start lg:col-span-7">
+        <EmailLine className="md:col-span-12 lg:col-span-7" />
+        <ContactLinks className="mt-8 sm:mt-10 md:col-span-7 lg:col-span-4" />
+      </Reveal>
+      <Reveal delay={0.08} className="md:col-span-12 lg:col-span-5 lg:col-start-8">
+        <ContactForm />
+      </Reveal>
+    </div>
   );
 }

@@ -50,8 +50,14 @@ export default function ThemeProvider({ children }) {
         Math.max(y, window.innerHeight - y)
       );
 
+      // Scopes the circular reveal in index.css (page changes have their own).
+      const root = document.documentElement;
+      root.dataset.vt = 'theme';
       const transition = document.startViewTransition(() => {
         flushSync(() => setTheme(next));
+      });
+      transition.finished.finally(() => {
+        if (root.dataset.vt === 'theme') delete root.dataset.vt;
       });
 
       transition.ready
