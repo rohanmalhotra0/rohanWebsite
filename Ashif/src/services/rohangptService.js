@@ -70,6 +70,8 @@ function mdLink(label, url) {
 }
 
 const EMAIL_LINK = mdLink(profile.email, `mailto:${profile.email}`);
+/** Rohan's own line from the Contact section. */
+const INTERESTS = 'I’m interested in applied AI, robotics, quantitative systems, and developer tools.';
 
 /** "May 2026" -> {month: 4, year: 2026}, or null. */
 function parseMonth(text) {
@@ -261,6 +263,46 @@ const ANSWERS = {
       `I’m also on ${mdLink('LinkedIn', profile.linkedin)} and ${mdLink('GitHub', profile.github)}. You can read my résumé ${mdLink('here', '#/resume')} or download the ${mdLink('PDF', profile.resumeUrl)}.`
     ),
 
+  resume: () =>
+    `You can read my résumé ${mdLink('here', '#/resume')} or download it as a ${mdLink('PDF', profile.resumeUrl)}.`,
+
+  // Recruiting answers say only what the data says: no start dates, role
+  // types, availability, or job-search status beyond graduation.
+  availability: () =>
+    `I graduate from ${profile.school} in ${profile.graduation}. If you have a role in mind, email me at ${EMAIL_LINK} and we can talk about timing.`,
+
+  interests: () => `${INTERESTS} Send me a note at ${EMAIL_LINK} if the work overlaps.`,
+
+  location: () =>
+    `I’m based in ${profile.location}${education.location === profile.location ? `, where I study at ${profile.school}` : ''}.`,
+
+  /** What he does now: a student; past roles stay in the past tense. */
+  current: () => {
+    const student = `I’m a computer science student at ${profile.school}, graduating in ${profile.graduation}.`;
+    const ongoing = workExperience.filter((job) => hasRealDate(job.date) && !hasEnded(job.date));
+    if (ongoing.length) return paragraphs(student, ongoing.map(roleSentence).join(' '));
+
+    const endKey = (job) => {
+      const { end } = parseRange(job.date);
+      return end ? end.year * 12 + end.month : -1;
+    };
+    const latestKey = Math.max(...workExperience.map(endKey));
+    if (latestKey < 0) return student;
+    const latest = workExperience.filter((job) => endKey(job) === latestKey);
+    const { end } = parseRange(latest[0].date);
+    const what =
+      latest.length === 1
+        ? `role was ${article(latest[0].role)} ${latest[0].role}`
+        : latest.every((job) => /intern/i.test(job.role))
+          ? `roles were ${countWord(latest.length)} internships`
+          : `roles were ${joinAnd(latest.map((job) => job.role))}`;
+    const companies = joinAnd([...new Set(latest.map((job) => inProse(job.company)))]);
+    return paragraphs(
+      student,
+      `My most recent ${what} at ${companies}, which ended in ${MONTHS[end.month]} ${end.year}.`
+    );
+  },
+
   bestProject: () => {
     const picks = [
       ['epm-wizard', 'for applied AI in enterprise software'],
@@ -321,6 +363,9 @@ const ANSWERS = {
 
   thanks: () => `Anytime. If you want to talk more, email me at ${EMAIL_LINK}.`,
 };
+
+/** Work authorization, visas, sponsorship, pay, offers: never answered from data. */
+const DIRECT_REPLY = `I’d rather discuss that directly. You can email me at ${EMAIL_LINK}.`;
 
 const UNKNOWN_REPLY = paragraphs(
   'I don’t have anything about that in my résumé or project notes, so I won’t guess.',
@@ -425,7 +470,7 @@ const TOPICS = [
   }),
   entry({
     id: 'contact',
-    terms: ['contact', 'email', 'e mail', 'reach you', 'reach out', 'get in touch', 'hire', 'hiring', 'resume', 'cv', 'linkedin', 'github', 'phone', 'talk to you'],
+    terms: ['contact', 'email', 'e mail', 'reach you', 'reach out', 'get in touch', 'hire', 'hiring', 'linkedin', 'github', 'phone', 'talk to you'],
     answer: ANSWERS.contact,
   }),
 ];
@@ -547,6 +592,74 @@ const groupEntries = PROJECT_GROUPS.map((group) =>
   })
 );
 
+const RECRUITING = [
+  entry({
+    id: 'availability',
+    terms: [
+      'are you available', 'you available', 'your availability', 'availability', 'available for', 'available to start',
+      'when can you start', 'can you start', 'start date', 'how soon',
+      'when do you graduate', 'when will you graduate', 'when are you graduating', 'graduation date', 'expected graduation', 'what year do you graduate', 'class of',
+      'finish school', 'finish your degree', 'after graduation', 'after you graduate', 'new grad',
+      'internship or full time', 'internships or full time', 'full time', 'fulltime', 'part time',
+      'open to work', 'open to opportunities', 'open to new', 'open to roles', 'open to internships',
+      'looking for a job', 'looking for work', 'looking for an internship', 'looking for internships', 'job search', 'job hunting', 'seeking',
+    ],
+    answer: ANSWERS.availability,
+  }),
+  entry({
+    id: 'interests',
+    terms: [
+      'what are you looking for', 'looking for', 'what roles', 'what role', 'kind of role*', 'type of role*', 'kind of work', 'type of work', 'kind of job*', 'kind of company',
+      'interested in', 'your interests', 'what interests you', 'career', 'dream job', 'ideal role', 'ideal job', 'what do you want to do', 'what field', 'which field', 'goals',
+    ],
+    answer: ANSWERS.interests,
+  }),
+  entry({
+    id: 'location',
+    terms: ['where are you based', 'based in', 'based out of', 'where are you located', 'you located', 'location', 'where do you live', 'where are you from', 'where are you', 'which city', 'what city', 'nyc', 'new york'],
+    answer: ANSWERS.location,
+  }),
+  entry({
+    id: 'resume',
+    terms: ['resume', 'cv', 'curriculum vitae'],
+    answer: ANSWERS.resume,
+  }),
+  entry({
+    id: 'current',
+    terms: [
+      'right now', 'currently', 'currently at', 'at the moment', 'are you working on', 'are you doing now', 'what do you do now',
+      'current job', 'current role', 'current position', 'current employer', 'where do you work', 'where are you working', 'do you work at',
+      'still work*', 'still at', 'still with', 'employed',
+    ],
+    weak: ['working on', 'now'],
+    answer: ANSWERS.current,
+  }),
+];
+
+/**
+ * Checked before everything else, so a question that touches work
+ * authorization, visas, sponsorship, pay, offers, or where he'll work never
+ * gets a factual answer, however else it is phrased.
+ */
+const DIRECT = [
+  entry({
+    id: 'direct',
+    terms: [
+      'visa', 'visas', 'need sponsorship', 'require sponsorship', 'requires sponsorship', 'sponsorship for', 'sponsor you', 'sponsor your', 'sponsor a visa',
+      'work authorization', 'work authorisation', 'authorized to work', 'authorised to work', 'eligible to work', 'work permit', 'right to work', 'legally',
+      'citizen*', 'green card', 'h1b', 'h 1b', 'opt', 'cpt', 'immigration', 'international student',
+      'salary', 'salaries', 'compensation', 'expected comp*', 'pay', 'paid', 'pay rate', 'hourly rate', 'your rate', 'stipend',
+      'how much do you charge', 'how much do you expect', 'how much do you want', 'how much are you asking',
+      'relocat*', 'remote', 'remotely', 'hybrid role', 'hybrid work', 'work hybrid', 'onsite', 'on site', 'in office', 'in person',
+      'job offer', 'return offer', 'full time offer', 'an offer', 'any offers', 'other offers',
+      'go back to', 'going back to', 'return to', 'rejoin', 'there again', 'ibm again',
+    ],
+    answer: () => DIRECT_REPLY,
+  }),
+  // Single words that are only safe in short questions ("Sponsorship?").
+  entry({ id: 'direct', terms: ['sponsorship', 'sponsor'], maxWords: 4, answer: () => DIRECT_REPLY }),
+];
+
 const OVERVIEWS = [
   ...groupEntries,
   entry({
@@ -567,8 +680,8 @@ const OVERVIEWS = [
   // Below topics, companies, and projects so "what are you working on at IBM" stays about IBM.
   entry({
     id: 'intro',
-    terms: ['who are you', 'yourself', 'about you', 'who is rohan', 'your name', 'introduce', 'background', 'where are you', 'located', 'location', 'nyc', 'new york'],
-    weak: ['working on', 'lately', 'these days', 'currently'],
+    terms: ['who are you', 'yourself', 'about you', 'who is rohan', 'your name', 'introduce', 'background'],
+    weak: ['lately', 'these days'],
     answer: ANSWERS.intro,
   }),
   entry({
@@ -590,7 +703,7 @@ const OVERVIEWS = [
   }),
 ];
 
-const QUICK_ANSWERS = [...TOPICS, ...companyEntries, ...projectEntries, ...OVERVIEWS].filter(
+const QUICK_ANSWERS = [...TOPICS, ...companyEntries, ...projectEntries, ...RECRUITING, ...OVERVIEWS].filter(
   (item) => item.answer
 );
 
@@ -612,6 +725,9 @@ export function findQuickAnswer(input) {
   if (!text) return null;
   const padded = ` ${text} `;
   const wordCount = text.split(' ').length;
+
+  const direct = DIRECT.find((item) => scoreEntry(item, padded, wordCount) > 0);
+  if (direct) return { id: direct.id, answer: direct.answer };
 
   let best = null;
   let bestScore = 0;
@@ -654,6 +770,8 @@ const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', yea
 const SYSTEM_PROMPT = `You are the assistant on Rohan Malhotra's portfolio site (rohanm.org). Answer as Rohan, in a plain, specific, first-person voice. Keep answers short: two to five sentences, or a few bullets. Markdown is fine (bold, inline code, links, bullet lists).
 
 It is ${currentMonth}. Roles that have ended are finished: describe them in the past tense. Never say or imply that Rohan currently works at IBM or will work there again.
+
+On availability, start dates, or the kind of role he wants, say only that he graduates from ${profile.school} in ${profile.graduation} and that ${INTERESTS.replace(/^I’m/, 'he’s')} Then suggest emailing ${profile.email}. Never discuss work authorization, visas, sponsorship, salary, or offers: say he'd rather discuss that directly and give his email.
 
 Facts:
 - ${profile.summary} Based in ${profile.location}.

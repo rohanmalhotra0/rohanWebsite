@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from 'lucide-react';
 import Button from '@/components/primitives/Button';
 import { TechList } from '@/components/primitives/Tag';
+import { cn } from '@/lib/utils';
 import {
   EASE,
   FLIGHT,
@@ -12,6 +13,7 @@ import {
   projectLinks,
   projectMeta,
 } from './projectData';
+import TypeCover from './TypeCover';
 import { lockScroll, preloadImage } from './viewerDom';
 
 const MotionDiv = motion.div;
@@ -87,19 +89,38 @@ function ViewerMedia({ project, paired, first, fromHover, custom }) {
         exit={paired ? undefined : 'exit'}
         className="relative aspect-[16/10] overflow-hidden bg-surface-2 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:ring-1 after:ring-inset after:ring-fg/10"
       >
-        <MotionImg
-          src={project.imageUrl}
-          alt={project.imageAlt || ''}
-          width={width}
-          height={height}
-          draggable="false"
-          // The card's image was zoomed on hover; settle it while it flies.
-          initial={flying && fromHover ? { scale: 1.02 } : false}
-          animate={{ scale: 1 }}
-          transition={FLIGHT.layout}
-          className="size-full object-cover"
-          style={{ objectPosition: focalPoint(project) }}
-        />
+        {project.imageUrl ? (
+          <MotionImg
+            src={project.imageUrl}
+            alt={project.imageAlt || ''}
+            width={width}
+            height={height}
+            draggable="false"
+            // The card's image was zoomed on hover; settle it while it flies.
+            initial={flying && fromHover ? { scale: 1.02 } : false}
+            animate={{ scale: 1 }}
+            transition={FLIGHT.layout}
+            className="size-full object-cover"
+            style={{ objectPosition: focalPoint(project) }}
+          />
+        ) : (
+          <TypeCover project={project} />
+        )}
+      </MotionDiv>
+    );
+  }
+
+  if (!project.imageUrl) {
+    return (
+      <MotionDiv
+        custom={custom}
+        variants={MEDIA}
+        initial="enter"
+        animate="show"
+        exit="exit"
+        className="aspect-[16/10] overflow-hidden rounded-lg border border-line"
+      >
+        <TypeCover project={project} />
       </MotionDiv>
     );
   }
@@ -136,8 +157,14 @@ function Slide({ project, viewer, titleId, reduceMotion }) {
 
   return (
     <article className="col-start-1 row-start-1 grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8">
-      {/* Above the details, so the flying image passes over the text. */}
-      <div className="relative z-10 lg:col-span-7 xl:col-span-8">
+      {/* Above the details, so the flying image passes over the text. A cover
+          without an image would only repeat the title on phones, so it hides. */}
+      <div
+        className={cn(
+          'relative z-10 lg:col-span-7 xl:col-span-8',
+          !project.imageUrl && !project.featured && 'hidden sm:block'
+        )}
+      >
         <ViewerMedia
           project={project}
           paired={viewer.paired}
@@ -308,10 +335,25 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
  * centered two-column panel on large screens. The dialog stays open until the
  * closing animation (including the flight back to the card) has finished.
  */
-export default function ProjectViewer({ viewer, open, onNavigate, onClose, onExited, returnFocusRef }) {
+export default function ProjectViewer({
+  viewer,
+  open,
+  onNavigate,
+  onClose,
+  onExited,
+  onReady,
+  returnFocusRef,
+}) {
   const dialogRef = useRef(null);
   const titleId = useId();
   const reduceMotion = useReducedMotion();
+
+  // Mounted (closed) as soon as its code has loaded; an open that was waiting
+  // for it runs now, before the first paint.
+  useLayoutEffect(() => {
+    onReady(true);
+    return () => onReady(false);
+  }, [onReady]);
 
   // Opened in a layout effect so the dialog is on screen before Motion
   // measures the image it is about to fly in. The dialog itself takes focus,

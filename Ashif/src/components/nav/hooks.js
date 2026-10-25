@@ -343,3 +343,37 @@ export function usePaletteHotkeys(setOpen) {
     };
   }, [setOpen]);
 }
+
+/**
+ * Call `preload` (warms the palette chunk) once the page has loaded and the
+ * main thread is idle, or on the first Meta/Ctrl keydown (the start of ⌘K),
+ * whichever comes first. With Save-Data on, only the keypress counts.
+ */
+export function usePalettePreload(preload) {
+  useEffect(() => {
+    let idle = 0;
+    let timer = 0;
+    const whenIdle = () => {
+      if (window.requestIdleCallback) idle = window.requestIdleCallback(preload, { timeout: 4000 });
+      else timer = window.setTimeout(preload, 1500);
+    };
+    if (!navigator.connection?.saveData) {
+      if (document.readyState === 'complete') whenIdle();
+      else window.addEventListener('load', whenIdle, { once: true });
+    }
+
+    const onKeyDown = (event) => {
+      if (event.key !== 'Meta' && event.key !== 'Control') return;
+      window.removeEventListener('keydown', onKeyDown);
+      preload();
+    };
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('load', whenIdle);
+      window.removeEventListener('keydown', onKeyDown);
+      if (idle) window.cancelIdleCallback(idle);
+      window.clearTimeout(timer);
+    };
+  }, [preload]);
+}

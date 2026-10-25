@@ -25,9 +25,18 @@ const LINKS = [
  * handed back to the menu button on close; Esc, the close button, or a tap on
  * empty space closes it. Its top row repeats the navbar so it opens in place.
  * `onNavigate(id)` runs before an in-page link scrolls, `onSearch` opens the
- * palette, and `triggerRef` (the menu button) gets focus back on close.
+ * palette (`onSearchIntent` warms it), and `triggerRef` (the menu button) gets
+ * focus back on close.
  */
-export default function MobileMenu({ open, onClose, active, onNavigate, onSearch, triggerRef }) {
+export default function MobileMenu({
+  open,
+  onClose,
+  active,
+  onNavigate,
+  onSearch,
+  onSearchIntent,
+  triggerRef,
+}) {
   const sheetRef = useRef(null);
   const closeRef = useRef(null);
 
@@ -77,13 +86,23 @@ export default function MobileMenu({ open, onClose, active, onNavigate, onSearch
           onSectionClick={onSectionClick}
           onLeave={() => close({ restore: false })}
           onSearch={onSearch}
+          onSearchIntent={onSearchIntent}
         />
       ) : null}
     </AnimatePresence>
   );
 }
 
-function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, onSearch }) {
+function Sheet({
+  sheetRef,
+  closeRef,
+  active,
+  onClose,
+  onSectionClick,
+  onLeave,
+  onSearch,
+  onSearchIntent,
+}) {
   const reduceMotion = useReducedMotion();
   const rise = (i) =>
     reduceMotion
@@ -116,7 +135,7 @@ function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, o
         <div className={BAR_ROW}>
           <Wordmark onClick={onSectionClick('top')} />
           <div className="flex items-center">
-            <SearchButton onClick={onSearch} />
+            <SearchButton onClick={onSearch} onIntent={onSearchIntent} />
             <ThemeToggle className={ICON_BUTTON} />
             <button
               ref={closeRef}

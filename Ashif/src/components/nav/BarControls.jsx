@@ -20,13 +20,19 @@ export function Wordmark({ onClick, className }) {
   );
 }
 
-/** Opens the command palette. Icon only on small screens; icon and shortcut on desktop. */
-export function SearchButton({ ref, onClick, className }) {
+/**
+ * Opens the command palette. Icon only on small screens; icon and shortcut on
+ * desktop. `onIntent` runs on hover or focus, ahead of the click, so the
+ * palette's code can start loading.
+ */
+export function SearchButton({ ref, onClick, onIntent, className }) {
   return (
     <button
       ref={ref}
       type="button"
       onClick={onClick}
+      onPointerEnter={onIntent}
+      onFocus={onIntent}
       aria-label="Search"
       aria-haspopup="dialog"
       aria-keyshortcuts={PALETTE_SHORTCUT_ARIA}

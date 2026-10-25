@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useNewYorkTime } from './clock';
 import Gallery from './Gallery';
 import GitHubActivity from './GitHubActivity';
+import { PORTRAIT_SIZES, srcSetFor } from './images';
 
 const [portrait] = photos;
 
@@ -41,6 +42,8 @@ export default function About() {
             <div className="relative aspect-[4/5] rounded-lg bg-surface-2 lg:aspect-[2/3] lg:grow">
               <img
                 src={portrait.src}
+                srcSet={srcSetFor(portrait)}
+                sizes={PORTRAIT_SIZES}
                 alt={portrait.alt}
                 width={portrait.width}
                 height={portrait.height}

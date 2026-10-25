@@ -17,34 +17,18 @@ export const ARCHIVE_ROWS = 10;
 export const archiveCollapses = (count) => count > ARCHIVE_ROWS + 2;
 
 // Natural pixel sizes of the covers in public/img/projects, keyed by file name.
-// They reserve each image's box before it loads and keep tiny covers small.
+// They reserve each image's box before it loads and keep small covers small.
 const IMAGE_SIZES = {
-  'ai-quiz-maker': [1200, 600],
-  'algorithms-practice': [1200, 600],
-  'american-options-pricing': [277, 182],
   'autism-research': [1400, 1057],
   casen: [1265, 712],
-  'democracies-survive': [1200, 600],
   'epm-interactive-guide': [1400, 875],
   'epm-wizard': [1400, 736],
   gavindle: [1400, 1119],
-  'german-study-lab': [1200, 600],
   greensticker: [1400, 1258],
-  'ibm-internship-tracker': [1200, 600],
-  'income-risk-hedging': [277, 182],
-  'indytrack-api': [1200, 600],
-  'kalshi-live-kelly': [1200, 600],
   'linear-generator': [539, 463],
-  'love-island-roi': [1200, 600],
   nightshift: [1265, 712],
-  'oscillating-stock-model': [329, 153],
-  'physics-calculator': [1200, 600],
-  pivot: [464, 426],
   refrax: [858, 732],
-  'rohan-lab': [1200, 600],
-  'rsi-predictor': [283, 178],
-  'spot-vision': [1200, 800],
-  'spy-gradient-boosting': [1200, 600],
+  'spot-vision': [1320, 825],
 };
 
 /** `{ width, height, small }`; small covers are shown at their natural size. */
@@ -61,7 +45,6 @@ export function imageSize(project) {
 const FOCAL_POINTS = {
   'epm-wizard': '0% 50%',
   nightshift: '30% 50%',
-  'spot-vision': '50% 60%',
 };
 
 export const focalPoint = (project) => FOCAL_POINTS[project.slug] ?? '50% 50%';

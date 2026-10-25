@@ -3,6 +3,7 @@ import { useReducedMotion } from 'motion/react';
 import { projects } from '@/data/portfolioData';
 import { featuredProjects, findProject, projectHash, slugFromHash } from './projectData';
 import { findTrigger, revealElement, revealProject } from './viewerDom';
+import { loadViewer } from './viewerLoader';
 
 const stripHash = () => window.location.pathname + window.location.search;
 
@@ -16,11 +17,16 @@ const stripHash = () => window.location.pathname + window.location.search;
  * `dialogOpen` stays true until the closing animation has finished.
  *
  * Opening from the page pushes a history entry, so Back closes the viewer.
+ *
+ * The viewer is code-split. `preloadViewer` loads it, after which it stays
+ * mounted (closed) and reports `onViewerReady`. An open requested before that
+ * waits and runs the moment it is ready, so the image still flies from its card.
  */
 export function useProjectViewer() {
   const reduceMotion = useReducedMotion();
   const [viewer, setViewer] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewerLoaded, setViewerLoaded] = useState(false);
 
   const viewerRef = useRef(null);
   const reduceRef = useRef(reduceMotion);
@@ -30,13 +36,22 @@ export function useProjectViewer() {
   const pushedRef = useRef(false);
   // The page's own scrollRestoration, put back once we have stepped back.
   const restoreRef = useRef(null);
+  const readyRef = useRef(false);
+  const pendingRef = useRef(null);
 
   useLayoutEffect(() => {
     viewerRef.current = viewer;
     reduceRef.current = reduceMotion;
   });
 
-  const open = useCallback((list, index, origin, { opener = null, fromHover = false } = {}) => {
+  const preloadViewer = useCallback(() => {
+    loadViewer().then(
+      () => setViewerLoaded(true),
+      () => {} // offline or a failed chunk: the next hover or click tries again
+    );
+  }, []);
+
+  const openNow = useCallback((list, index, origin, { opener = null, fromHover = false } = {}) => {
     const project = list[index];
     if (!project) return;
     openerRef.current = opener;
@@ -58,6 +73,28 @@ export function useProjectViewer() {
     setViewer({ list, index, origin, paired, fromHover, dir: 1, step: 0 });
     setDialogOpen(true);
   }, []);
+
+  const open = useCallback(
+    (...args) => {
+      if (readyRef.current) {
+        openNow(...args);
+      } else {
+        pendingRef.current = args;
+        preloadViewer();
+      }
+    },
+    [openNow, preloadViewer]
+  );
+
+  const onViewerReady = useCallback(
+    (ready) => {
+      readyRef.current = ready;
+      const pending = pendingRef.current;
+      pendingRef.current = null;
+      if (ready && pending) openNow(...pending);
+    },
+    [openNow]
+  );
 
   const openLink = useCallback(
     (slug) => {
@@ -159,5 +196,16 @@ export function useProjectViewer() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, [close, goTo, openLink]);
 
-  return { viewer, dialogOpen, open, navigate, close, onExited, returnFocusRef };
+  return {
+    viewer,
+    dialogOpen,
+    viewerLoaded,
+    preloadViewer,
+    onViewerReady,
+    open,
+    navigate,
+    close,
+    onExited,
+    returnFocusRef,
+  };
 }

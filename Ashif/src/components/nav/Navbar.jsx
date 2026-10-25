@@ -5,10 +5,16 @@ import Button from '@/components/primitives/Button';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { MenuIcon, SearchButton, Wordmark } from './BarControls';
-import CommandPalette from './CommandPalette';
 import MobileMenu from './MobileMenu';
 import ThemeToggle from './ThemeToggle';
-import { usePaletteHotkeys, useReducedMotion, useScrolled, useScrollSpy } from './hooks';
+import {
+  usePaletteHotkeys,
+  usePalettePreload,
+  useReducedMotion,
+  useScrolled,
+  useScrollSpy,
+} from './hooks';
+import { loadPalette } from './loadPalette';
 import { goToSection, isPlainClick } from './navigation';
 import { BAR_ROW, ICON_BUTTON } from './styles';
 
@@ -21,15 +27,33 @@ export default function Navbar() {
   const { active, last, lockTo } = useScrollSpy(SECTION_IDS);
   const [menuOpen, setMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  // The palette component, once its chunk has loaded.
+  const [Palette, setPaletteComponent] = useState(null);
   const isDesktop = useMediaQuery('(min-width: 64rem)');
   const menuButtonRef = useRef(null);
   const reduceMotion = useReducedMotion();
 
-  // Opening the palette always closes the menu, whatever opened it.
-  const setPalette = useCallback((next) => {
-    setMenuOpen(false);
-    setPaletteOpen(next);
+  const preloadPalette = useCallback(() => {
+    loadPalette().then(
+      (module) => setPaletteComponent(() => module.default),
+      // Offline, or the chunk is gone after a redeploy: drop the queued open
+      // so the next ⌘K starts fresh and retries the load.
+      () => setPaletteOpen(false)
+    );
   }, []);
+  usePalettePreload(preloadPalette);
+
+  // Opening the palette always closes the menu, whatever opened it. An open
+  // that arrives before the chunk has loaded stays queued in `paletteOpen`;
+  // the palette mounts already open (and takes focus) when it lands.
+  const setPalette = useCallback(
+    (next) => {
+      preloadPalette();
+      setMenuOpen(false);
+      setPaletteOpen(next);
+    },
+    [preloadPalette]
+  );
   usePaletteHotkeys(setPalette);
 
   // The sheet is for small screens only; don't leave it (and its scroll lock)
@@ -118,6 +142,7 @@ export default function Navbar() {
 
             <div className="flex items-center justify-self-end lg:gap-1">
               <SearchButton
+                onIntent={preloadPalette}
                 onClick={(event) => {
                   // Safari doesn't focus buttons on click; the palette gives focus back to this.
                   event.currentTarget.focus({ preventScroll: true });
@@ -156,9 +181,12 @@ export default function Navbar() {
         active={active}
         onNavigate={lockTo}
         onSearch={openPalette}
+        onSearchIntent={preloadPalette}
         triggerRef={menuButtonRef}
       />
-      <CommandPalette open={paletteOpen} onClose={closePalette} onNavigate={navigateTo} />
+      {Palette ? (
+        <Palette open={paletteOpen} onClose={closePalette} onNavigate={navigateTo} />
+      ) : null}
     </>
   );
 }

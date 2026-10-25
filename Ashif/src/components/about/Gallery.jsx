@@ -1,14 +1,29 @@
-import { useRef, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { photos } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
-import Lightbox from './Lightbox';
+import { srcSetFor, thumbnailSizes } from './images';
 
 // photos[0] is the portrait, shown on its own.
 const gallery = photos.slice(1);
+const totalAspect = gallery.reduce((total, photo) => total + photo.width / photo.height, 0);
+
+// The viewer loads on first hover or focus of a thumbnail, so the first open is
+// instant. If it can't load (offline), thumbnails do nothing rather than break the page.
+const loadLightbox = () => import('./Lightbox');
+const Lightbox = lazy(() => loadLightbox().catch(() => ({ default: () => null })));
+const preloadLightbox = () => {
+  loadLightbox().catch(() => {});
+};
 
 export default function Gallery({ className }) {
   const [view, setView] = useState(null);
+  const [viewerMounted, setViewerMounted] = useState(false);
   const buttons = useRef([]);
+
+  const open = (index) => {
+    setViewerMounted(true);
+    setView({ index, direction: 0 });
+  };
 
   const navigate = (direction) =>
     setView(
@@ -51,11 +66,15 @@ export default function Gallery({ className }) {
                 }}
                 type="button"
                 aria-haspopup="dialog"
-                onClick={() => setView({ index, direction: 0 })}
+                onClick={() => open(index)}
+                onPointerEnter={preloadLightbox}
+                onFocus={preloadLightbox}
                 className="group block w-full cursor-zoom-in overflow-hidden rounded-lg bg-surface-2"
               >
                 <img
                   src={photo.src}
+                  srcSet={srcSetFor(photo)}
+                  sizes={thumbnailSizes(photo, totalAspect)}
                   alt={photo.alt}
                   width={photo.width}
                   height={photo.height}
@@ -75,7 +94,11 @@ export default function Gallery({ className }) {
         ))}
       </ul>
 
-      <Lightbox photos={gallery} view={view} onNavigate={navigate} onClose={close} />
+      {viewerMounted ? (
+        <Suspense fallback={null}>
+          <Lightbox photos={gallery} view={view} onNavigate={navigate} onClose={close} />
+        </Suspense>
+      ) : null}
     </>
   );
 }

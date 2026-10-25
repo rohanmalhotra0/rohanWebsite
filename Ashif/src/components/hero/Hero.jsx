@@ -13,7 +13,9 @@ const LINKS = [
 export default function Hero() {
   return (
     <section id="top" className="relative overflow-x-clip">
-      <div className="container-page grid min-h-svh grid-cols-1 content-start pb-12 pt-[4.75rem] sm:pt-24 lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-8 lg:pb-10">
+      {/* DOM order is name, actions, stage (reading and tab order); from lg the
+          grid places the stage in the right-hand columns. */}
+      <div className="container-page grid min-h-svh grid-cols-1 content-start pb-10 pt-[4.75rem] sm:pt-24 lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-8 lg:pb-10">
         <div className="relative z-10 lg:col-span-5 lg:row-start-2">
           {/* "Malhotra" is ~5.2em wide in Hubot Sans: on phones size it to the
               gutters (with margin to spare); from lg it is a fixed display size. */}
@@ -21,13 +23,11 @@ export default function Hero() {
             {profile.name}
           </h1>
           <p className="mt-5 max-w-[34rem] text-pretty text-base leading-[1.65] text-muted sm:text-[17px] lg:mt-7">
-            {profile.summary}
+            {profile.intro}
           </p>
         </div>
 
-        <RobotStage className="mt-3 lg:col-span-7 lg:col-start-6 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:self-center" />
-
-        <div className="relative z-10 mt-5 lg:col-span-5 lg:row-start-3 lg:mt-9">
+        <div className="relative z-10 mt-6 lg:col-span-5 lg:row-start-3 lg:mt-9">
           <div className="flex flex-wrap gap-3">
             <Button href="#projects" size="lg">
               View projects
@@ -36,16 +36,16 @@ export default function Hero() {
               Résumé
             </Button>
           </div>
-          <ul className="mt-3 flex flex-wrap gap-x-6 text-[15px]">
+          <ul className="mt-2 flex flex-wrap gap-x-6 text-[15px]">
             {LINKS.map(({ label, href, external }) => (
               <li key={label}>
                 <a
                   href={href}
                   target={external ? '_blank' : undefined}
                   rel={external ? 'noreferrer' : undefined}
-                  className="link inline-flex min-h-11 items-center gap-1 text-fg"
+                  className="group inline-flex min-h-11 items-center gap-1 text-fg"
                 >
-                  {label}
+                  <span className="link group-hover:decoration-accent">{label}</span>
                   {external ? (
                     <span aria-hidden="true" className="text-subtle">
                       ↗
@@ -55,10 +55,12 @@ export default function Hero() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-sm text-subtle lg:mt-8">
+          <p className="mt-2 text-sm text-subtle lg:mt-8">
             {city} · Graduating {profile.graduation}
           </p>
         </div>
+
+        <RobotStage className="mt-2 lg:col-span-7 lg:col-start-6 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:self-center" />
       </div>
     </section>
   );

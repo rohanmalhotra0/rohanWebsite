@@ -50,9 +50,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Vendor chunks cache across deploys; the app chunk changes often.
-        manualChunks: {
-          react: ['react', 'react-dom'],
-          motion: ['motion', 'framer-motion'],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'react';
+          if (/[\\/]node_modules[\\/](motion|framer-motion|motion-dom|motion-utils)[\\/]/.test(id)) return 'motion';
+          return undefined;
         },
       },
     },

@@ -1,4 +1,4 @@
-import { profile } from '@/data/portfolioData';
+import { profile, projects } from '@/data/portfolioData';
 import { MINUTE } from './clock';
 
 export const GITHUB_LOGIN = profile.github.split('/').filter(Boolean).pop();
@@ -7,14 +7,33 @@ const ENDPOINT = `https://api.github.com/users/${GITHUB_LOGIN}/events/public?per
 const CACHE_KEY = 'rm:github-activity';
 const CACHE_TTL = 10 * MINUTE;
 const MAX_OTHERS = 2;
-const REPO_NAME = /^[\w.-]+\/[\w.-]+$/;
+
+/** "owner/name" from a github.com repo URL; null for anything else, including a bare profile URL. */
+export function repoFromUrl(url) {
+  try {
+    const { hostname, pathname } = new URL(url);
+    const [owner, name] = pathname.split('/').filter(Boolean);
+    if (hostname.replace(/^www\./, '') !== 'github.com' || !owner || !name) return null;
+    return `${owner}/${name.replace(/\.git$/, '')}`;
+  } catch {
+    return null;
+  }
+}
+
+// Only repos the site itself links to (a project's repoUrl) are ever named, so
+// coursework, practice and scratch repos never show up. Case-insensitive, like GitHub.
+const LINKED_REPOS = new Set(
+  projects.map(({ repoUrl }) => repoFromUrl(repoUrl)?.toLowerCase()).filter(Boolean)
+);
+const isLinked = (repo) => typeof repo === 'string' && LINKED_REPOS.has(repo.toLowerCase());
 
 // Events that say nothing about work in the repo itself.
 const IGNORED_EVENTS = new Set(['WatchEvent', 'ForkEvent', 'MemberEvent', 'SponsorshipEvent']);
 
 /**
- * Reduce the public events feed to the latest push plus a few other recently
- * active repos: { repo, pushedAt, others: [repo] }, or null if there was no push.
+ * Reduce the public events feed to the latest push to a linked repo plus a few
+ * other recently active linked repos: { repo, pushedAt, others: [repo] }, or
+ * null if no linked repo was pushed to.
  */
 export function summarize(events) {
   if (!Array.isArray(events)) return null;
@@ -25,13 +44,7 @@ export function summarize(events) {
       repo: event?.repo?.name,
       time: Date.parse(event?.created_at),
     }))
-    .filter(
-      ({ type, repo, time }) =>
-        typeof repo === 'string' &&
-        REPO_NAME.test(repo) &&
-        Number.isFinite(time) &&
-        !IGNORED_EVENTS.has(type)
-    )
+    .filter(({ type, repo, time }) => isLinked(repo) && Number.isFinite(time) && !IGNORED_EVENTS.has(type))
     // The feed is only roughly chronological.
     .sort((a, b) => b.time - a.time);
 
@@ -46,13 +59,13 @@ export function summarize(events) {
   return { repo: push.repo, pushedAt: push.time, others };
 }
 
+// Also re-checks cached summaries against the linked repos.
 const isSummary = (value) =>
   value === null ||
-  (typeof value?.repo === 'string' &&
-    REPO_NAME.test(value.repo) &&
+  (isLinked(value?.repo) &&
     Number.isFinite(value.pushedAt) &&
     Array.isArray(value.others) &&
-    value.others.every((repo) => typeof repo === 'string' && REPO_NAME.test(repo)));
+    value.others.every(isLinked));
 
 // Same record kept in memory, for when sessionStorage is blocked.
 let remembered = null;
