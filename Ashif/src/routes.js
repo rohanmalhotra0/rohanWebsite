@@ -106,6 +106,8 @@ export const routes = [
 
 // A project with a case study gets a page of its own under /projects/
 // (no `label`, so it isn't in the navbar; `parent` marks Projects instead).
+// Its header is Projects' color block, with the role and dates as tagline.
+const projectsBlock = routes.find((route) => route.id === 'projects').block;
 for (const project of projects.filter((p) => p.caseStudy)) {
   routes.push({
     id: `case-${project.slug}`,
@@ -113,6 +115,8 @@ for (const project of projects.filter((p) => p.caseStudy)) {
     page: 'CaseStudyPage',
     parent: 'projects',
     project: project.slug,
+    block: projectsBlock,
+    tagline: project.caseStudy.context,
     title: `${project.title} — Rohan Malhotra`,
     description: project.description,
   });
