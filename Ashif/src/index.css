@@ -548,45 +548,11 @@ img[data-hero-poster]:not([src]) {
   height: 100%;
   background: var(--surface-2) no-repeat 52% 34% / 240%;
 }
-/* The lab posters from the home page (scripts/posters), one per palette and
-   theme. Fetched once the stamp is near the screen (Stamp sets data-near),
-   or straight away without JavaScript. */
-[data-palette="spot"][data-theme="light"] .stamp-art {
-  --poster: url("/img/hero/robot-spot-light-800.webp");
-}
-[data-palette="spot"][data-theme="dark"] .stamp-art {
-  --poster: url("/img/hero/robot-spot-dark-800.webp");
-}
-[data-palette="terminal"][data-theme="light"] .stamp-art {
-  --poster: url("/img/hero/robot-terminal-light-800.webp");
-}
-[data-palette="terminal"][data-theme="dark"] .stamp-art {
-  --poster: url("/img/hero/robot-terminal-dark-800.webp");
-}
-[data-palette="courant"][data-theme="light"] .stamp-art {
-  --poster: url("/img/hero/robot-courant-light-800.webp");
-}
-[data-palette="courant"][data-theme="dark"] .stamp-art {
-  --poster: url("/img/hero/robot-courant-dark-800.webp");
-}
-[data-palette="market"][data-theme="light"] .stamp-art {
-  --poster: url("/img/hero/robot-market-light-800.webp");
-}
-[data-palette="market"][data-theme="dark"] .stamp-art {
-  --poster: url("/img/hero/robot-market-dark-800.webp");
-}
-[data-palette="paper"][data-theme="light"] .stamp-art {
-  --poster: url("/img/hero/robot-paper-light-800.webp");
-}
-[data-palette="paper"][data-theme="dark"] .stamp-art {
-  --poster: url("/img/hero/robot-paper-dark-800.webp");
-}
-[data-near] .stamp-art {
-  background-image: var(--poster);
-}
+/* Stamp sets the palette's poster once it nears the screen. Without
+   JavaScript the page is always Spot, light: its poster, straight away. */
 @media (scripting: none) {
   .stamp-art {
-    background-image: var(--poster);
+    background-image: url("/img/hero/robot-spot-light-800.webp");
   }
 }
 
@@ -600,21 +566,5 @@ img[data-hero-poster]:not([src]) {
     opacity: 0;
     scale: 1.6;
     rotate: -34deg;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .contact-tile .tile-arrow {
-    transition: none;
-  }
-  .contact-tile:is(:hover, :focus-visible) .tile-arrow {
-    translate: none;
-    opacity: 1;
-  }
-  .contact-tile .tile-arrow-next {
-    display: none;
-  }
-  .postmark {
-    animation: none;
   }
 }

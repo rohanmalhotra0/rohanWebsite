@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { assetUrl } from '@/data/portfolioData';
+import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
 /**
@@ -41,12 +43,14 @@ function Postmark({ className }) {
 }
 
 /**
- * The postcard's stamp: the home page's robot in the current palette (CSS
- * picks the poster; see the Contact section of index.css), postmarked once
- * sent. The poster loads once the stamp nears the screen (data-near), so it
- * never competes with the page's first paint.
+ * The postcard's stamp: the home page's robot in the current palette (its lab
+ * poster, from scripts/posters), postmarked once sent. The poster loads once
+ * the stamp nears the screen, so it never competes with the page's first
+ * paint. Without JavaScript, CSS shows Spot's (the Contact section of
+ * index.css).
  */
 export default function Stamp({ sent, className }) {
+  const { theme, palette } = useTheme();
   const ref = useRef(null);
   const [near, setNear] = useState(false);
 
@@ -66,14 +70,12 @@ export default function Stamp({ sent, className }) {
   }, []);
 
   return (
-    <div
-      ref={ref}
-      aria-hidden="true"
-      data-near={near || undefined}
-      className={cn('pointer-events-none select-none', className)}
-    >
+    <div ref={ref} aria-hidden="true" className={cn('pointer-events-none select-none', className)}>
       <div className="stamp size-full rotate-3">
-        <div className="stamp-art" />
+        <div
+          className="stamp-art"
+          style={near ? { backgroundImage: `url("${assetUrl(`img/hero/robot-${palette}-${theme}-800.webp`)}")` } : undefined}
+        />
       </div>
       {sent ? (
         <Postmark className="absolute -left-[118%] top-[18%] w-[230%] -rotate-12 opacity-90" />
