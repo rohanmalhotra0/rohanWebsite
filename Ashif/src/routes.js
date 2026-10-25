@@ -147,6 +147,23 @@ export function routeNumber(route) {
 /** The color-block utility for a route's `block`. */
 export const BLOCK_CLASS = { a: 'block-a', b: 'block-b', c: 'block-c' };
 
+/**
+ * A page's link-preview card (og:image): public/og/<id>.jpg, drawn from the
+ * page's block by `npm run og` (scripts/og). Pages without a block of their
+ * own (home, résumé, 404) share the home page's.
+ */
+export function ogCard(route) {
+  const project = route.project && projects.find((p) => p.slug === route.project);
+  if (project) {
+    return {
+      id: route.id,
+      alt: `${project.title}, a case study by Rohan Malhotra: the robot's camera view, the pink toy boxed at 0.91.`,
+    };
+  }
+  if (route.label) return { id: route.id, alt: `${route.label}, Rohan Malhotra: ${route.tagline}. rohanm.org` };
+  return { id: 'home', alt: 'Rohan Malhotra, rohanm.org: a yellow robot dog in a graphite lab.' };
+}
+
 /** The page that comes after `route` in reading order, for the link at its end. */
 export function nextRoute(route) {
   const index = navRoutes.indexOf(route);

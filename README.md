@@ -13,6 +13,7 @@ npm run dev       # http://localhost:5173
 npm run lint
 npm run contrast  # WCAG AA check of every palette
 npm run build     # outputs Ashif/dist
+npm run og        # re-render the link-preview cards (needs Playwright)
 ```
 
 ## Stack
@@ -108,6 +109,17 @@ To add a palette, add its two blocks to `palettes.css`, its entry to
 `PALETTES` and `THEME_COLORS` in `Ashif/src/lib/theme.js`, its id and page
 colors to the list in `index.html`'s head script, and its glow and duotone
 colors near the top of `palettes.css`; then render its posters.
+
+## Link previews
+
+Each page's `og:image` is its own 1200×630 card in `Ashif/public/og/`: the
+hero for Home (also used by the résumé and 404), and each page's color
+block, or the camera drawing for the Spot case study. `npm run og` draws
+them with Playwright from the site's own CSS and components
+(`Ashif/scripts/og/`), in the Spot palette, and `scripts/prerender.mjs`
+points each page at its card (`ogCard` in `Ashif/src/routes.js`). Re-run it
+after changing a page's name, tagline or block, or the hero; the build warns
+about a page whose card is missing and gives it the home page's.
 
 ## Editing content
 

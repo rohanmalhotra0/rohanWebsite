@@ -10,6 +10,7 @@
 // template with its own <head>, so every URL keeps working. If the step can't
 // run at all, the build fails: without these files every page but the home
 // page would 404, so the deploy stops and the live site stays as it was.
+import { existsSync } from 'node:fs';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -71,7 +72,18 @@ function setMeta(html, attribute, key, content) {
 }
 
 /** The page's own <head>: title, description, canonical URL, and social cards. */
-function headFor(template, route) {
+/**
+ * The page's link-preview card (ogCard in src/routes.js), or the home page's
+ * if its card hasn't been rendered (npm run og).
+ */
+function cardFor(route, ogCard) {
+  const card = ogCard(route);
+  if (existsSync(path.join(dist, 'og', `${card.id}.jpg`))) return card;
+  console.warn(`prerender: ${route.path ?? '404.html'} has no card (public/og/${card.id}.jpg), using the home page's; run npm run og`);
+  return ogCard({});
+}
+
+function headFor(template, route, ogCard) {
   const notFound = !route.path;
   const url = `${SITE}${route.path ?? '/'}`;
   let html = template.replace(/<title>[^<]*<\/title>/, () => `<title>${escapeAttr(route.title)}</title>`);
@@ -84,6 +96,12 @@ function headFor(template, route) {
   }
   html = html.replace(/<link rel="canonical" href="[^"]*"\s*\/>/, () => `<link rel="canonical" href="${url}" />`);
   html = setMeta(html, 'property', 'og:url', url);
+  const card = cardFor(route, ogCard);
+  const image = `${SITE}/og/${card.id}.jpg`;
+  html = setMeta(html, 'property', 'og:image', image);
+  html = setMeta(html, 'property', 'og:image:alt', card.alt);
+  html = setMeta(html, 'name', 'twitter:image', image);
+  html = setMeta(html, 'name', 'twitter:image:alt', card.alt);
   // The home page keeps the social copy written for it in index.html.
   if (route.path !== '/') {
     html = setMeta(html, 'property', 'og:title', route.title);
@@ -148,12 +166,12 @@ try {
   }
 
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-  const { render, routes, notFoundRoute } = await import(pathToFileURL(serverEntry).href);
+  const { render, routes, notFoundRoute, ogCard } = await import(pathToFileURL(serverEntry).href);
   const pages = [...routes, notFoundRoute];
   let written = 0;
 
   for (const route of pages) {
-    const head = headFor(template, route);
+    const head = headFor(template, route, ogCard);
     try {
       const { links, markup } = splitHoisted(await render(route.path ?? '/404/'));
       const app = route.id === 'home' ? themePoster(markup) : markup;
