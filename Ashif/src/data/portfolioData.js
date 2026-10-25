@@ -153,10 +153,28 @@ export const workExperience = [
     tags: ['C++', 'Next.js', 'Monte Carlo', 'FRED', 'BLS', 'Docker'],
   },
   {
+    company: 'Aress Software',
+    role: 'Machine Learning Intern',
+    metric: { value: '500K+', label: 'multimodal records used for training' },
+    location: 'New York, NY',
+    date: 'Jun 2025 – Aug 2025',
+    imageUrl: assetUrl('website-photos/work/aress-logo.png'),
+    imageAlt: 'Aress Software logo',
+    imageLabel: 'Aress Software',
+    logoClassName: 'h-[58px] w-auto max-w-[74%]',
+    summary:
+      'I trained PyTorch models on multimodal data and brought several reporting sources into one analytics workflow.',
+    highlights: [
+      'Trained PyTorch models on more than 500,000 multimodal records.',
+      'Combined data from more than 10 sources into dashboards the team used for reporting.',
+    ],
+    tags: ['PyTorch', 'Data Engineering', 'Analytics'],
+  },
+  {
     company: 'Hume Center',
     role: 'Aerospace Researcher',
     location: 'Blacksburg, VA',
-    date: 'Research experience',
+    date: 'Nov 2024 – May 2025',
     imageUrl: assetUrl('website-photos/work/hume-center-logo.jpg'),
     imageAlt: 'Hume Center for National Security and Technology logo',
     imageLabel: 'Virginia Tech Hume Center',
@@ -171,28 +189,10 @@ export const workExperience = [
     tags: ['C', 'CubeSat', 'Embedded Systems', 'Signal Processing'],
   },
   {
-    company: 'Aress Software',
-    role: 'Machine Learning Intern',
-    metric: { value: '500K+', label: 'multimodal records used for training' },
-    location: 'Earlier experience',
-    date: 'Earlier experience',
-    imageUrl: assetUrl('website-photos/work/aress-logo.png'),
-    imageAlt: 'Aress Software logo',
-    imageLabel: 'Aress Software',
-    logoClassName: 'h-[58px] w-auto max-w-[74%]',
-    summary:
-      'I trained PyTorch models on multimodal data and brought several reporting sources into one analytics workflow.',
-    highlights: [
-      'Trained PyTorch models on more than 500,000 multimodal records.',
-      'Combined data from more than 10 sources into dashboards the team used for reporting.',
-    ],
-    tags: ['PyTorch', 'Data Engineering', 'Analytics'],
-  },
-  {
     company: 'Y-Axis',
     role: 'Data Engineering Intern',
-    location: 'Earlier experience',
-    date: 'Earlier experience',
+    location: 'Chatham, NJ',
+    date: 'May 2024 – Aug 2024',
     imageUrl: assetUrl('website-photos/work/y-axis-logo.webp'),
     imageAlt: 'Y-Axis Overseas Careers logo',
     imageLabel: 'Y-Axis',
@@ -209,34 +209,42 @@ export const workExperience = [
 
 export const research = [
   {
-    title: 'Hedging Personal Income Risk with Prediction Markets',
-    eyebrow: 'Applied quantitative research',
+    title: 'Hedging Personal Income Risk Using Prediction Markets',
+    authors: 'Rahul Jayachandran, Ethan Lin, Rohan Malhotra',
+    year: '2026',
+    keywords: ['Kalshi'],
     description:
       'A macro-sensitive Poisson hazard model with jump-diffusion income dynamics, minimum-variance hedge ratios, and Monte Carlo simulation for measuring tail-risk reduction.',
     imageUrl: assetUrl('img/research/income-hedging.webp'),
-    imageAlt: 'Quantitative model visualization for prediction-market hedging',
+    imageAlt: 'First page of the paper',
     liveUrl: assetUrl('papers/hedging-income-risk-prediction-markets.pdf'),
     tags: ['Prediction Markets', 'Poisson Process', 'Monte Carlo'],
   },
   {
-    title: 'Reddit Sentiment Data for Financial Applications',
-    eyebrow: 'Published research',
+    title: 'Reddit Data in Quantitative Financial Models',
+    subtitle: 'Evolution and Implications Post GameStop and AMC Short Squeeze',
+    authors: 'Rohan Malhotra, Colin Jones',
+    year: '2025',
+    venue: 'VTechWorks',
     description:
       'NLP and regression models in Python measuring how r/wallstreetbets sentiment relates to equity returns and volatility.',
     imageUrl: assetUrl('img/research/reddit-sentiment.webp'),
-    imageAlt: 'Reddit sentiment research paper figure',
+    imageAlt: 'First page of the paper',
     liveUrl: assetUrl('papers/reddit-sentiment-financial-models.pdf'),
     externalUrl: 'https://hdl.handle.net/10919/124730',
     tags: ['NLP', 'Regression', 'Market Data'],
   },
   {
-    title: 'An Economic Approach to Capital Allocation',
-    eyebrow: 'Optimization research',
+    title: 'An Economic Approach to Optimize Capital Allocation',
+    authors: 'Rohan Malhotra',
+    year: '2024',
+    venue: 'VTechWorks',
     description:
       'Monte Carlo backtesting of fractional and full Kelly strategies with emphasis on drawdowns, path dependence, and risk-adjusted growth.',
     imageUrl: assetUrl('img/research/capital-allocation.webp'),
-    imageAlt: 'Capital-allocation research visualization',
+    imageAlt: 'First page of the paper',
     liveUrl: assetUrl('papers/kelly-capital-allocation.pdf'),
+    externalUrl: 'https://hdl.handle.net/10919/124871',
     tags: ['Kelly Criterion', 'Optimization', 'Risk'],
   },
 ];
@@ -245,7 +253,7 @@ export const projects = [
   {
     title: 'EPM Wizard',
     slug: 'epm-wizard',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I built EPM Wizard so I could describe an Oracle EPM form or rule in plain English, inspect the generated artifact, and approve it before deployment.',
@@ -276,7 +284,7 @@ export const projects = [
   {
     title: 'Casen: Consulting Casebook',
     slug: 'casen',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I built Casen to make case-interview prep feel less scattered by keeping cases, drills, voice practice, and job tracking in one place.',
@@ -292,7 +300,7 @@ export const projects = [
   {
     title: 'NightShift',
     slug: 'nightshift',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I built NightShift to handle the repetitive parts of applying to jobs: finding roles, filling forms, checking confirmation emails, and keeping an application log.',
@@ -309,6 +317,7 @@ export const projects = [
     title: 'Refrax',
     slug: 'refrax',
     category: 'Quant',
+    year: '2025',
     description:
       'I built Refrax to explore market data, run models, and see the results in 2D and 3D without jumping between tools.',
     longDescription:
@@ -323,7 +332,8 @@ export const projects = [
   {
     title: 'Spot Vision Pipeline',
     slug: 'spot-vision',
-    category: 'AI & Robotics',
+    category: 'AI & robotics',
+    year: '2026',
     description:
       'At IBM, I trained the vision system that helps a Boston Dynamics Spot robot find and retrieve objects in real time.',
     longDescription:
@@ -338,6 +348,7 @@ export const projects = [
     title: 'Income Risk Hedging Engine',
     slug: 'income-risk-hedging',
     category: 'Quant',
+    year: '2026',
     description:
       'I turned my Kalshi research into a simulator that shows how prediction-market contracts could hedge job-loss risk.',
     longDescription:
@@ -348,7 +359,8 @@ export const projects = [
   {
     title: 'GreenSticker',
     slug: 'greensticker',
-    category: 'AI & Robotics',
+    category: 'AI & robotics',
+    year: '2025',
     description:
       'I built a hands-free mouse that follows a colored sticker through a webcam, making basic computer control more accessible.',
     imageUrl: assetUrl('img/projects/greensticker.webp'),
@@ -373,6 +385,7 @@ export const projects = [
     title: 'PIVOT Platform',
     slug: 'pivot',
     category: 'Web',
+    year: '2024',
     description:
       'I worked on PIVOT, a site where students at different universities can post STEM projects and find collaborators.',
     liveUrl: 'https://vtpivot.org',
@@ -429,7 +442,7 @@ export const projects = [
   {
     title: 'AI Quiz Maker',
     slug: 'ai-quiz-maker',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I made this so I could drop in a PDF or notes and get a usable set of quizzes, flashcards, and recall prompts.',

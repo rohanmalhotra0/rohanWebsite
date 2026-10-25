@@ -92,7 +92,7 @@ const researchItems = research
     group: 'research',
     title: paper.title,
     meta: 'PDF',
-    keywords: unique([paper.eyebrow, 'paper', 'pdf', ...(paper.tags ?? [])]),
+    keywords: unique([paper.venue, paper.authors, 'paper', 'pdf', ...(paper.keywords ?? []), ...(paper.tags ?? [])]),
     icon: FileText,
     external: true,
     verb: 'Open PDF',

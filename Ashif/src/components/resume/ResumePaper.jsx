@@ -180,7 +180,7 @@ function ResearchSection() {
     <Section id="rv-research" title="Research">
       {research.map((paper) => (
         <div key={paper.title} className="rv-entry">
-          <Row meta={paper.eyebrow}>
+          <Row meta={paper.year}>
             <h3 className="rv-heading rv-strong">
               {paper.liveUrl ? (
                 <PaperLink href={paper.liveUrl}>{paper.title}</PaperLink>
