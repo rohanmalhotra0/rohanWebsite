@@ -13,12 +13,15 @@ export function weeksText(value) {
 }
 
 /**
- * Two amounts in weeks, with enough decimals to tell them apart:
+ * Two amounts in weeks, with enough decimals (up to 3) to tell them apart:
  * [36.3, 34.7], or [4.48, 4.53] when one decimal would make them equal.
  */
 export function weeksPair(a, b) {
   if (weeks(a) !== weeks(b)) return [weeks(a), weeks(b)];
-  return [a.toFixed(2), b.toFixed(2)];
+  for (const digits of [2, 3]) {
+    if (a.toFixed(digits) !== b.toFixed(digits) || digits === 3) return [a.toFixed(digits), b.toFixed(digits)];
+  }
+  return [weeks(a), weeks(b)];
 }
 
 /** A hedge size rounded to the slider's half weeks. */

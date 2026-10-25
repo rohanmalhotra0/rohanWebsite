@@ -388,8 +388,9 @@ html[data-vt="page"]::view-transition-new(root) {
   background-repeat: no-repeat;
 }
 
-/* The Kelly explainer's sliders (components/research/kelly): a track that
-   fills with the accent up to the value (--val), and a round thumb. */
+/* The research labs' sliders (components/research/LabControls.jsx): a
+   track that fills with the accent up to the value (--val), and a round
+   thumb. */
 .lab-range {
   appearance: none;
   height: 28px;

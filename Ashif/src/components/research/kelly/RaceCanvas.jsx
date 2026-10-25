@@ -219,7 +219,7 @@ export default function RaceCanvas({ paths, colors, names, dashes = [], runKey, 
     start.observe(canvas);
 
     const theme = new MutationObserver(() => v.range && draw());
-    theme.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    theme.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-palette'] });
 
     return () => {
       resize.disconnect();

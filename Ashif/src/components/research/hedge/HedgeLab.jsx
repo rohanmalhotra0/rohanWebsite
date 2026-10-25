@@ -3,7 +3,7 @@ import { Readout, Slider } from '@/components/research/LabControls';
 import Lanes from './Lanes';
 import { MAX_HEDGE, SAMPLE, SEARCH_WEEKS, YEARS } from './hedge';
 import { halfWeeks, share, signedWeeks, weeks, weeksText } from './format';
-import { verdict } from './words';
+import { shortVerdict, verdict } from './words';
 
 // The lab, always drawn in the dark theme: set how likely you are to lose
 // your job, watch 1,000 versions of next year, then size a hedge and see the
@@ -18,8 +18,12 @@ export default function HedgeLab({ risk, setRisk, mult, setMult, hedge, setHedge
   const downRisk = Math.min(99, Math.round(risk * mult));
   const { calm, tail, none, shares: split } = model;
   const words = verdict(hedge, calm.hedge, tail, split.keptInDownturn);
+  // The two reference sizes, on the slider's half-week grid (as the buttons set them).
+  const calmSize = halfWeeks(calm.hedge);
+  const tailSize = halfWeeks(tail);
+  const tailHelps = tailSize > calmSize;
   const marks = [{ key: 'calm', label: 'calmest', value: calm.hedge, color: 'var(--c5)' }];
-  if (tail > calm.hedge + 0.5) marks.push({ key: 'tail', label: 'worst years', value: tail, color: 'var(--c4)' });
+  if (tailHelps) marks.push({ key: 'tail', label: 'worst years', value: tail, color: 'var(--c4)' });
   // Labels only when the two marks are far enough apart to read.
   if (marks.length === 2 && tail - calm.hedge < 7) marks[1].label = '';
 
@@ -123,7 +127,7 @@ export default function HedgeLab({ risk, setRisk, mult, setMult, hedge, setHedge
               step={0.5}
               onChange={setHedge}
               display={weeksText(hedge)}
-              valueText={`${weeksText(hedge)} of pay if a downturn hits, for ${weeksText(mine.cost)} a year. ${words}`}
+              valueText={`${weeksText(hedge)} if a downturn hits, ${weeksText(mine.cost)} a year. ${shortVerdict(hedge, calm.hedge, tail)}`}
               marks={marks}
             />
           </div>
@@ -135,12 +139,14 @@ export default function HedgeLab({ risk, setRisk, mult, setMult, hedge, setHedge
             <button type="button" className={chip} aria-pressed={hedge === 0} onClick={() => setHedge(0)}>
               No hedge
             </button>
-            <button type="button" className={chip} aria-pressed={hedge === halfWeeks(calm.hedge)} onClick={() => setHedge(halfWeeks(calm.hedge))}>
-              Calmest: {weeks(halfWeeks(calm.hedge))} wk
-            </button>
-            {tail > calm.hedge + 0.5 ? (
-              <button type="button" className={chip} aria-pressed={hedge === halfWeeks(tail)} onClick={() => setHedge(halfWeeks(tail))}>
-                Best for worst years: {weeks(halfWeeks(tail))} wk
+            {calmSize > 0 ? (
+              <button type="button" className={chip} aria-pressed={hedge === calmSize} onClick={() => setHedge(calmSize)}>
+                Calmest: {weeks(calmSize)} wk
+              </button>
+            ) : null}
+            {tailHelps ? (
+              <button type="button" className={chip} aria-pressed={hedge === tailSize} onClick={() => setHedge(tailSize)}>
+                Best for worst years: {weeks(tailSize)} wk
               </button>
             ) : null}
           </div>

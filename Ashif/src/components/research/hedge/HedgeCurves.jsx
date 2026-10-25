@@ -1,5 +1,6 @@
 import { useMemo, useRef } from 'react';
-import { MAX_HEDGE, outcome } from './hedge';
+import useScrub from '@/components/research/useScrub';
+import { MAX_HEDGE, outcome, YEARS } from './hedge';
 import { halfWeeks, percent, share, weeks, weeksPair, weeksText } from './format';
 
 // Two ways to size the hedge, over every hedge size from 0 to MAX_HEDGE: the
@@ -16,7 +17,6 @@ const mono = { fontFamily: 'var(--font-mono)' };
 
 function MiniCurve({ id, points, mine, best, floor, title, onChange }) {
   const svgRef = useRef(null);
-  const dragging = useRef(false);
   const values = points.map((point) => point.value);
   const lowest = Math.min(...values, floor?.value ?? Infinity);
   const highest = Math.max(...values);
@@ -34,17 +34,7 @@ function MiniCurve({ id, points, mine, best, floor, title, onChange }) {
     const size = ((point.x - X0) / (X1 - X0)) * MAX_HEDGE;
     return Math.round(Math.min(MAX_HEDGE, Math.max(0, size)) * 2) / 2;
   };
-  const down = (event) => {
-    dragging.current = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    onChange(toSize(event));
-  };
-  const move = (event) => {
-    if (dragging.current) onChange(toSize(event));
-  };
-  const up = () => {
-    dragging.current = false;
-  };
+  const scrub = useScrub(toSize, onChange);
 
   const you = at(mine);
   const ref = at(best.size);
@@ -57,10 +47,7 @@ function MiniCurve({ id, points, mine, best, floor, title, onChange }) {
       className="h-auto w-full touch-pan-y select-none"
       role="img"
       aria-label={title}
-      onPointerDown={down}
-      onPointerMove={move}
-      onPointerUp={up}
-      onPointerCancel={up}
+      {...scrub}
     >
       <defs>
         <linearGradient id={`${id}-fill`} x1="0" y1={Y0} x2="0" y2={Y1} gradientUnits="userSpaceOnUse">
@@ -136,19 +123,27 @@ export default function HedgeCurves({ counts, model, hedge, setHedge }) {
   }, [counts]);
   const calmOutcome = outcome(counts, calm.hedge);
   const tailOutcome = outcome(counts, tail);
-  const tailHelps = tail > calm.hedge + 0.5;
   // Sizes as the slider can set them, so the charts and the buttons agree.
   const calmSize = halfWeeks(calm.hedge);
   const tailSize = halfWeeks(tail);
+  const tailHelps = tailSize > calmSize;
   const [calmSwing, noSwing] = weeksPair(calmOutcome.sd, none.sd);
+  const [tailSwing, calmSwingAgain] = weeksPair(tailOutcome.sd, calmOutcome.sd);
+  // The tail share can move either way, or round to the same number.
+  const [halfBefore, halfAfter] = [share(none.half), share(tailOutcome.half)];
+  const halfChange =
+    halfBefore === halfAfter
+      ? `stays at ${halfBefore}`
+      : `${tailOutcome.half < none.half ? 'falls' : 'rises'} from ${halfBefore} to ${halfAfter}`;
+  const calmDoesLittle = percent(calm.removed) === '0%' || calmSize === 0;
 
   return (
     <div className="mt-16 sm:mt-20">
       <div className="max-w-2xl">
         <h2 className="type-heading text-balance text-2xl text-fg sm:text-3xl">Two ways to size a hedge</h2>
         <p className="mt-3 text-pretty text-base leading-7 text-muted">
-          Over all 10,000 simulated years, at the risk you set above. Drag on a chart to try a size; your hedge is the
-          bright dot.
+          Over all {YEARS.toLocaleString('en-US')} simulated years, at the risk you set above. Drag on a chart to try a
+          size; your hedge is the bright dot.
         </p>
       </div>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -165,12 +160,22 @@ export default function HedgeCurves({ counts, model, hedge, setHedge }) {
             />
           </div>
           <p className="mt-4 text-pretty text-[15px] leading-6 text-muted">
-            A hedge of about <strong className="font-semibold text-fg">{weeksText(calmSize)}</strong> pays back what a
-            downturn costs you on average, so your swing is as small as it gets:{' '}
-            <strong className="font-semibold text-fg">{calmSwing}</strong> weeks, down from {noSwing}.
-            That removes only <strong className="font-semibold text-fg">{percent(calm.removed)}</strong> of the variance.
-            The rest is your own luck: whether you in particular lose your job, in a good year or a bad one. No contract on
-            the economy can reach that.
+            {calmDoesLittle ? (
+              <>
+                At this risk a downturn barely changes your average pay, so no hedge makes your year calmer. Your swing,{' '}
+                <strong className="font-semibold text-fg">{weeks(none.sd)}</strong> weeks, is your own luck: whether you in
+                particular lose your job. No contract on the economy can reach that.
+              </>
+            ) : (
+              <>
+                A hedge of about <strong className="font-semibold text-fg">{weeksText(calmSize)}</strong> pays back what a
+                downturn costs you on average, so your swing is as small as it gets:{' '}
+                <strong className="font-semibold text-fg">{calmSwing}</strong> weeks, down from {noSwing}. That removes
+                only <strong className="font-semibold text-fg">{percent(calm.removed)}</strong> of the variance. The rest
+                is your own luck: whether you in particular lose your job, in a good year or a bad one. No contract on the
+                economy can reach that.
+              </>
+            )}
           </p>
         </Card>
 
@@ -181,7 +186,7 @@ export default function HedgeCurves({ counts, model, hedge, setHedge }) {
               title={`Average pay in the worst 5% of years against hedge size. It is highest at about ${weeksText(tailSize)}.`}
               points={points.map((point) => ({ size: point.size, value: point.worst }))}
               mine={hedge}
-              best={{ size: tail, label: tailHelps ? `Best: ${weeks(tailSize)} wk` : 'Best: none', color: 'var(--c4)' }}
+              best={{ size: tail, label: tailSize === 0 ? 'Best: none' : `Best: ${weeks(tailSize)} wk`, color: 'var(--c4)' }}
               onChange={setHedge}
             />
           </div>
@@ -190,15 +195,14 @@ export default function HedgeCurves({ counts, model, hedge, setHedge }) {
               <>
                 Your worst 5% of years do best with about <strong className="font-semibold text-fg">{weeksText(tailSize)}</strong>:{' '}
                 {weeks(tailOutcome.worst)} weeks of pay on average instead of {weeks(none.worst)}, and the chance of losing
-                over half a year’s pay falls from {share(none.half)} to {share(tailOutcome.half)}. The price is a bigger
-                swing, {weeks(tailOutcome.sd)} weeks instead of {weeks(none.sd)}, because{' '}
-                {percent(split.keptInDownturn)} of downturn years keep the job anyway: for them the payout is a win on a
-                bet.
+                over half a year’s pay {halfChange}. The price is a bigger swing than the calmest hedge’s, {tailSwing}{' '}
+                weeks instead of {calmSwingAgain}, because {percent(split.keptInDownturn)} of downturn years keep the job
+                anyway: for them the payout is a win on a bet.
               </>
             ) : (
               <>
-                Here a hedge doesn’t help your worst years at all. Your job barely moves with the economy, so most of the
-                payout would land in years you didn’t need it, and the cost comes out of the years you did.
+                {tailSize === 0 ? 'Here no hedge helps your worst years' : `Here your worst years do best near the calmest hedge, about ${weeksText(tailSize)}, and a bigger one doesn’t help them`}
+                : most of the payout would land in years you didn’t need it, and the cost comes out of the years you did.
               </>
             )}
           </p>

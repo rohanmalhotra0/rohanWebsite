@@ -74,7 +74,10 @@ export default function Lanes({ sample, shares, hedge, cost, compact = false, la
   const [phase, setPhase] = useState('done');
   useEffect(() => {
     const svg = svgRef.current;
-    if (!svg || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    // Not for the copy hidden at this width, or with reduced motion.
+    if (!svg || !svg.getClientRects().length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return undefined;
+    }
     const box = svg.getBoundingClientRect();
     if (box.top < window.innerHeight && box.bottom > 0) return undefined;
     setPhase('start');
