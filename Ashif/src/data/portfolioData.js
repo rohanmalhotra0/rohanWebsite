@@ -10,55 +10,92 @@ export const profile = {
   website: 'https://rohanm.org',
   github: 'https://github.com/rohanmalhotra0',
   linkedin: 'https://www.linkedin.com/in/rohanamal',
-  resumeUrl: assetUrl(
-    'website-photos/resume/Rohan_Malhotra_Resume_2026.pdf'
-  ),
+  resumeUrl: assetUrl('Rohan_Malhotra_Resume.pdf'),
   headline: 'Applied AI, quantitative systems, and robotics.',
+  /** Hero line: leads with the IBM robotics and Kalshi work, in past tense. */
+  intro:
+    'I’m a computer science student at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
+  school: 'NYU Courant',
+  graduation: 'May 2027',
   summary:
     'I’m a computer science student at NYU Courant. Lately I’ve been building Oracle finance tools, computer-vision systems for Boston Dynamics Spot, and quantitative research software.',
 };
 
 export const heroStats = [
-  { value: '99.5%', label: 'YOLO11 mAP@50' },
-  { value: '95.0%', label: 'EPM task accuracy' },
-  { value: '3 years', label: 'Accelerated NYU path' },
+  { value: 99.5, decimals: 1, suffix: '%', label: 'mAP@50 on the Spot vision model' },
+  { value: 95.0, decimals: 1, suffix: '%', label: 'EPM task accuracy after fine-tuning, up from 36.7%' },
+  { value: 26, label: 'projects on this site' },
+  { value: 3, label: 'years to finish the NYU degree' },
 ];
 
 export const photos = [
   {
+    id: 'portrait',
+    src: assetUrl('img/me/portrait.webp'),
+    width: 800,
+    height: 1200,
+    alt: 'Professional headshot of Rohan Malhotra',
+    label: 'Me',
+    caption: 'Computer science, math, robots, markets, and too many side projects.',
+  },
+  {
     id: 'switzerland',
-    src: assetUrl('website-photos/me/01.png'),
+    src: assetUrl('img/me/switzerland.webp'),
+    width: 702,
+    height: 942,
     alt: 'Rohan Malhotra with another person in front of the Swiss Alps',
     label: 'Switzerland',
     caption: 'One of those views that makes you stop and stare.',
   },
   {
     id: 'paragliding',
-    src: assetUrl('website-photos/me/04.jpg'),
+    src: assetUrl('img/me/paragliding.webp'),
+    width: 1200,
+    height: 900,
     alt: 'Rohan Malhotra tandem paragliding over a mountain valley and lake',
     label: 'Paragliding',
     caption: 'Probably the best way I have ever seen the mountains.',
   },
   {
     id: 'kayaking',
-    src: assetUrl('website-photos/me/09.png'),
+    src: assetUrl('img/me/kayaking.webp'),
+    width: 704,
+    height: 938,
     alt: 'Rohan Malhotra kayaking on an alpine lake',
     label: 'Kayaking',
     caption: 'A little quieter than most of my side projects.',
   },
   {
-    id: 'headshot',
-    src: assetUrl('website-photos/me/01-headshot.png'),
-    alt: 'Professional headshot of Rohan Malhotra',
-    label: 'Me',
-    caption: 'Computer science, math, robots, markets, and too many side projects.',
+    id: 'basketball',
+    src: assetUrl('img/me/basketball.webp'),
+    width: 800,
+    height: 1200,
+    alt: 'Rohan Malhotra dribbling a basketball outdoors',
+    label: 'Basketball',
+  },
+  {
+    id: 'giraffe',
+    src: assetUrl('img/me/giraffe.webp'),
+    width: 712,
+    height: 950,
+    alt: 'Rohan Malhotra standing next to a giraffe at an outdoor enclosure',
+    label: 'Giraffe',
   },
 ];
+
+/** Cut-out headshot on pure black; blends into the dark theme. */
+export const portraitCutout = {
+  src: assetUrl('img/me/portrait-cutout.webp'),
+  width: 800,
+  height: 1200,
+  alt: 'Professional headshot of Rohan Malhotra',
+};
 
 export const workExperience = [
   {
     company: 'IBM',
     role: 'Applications Developer Intern',
+    metric: { value: '36.7% → 95.0%', label: 'EPM artifact accuracy after fine-tuning Qwen-Coder-32B' },
     location: 'Dallas, TX',
     date: 'May 2026 – Aug 2026',
     imageUrl: assetUrl('website-photos/work/ibm_logo.webp'),
@@ -78,6 +115,7 @@ export const workExperience = [
   {
     company: 'IBM',
     role: 'Robotics Engineer Intern',
+    metric: { value: '99.5%', label: 'mAP@50 on 898 hand-labeled images' },
     location: 'Dallas, TX',
     date: 'Jun 2026 – Aug 2026',
     imageUrl: assetUrl('website-photos/work/ibm_logo.webp'),
@@ -115,10 +153,28 @@ export const workExperience = [
     tags: ['C++', 'Next.js', 'Monte Carlo', 'FRED', 'BLS', 'Docker'],
   },
   {
+    company: 'Aress Software',
+    role: 'Machine Learning Intern',
+    metric: { value: '500K+', label: 'multimodal records used for training' },
+    location: 'New York, NY',
+    date: 'Jun 2025 – Aug 2025',
+    imageUrl: assetUrl('website-photos/work/aress-logo.png'),
+    imageAlt: 'Aress Software logo',
+    imageLabel: 'Aress Software',
+    logoClassName: 'h-[58px] w-auto max-w-[74%]',
+    summary:
+      'I trained PyTorch models on multimodal data and brought several reporting sources into one analytics workflow.',
+    highlights: [
+      'Trained PyTorch models on more than 500,000 multimodal records.',
+      'Combined data from more than 10 sources into dashboards the team used for reporting.',
+    ],
+    tags: ['PyTorch', 'Data Engineering', 'Analytics'],
+  },
+  {
     company: 'Hume Center',
     role: 'Aerospace Researcher',
     location: 'Blacksburg, VA',
-    date: 'Research experience',
+    date: 'Nov 2024 – May 2025',
     imageUrl: assetUrl('website-photos/work/hume-center-logo.jpg'),
     imageAlt: 'Hume Center for National Security and Technology logo',
     imageLabel: 'Virginia Tech Hume Center',
@@ -133,27 +189,10 @@ export const workExperience = [
     tags: ['C', 'CubeSat', 'Embedded Systems', 'Signal Processing'],
   },
   {
-    company: 'Aress Software',
-    role: 'Machine Learning Intern',
-    location: 'Earlier experience',
-    date: 'Earlier experience',
-    imageUrl: assetUrl('website-photos/work/aress-logo.png'),
-    imageAlt: 'Aress Software logo',
-    imageLabel: 'Aress Software',
-    logoClassName: 'h-[58px] w-auto max-w-[74%]',
-    summary:
-      'I trained PyTorch models on multimodal data and brought several reporting sources into one analytics workflow.',
-    highlights: [
-      'Trained PyTorch models on more than 500,000 multimodal records.',
-      'Combined data from more than 10 sources into dashboards the team used for reporting.',
-    ],
-    tags: ['PyTorch', 'Data Engineering', 'Analytics'],
-  },
-  {
     company: 'Y-Axis',
     role: 'Data Engineering Intern',
-    location: 'Earlier experience',
-    date: 'Earlier experience',
+    location: 'Chatham, NJ',
+    date: 'May 2024 – Aug 2024',
     imageUrl: assetUrl('website-photos/work/y-axis-logo.webp'),
     imageAlt: 'Y-Axis Overseas Careers logo',
     imageLabel: 'Y-Axis',
@@ -170,38 +209,42 @@ export const workExperience = [
 
 export const research = [
   {
-    title: 'Hedging Personal Income Risk with Prediction Markets',
-    eyebrow: 'Applied quantitative research',
+    title: 'Hedging Personal Income Risk Using Prediction Markets',
+    authors: 'Rahul Jayachandran, Ethan Lin, Rohan Malhotra',
+    year: '2026',
+    keywords: ['Kalshi'],
     description:
       'A macro-sensitive Poisson hazard model with jump-diffusion income dynamics, minimum-variance hedge ratios, and Monte Carlo simulation for measuring tail-risk reduction.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/discreteOptions.jpeg'),
-    imageAlt: 'Quantitative model visualization for prediction-market hedging',
-    liveUrl: assetUrl('website-photos/Research/currentModel%20(2).pdf'),
+    imageUrl: assetUrl('img/research/income-hedging.webp'),
+    imageAlt: 'First page of the paper',
+    liveUrl: assetUrl('papers/hedging-income-risk-prediction-markets.pdf'),
     tags: ['Prediction Markets', 'Poisson Process', 'Monte Carlo'],
   },
   {
-    title: 'Reddit Sentiment Data for Financial Applications',
-    eyebrow: 'Published research',
+    title: 'Reddit Data in Quantitative Financial Models',
+    subtitle: 'Evolution and Implications Post GameStop and AMC Short Squeeze',
+    authors: 'Rohan Malhotra, Colin Jones',
+    year: '2025',
+    venue: 'VTechWorks',
     description:
       'NLP and regression models in Python measuring how r/wallstreetbets sentiment relates to equity returns and volatility.',
-    imageUrl: assetUrl('website-photos/Research/RedditSetiment.png'),
-    imageAlt: 'Reddit sentiment research paper figure',
-    liveUrl: assetUrl(
-      'website-photos/Research/Reddit%20Data%20in%20Quantitative%20Financial%20Models%20copy.pdf'
-    ),
+    imageUrl: assetUrl('img/research/reddit-sentiment.webp'),
+    imageAlt: 'First page of the paper',
+    liveUrl: assetUrl('papers/reddit-sentiment-financial-models.pdf'),
     externalUrl: 'https://hdl.handle.net/10919/124730',
     tags: ['NLP', 'Regression', 'Market Data'],
   },
   {
-    title: 'An Economic Approach to Capital Allocation',
-    eyebrow: 'Optimization research',
+    title: 'An Economic Approach to Optimize Capital Allocation',
+    authors: 'Rohan Malhotra',
+    year: '2024',
+    venue: 'VTechWorks',
     description:
       'Monte Carlo backtesting of fractional and full Kelly strategies with emphasis on drawdowns, path dependence, and risk-adjusted growth.',
-    imageUrl: assetUrl('website-photos/Research/economic.png'),
-    imageAlt: 'Capital-allocation research visualization',
-    liveUrl: assetUrl(
-      'website-photos/Research/AnEconomic%20Approachto%20OptimizeCapital%20Allocation.pdf'
-    ),
+    imageUrl: assetUrl('img/research/capital-allocation.webp'),
+    imageAlt: 'First page of the paper',
+    liveUrl: assetUrl('papers/kelly-capital-allocation.pdf'),
+    externalUrl: 'https://hdl.handle.net/10919/124871',
     tags: ['Kelly Criterion', 'Optimization', 'Risk'],
   },
 ];
@@ -210,13 +253,13 @@ export const projects = [
   {
     title: 'EPM Wizard',
     slug: 'epm-wizard',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I built EPM Wizard so I could describe an Oracle EPM form or rule in plain English, inspect the generated artifact, and approve it before deployment.',
     longDescription:
       'I can describe what I need, preview the forms and rules it creates, approve the changes, and deploy them with checks in place.',
-    imageUrl: assetUrl('website-photos/project-covers/epm-wizard.png'),
+    imageUrl: assetUrl('img/projects/epm-wizard.webp'),
     imageAlt: 'EPM Wizard product interface',
     repoUrl: 'https://github.com/rohanmalhotra0/epm',
     tags: ['FastAPI', 'React', 'IBM Carbon', 'Groovy', 'Playwright'],
@@ -231,7 +274,7 @@ export const projects = [
       'I made this while learning Oracle EPM because I wanted something easier to explore than a normal textbook.',
     longDescription:
       'It includes visual workflows, an approval-state simulator, a glossary, quick navigation, and a built-in study assistant.',
-    imageUrl: assetUrl('website-photos/project-covers/epm-interactive-guide.png'),
+    imageUrl: assetUrl('img/projects/epm-interactive-guide.webp'),
     imageAlt: 'Oracle EPM interactive learning guide homepage',
     liveUrl: 'https://capstone-snowy-sigma.vercel.app',
     repoUrl: 'https://github.com/rohanmalhotra0/capstone',
@@ -241,13 +284,13 @@ export const projects = [
   {
     title: 'Casen: Consulting Casebook',
     slug: 'casen',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I built Casen to make case-interview prep feel less scattered by keeping cases, drills, voice practice, and job tracking in one place.',
     longDescription:
       'I use it for frameworks, vocabulary drills, behavioral stories, M&A news, and realistic voice-based mock interviews.',
-    imageUrl: assetUrl('website-photos/project-covers/casen-live.png'),
+    imageUrl: assetUrl('img/projects/casen.webp'),
     imageAlt: 'Casen consulting casebook landing page',
     liveUrl: 'https://getcasen.com',
     repoUrl: 'https://github.com/rohanmalhotra0/lab',
@@ -257,13 +300,13 @@ export const projects = [
   {
     title: 'NightShift',
     slug: 'nightshift',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I built NightShift to handle the repetitive parts of applying to jobs: finding roles, filling forms, checking confirmation emails, and keeping an application log.',
     longDescription:
       'It combines browser automation, scheduling, email checks, subscriptions, and a dashboard where I can see what is happening.',
-    imageUrl: assetUrl('website-photos/project-covers/nightshift-live.png'),
+    imageUrl: assetUrl('img/projects/nightshift.webp'),
     imageAlt: 'NightShift automated job platform landing page',
     liveUrl: 'https://night-shift-two.vercel.app',
     repoUrl: 'https://github.com/rohanmalhotra0/NightShift',
@@ -274,11 +317,12 @@ export const projects = [
     title: 'Refrax',
     slug: 'refrax',
     category: 'Quant',
+    year: '2025',
     description:
       'I built Refrax to explore market data, run models, and see the results in 2D and 3D without jumping between tools.',
     longDescription:
       'I wanted one workspace where I could pull live market data, run a numerical experiment, and inspect the result in 2D or 3D.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/refrax1.png'),
+    imageUrl: assetUrl('img/projects/refrax.webp'),
     imageAlt: 'Refrax quantitative visualization interface',
     liveUrl: 'https://refrax.io',
     repoUrl: 'https://github.com/rohanmalhotra0/prism-frontend',
@@ -288,13 +332,14 @@ export const projects = [
   {
     title: 'Spot Vision Pipeline',
     slug: 'spot-vision',
-    category: 'AI & Robotics',
+    category: 'AI & robotics',
+    year: '2026',
     description:
       'At IBM, I trained the vision system that helps a Boston Dynamics Spot robot find and retrieve objects in real time.',
     longDescription:
       'I labeled the data, trained and tested the model, connected it to the robot, and helped turn it into a live retrieval demo.',
-    imageUrl: assetUrl('website-photos/project-covers/spot-vision.jpg'),
-    imageAlt: 'Boston Dynamics Spot quadruped robot in motion',
+    imageUrl: assetUrl('img/projects/spot-vision.webp'),
+    imageAlt: 'Render of a Spot-style quadruped robot with an arm, from the 3D demo on this site',
     repoUrl: 'https://github.com/rohanmalhotra0',
     tags: ['YOLO11', 'OpenCV', 'Spot SDK', 'gRPC'],
     featured: true,
@@ -303,22 +348,22 @@ export const projects = [
     title: 'Income Risk Hedging Engine',
     slug: 'income-risk-hedging',
     category: 'Quant',
+    year: '2026',
     description:
       'I turned my Kalshi research into a simulator that shows how prediction-market contracts could hedge job-loss risk.',
     longDescription:
       'You enter a few assumptions and it compares contract sizes, upfront cost, and tail risk before and after the hedge.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/discreteOptions.jpeg'),
-    imageAlt: 'Prediction-market hedging model visualization',
     repoUrl: 'https://github.com/rohanmalhotra0/kalshiQR',
     tags: ['Next.js', 'Python', 'C++', 'Monte Carlo'],
   },
   {
     title: 'GreenSticker',
     slug: 'greensticker',
-    category: 'AI & Robotics',
+    category: 'AI & robotics',
+    year: '2025',
     description:
       'I built a hands-free mouse that follows a colored sticker through a webcam, making basic computer control more accessible.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/greensticker.png'),
+    imageUrl: assetUrl('img/projects/greensticker.webp'),
     imageAlt: 'GreenSticker computer-vision accessibility interface',
     liveUrl: 'https://greensticker.us',
     repoUrl: 'https://github.com/rohanmalhotra0/greenSticker2',
@@ -330,7 +375,7 @@ export const projects = [
     category: 'Web',
     description:
       'I built a research prototype for collecting screening responses in a structured, easier-to-follow flow. It does not diagnose autism.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/autism.png'),
+    imageUrl: assetUrl('img/projects/autism-research.webp'),
     imageAlt: 'Autism research tool interface',
     liveUrl: 'https://autismtester.com',
     repoUrl: 'https://github.com/rohanmalhotra0/AutismResearch',
@@ -340,10 +385,9 @@ export const projects = [
     title: 'PIVOT Platform',
     slug: 'pivot',
     category: 'Web',
+    year: '2024',
     description:
       'I worked on PIVOT, a site where students at different universities can post STEM projects and find collaborators.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/pivot.png'),
-    imageAlt: 'PIVOT student research platform',
     liveUrl: 'https://vtpivot.org',
     tags: ['React', 'Collaboration', 'Infrastructure'],
   },
@@ -353,7 +397,7 @@ export const projects = [
     category: 'Web',
     description:
       'I made a daily word game with streaks, stats, and a shared leaderboard because I wanted my own spin on Wordle.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/Gavindle.png'),
+    imageUrl: assetUrl('img/projects/gavindle.webp'),
     imageAlt: 'Gavindle word game interface',
     liveUrl: 'https://gavindle.com',
     repoUrl: 'https://github.com/rohanmalhotra0/gavindle',
@@ -365,8 +409,6 @@ export const projects = [
     category: 'Quant',
     description:
       'I built a scheduled Python pipeline that pulls option data, prices American contracts with a binomial tree, and saves each run for review.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/discreteOptions.jpeg'),
-    imageAlt: 'Binomial options model running on a Raspberry Pi',
     repoUrl: 'https://github.com/rohanmalhotra0/Discrete-Options-System',
     tags: ['Python', 'NumPy', 'Alpaca', 'Options'],
   },
@@ -376,18 +418,14 @@ export const projects = [
     category: 'Quant',
     description:
       'I experimented with wave-like cycles in market data to see whether they could help identify changing regimes and recurring signals.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/download.png'),
-    imageAlt: 'Oscillating stock-model visualization',
     tags: ['Time Series', 'Signals', 'Regime Detection'],
   },
   {
     title: 'RSI Predictor',
     slug: 'rsi-predictor',
-    category: 'AI & Robotics',
+    category: 'Quant',
     description:
       'I compared linear regression and random forests to see which one handled RSI prediction better from simple market features.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/rsi.jpeg'),
-    imageAlt: 'RSI predictor market chart',
     repoUrl: 'https://github.com/rohanmalhotra0/rsi-random-forest',
     tags: ['Random Forest', 'Moving Averages', 'Holdout MAE'],
   },
@@ -397,19 +435,17 @@ export const projects = [
     category: 'Systems',
     description:
       'I built a small hardware prototype that uses Faraday’s law to turn body motion into electrical power.',
-    imageUrl: assetUrl('website-photos/projectsPhotos/linear-generator-1.webp'),
+    imageUrl: assetUrl('img/projects/linear-generator.webp'),
     imageAlt: 'Wearable linear-generator engineering prototype',
     tags: ['Embedded Systems', 'Energy Harvesting', 'Hardware'],
   },
   {
     title: 'AI Quiz Maker',
     slug: 'ai-quiz-maker',
-    category: 'AI & Systems',
+    category: 'AI & systems',
     year: '2026',
     description:
       'I made this so I could drop in a PDF or notes and get a usable set of quizzes, flashcards, and recall prompts.',
-    imageUrl: assetUrl('website-photos/project-covers/ai-quiz-maker.png'),
-    imageAlt: 'AI Quiz Maker project image',
     repoUrl: 'https://github.com/rohanmalhotra0/ai-quiz-generator',
     tags: ['Next.js', 'FastAPI', 'OpenAI', 'PDF Extraction'],
   },
@@ -420,8 +456,6 @@ export const projects = [
     year: '2026',
     description:
       'I built a live dashboard that streams Kalshi prices and lets me test position sizes with the Kelly criterion.',
-    imageUrl: assetUrl('website-photos/project-covers/kalshi-live-kelly.png'),
-    imageAlt: 'Kalshi Live Kelly Dashboard project image',
     repoUrl: 'https://github.com/rohanmalhotra0/KalshiHedgingDashboard',
     tags: ['FastAPI', 'WebSocket', 'Plotly', 'Kelly Criterion'],
   },
@@ -432,8 +466,6 @@ export const projects = [
     year: '2026',
     description:
       'I kept this nine-week tracker during my IBM internship to show what I was working on, what I learned, and what shipped each week.',
-    imageUrl: assetUrl('website-photos/project-covers/ibm-internship-tracker.png'),
-    imageAlt: 'IBM internship tracker interface',
     liveUrl: 'https://rohanmalhotra0.github.io/blogs/',
     repoUrl: 'https://github.com/rohanmalhotra0/blogs',
     tags: ['JavaScript', 'Dashboard', 'Documentation'],
@@ -445,8 +477,6 @@ export const projects = [
     year: '2025',
     description:
       'I compared sponsorship cost, audience size, and engagement across Love Island partnerships, then built an interactive page to show the trade-offs.',
-    imageUrl: assetUrl('website-photos/project-covers/love-island-roi.png'),
-    imageAlt: 'Love Island ROI analysis slide',
     liveUrl: 'https://rohanmalhotra0.github.io/BAC/',
     repoUrl: 'https://github.com/rohanmalhotra0/BAC',
     tags: ['PyTorch', 'Pandas', 'Plotly', 'Jupyter'],
@@ -458,8 +488,6 @@ export const projects = [
     year: '2025',
     description:
       'I trained a gradient-boosting model to estimate the next SPY close from EMA, RSI, MACD, and PCA-reduced features.',
-    imageUrl: assetUrl('website-photos/project-covers/spy-gradient-boosting.png'),
-    imageAlt: 'SPY gradient boosting model chart',
     repoUrl: 'https://github.com/rohanmalhotra0/GBM-Model-Python',
     tags: ['scikit-learn', 'PCA', 'Gradient Boosting', 'yfinance'],
   },
@@ -470,8 +498,6 @@ export const projects = [
     year: '2026',
     description:
       'I pulled my study tools into one place: notes, quizzes, flashcards, voice practice, and source material for everything from operating systems to German.',
-    imageUrl: assetUrl('website-photos/project-covers/rohan-lab.png'),
-    imageAlt: 'rohan.lab study notebooks interface',
     repoUrl: 'https://github.com/rohanmalhotra0/schoolwork',
     tags: ['JavaScript', 'Study Tools', 'Voice Chat'],
   },
@@ -482,8 +508,6 @@ export const projects = [
     year: '2026',
     description:
       'I made this for German II, with flashcards, quizzes, grammar references, and practice that focuses on my weak spots.',
-    imageUrl: assetUrl('website-photos/project-covers/german-study-lab.png'),
-    imageAlt: 'German II Study Lab interface',
     repoUrl: 'https://github.com/rohanmalhotra0/german',
     tags: ['JavaScript', 'Adaptive Practice', 'Education'],
   },
@@ -494,8 +518,6 @@ export const projects = [
     year: '2026',
     description:
       'I turned a political-science paper into a multimedia explainer, using South Korea as the main case study.',
-    imageUrl: assetUrl('website-photos/project-covers/democracies-survive.png'),
-    imageAlt: 'Why Do Democracies Survive multimedia page',
     repoUrl: 'https://github.com/rohanmalhotra0/Vox',
     tags: ['Multimedia', 'Research', 'Responsive Web'],
   },
@@ -506,8 +528,6 @@ export const projects = [
     year: '2025',
     description:
       'I built the backend for a task tracker, including users, due dates, alerts, notifications, and SQL persistence.',
-    imageUrl: assetUrl('website-photos/project-covers/indytrack-api.png'),
-    imageAlt: 'IndyTrack backend project image',
     repoUrl: 'https://github.com/rohanmalhotra0/IndyTrack1',
     tags: ['Flask', 'SQLAlchemy', 'PostgreSQL', 'API'],
   },
@@ -518,8 +538,6 @@ export const projects = [
     year: '2025',
     description:
       'I wrote a small Python calculator for kinematics and electric-field problems so I did not have to repeat the same setup by hand.',
-    imageUrl: assetUrl('website-photos/project-covers/physics-calculator.png'),
-    imageAlt: 'Physics Calculator project image',
     repoUrl: 'https://github.com/rohanmalhotra0/physicscalc',
     tags: ['Python', 'Physics', 'Utilities'],
   },
@@ -530,8 +548,6 @@ export const projects = [
     year: 'Ongoing',
     description:
       'This is where I keep my ongoing LeetCode and NeetCode work as I practice data structures and algorithms.',
-    imageUrl: assetUrl('website-photos/project-covers/algorithms-practice.png'),
-    imageAlt: 'Algorithms practice project image',
     repoUrl: 'https://github.com/rohanmalhotra0/leet-code-daily',
     tags: ['Algorithms', 'Data Structures', 'Practice'],
   },
@@ -555,3 +571,52 @@ export const skillGroups = [
     items: ['Oracle EPM Cloud', 'OIC', 'EPM Automate', 'Monte Carlo', 'Excel Macros'],
   },
 ];
+
+/** Page sections in order; drives the navbar, command palette, and footer. */
+export const sections = [
+  { id: 'experience', label: 'Experience' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'research', label: 'Research' },
+  { id: 'about', label: 'About' },
+  { id: 'education', label: 'Education' },
+  { id: 'rohangpt', label: 'Ask me' },
+  { id: 'contact', label: 'Contact' },
+];
+
+/** Places I have worked or studied, for the hero "worked at" strip. */
+export const affiliations = ['IBM', 'Kalshi', 'Virginia Tech Hume Center', 'NYU Courant'];
+
+export const education = {
+  school: 'New York University',
+  college: 'Courant Institute of Mathematical Sciences',
+  degree: 'B.A. Computer Science',
+  minor: 'Mathematics minor',
+  gpa: '3.7',
+  gpaScale: '4.0',
+  start: '2024-08-01',
+  end: '2027-05-15',
+  dates: 'Aug 2024 – May 2027',
+  location: 'New York, NY',
+  logoUrl: assetUrl('website-photos/Work%20Logos/new_york_university_logo.jpeg'),
+  accelerated:
+    'Completing the degree in three years, with expected graduation in May 2027.',
+  graduateCourse: {
+    title: 'Mathematical Techniques for CS Applications',
+    description: 'Advanced mathematical tools for algorithms, modeling, and computation.',
+  },
+  coursework: [
+    'Algorithms',
+    'Operating Systems',
+    'Computer Organization',
+    'Data Structures',
+    'Machine Learning',
+    'Software Engineering',
+    'Linear Algebra',
+    'Probability & Statistics',
+    'Real Analysis',
+    'Differential Equations',
+    'Numerical Methods',
+  ],
+};
+
+export const formspreeUrl = 'https://formspree.io/f/xrbwdkqb';

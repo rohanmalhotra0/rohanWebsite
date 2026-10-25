@@ -1,49 +1,73 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
-      content="Rohan Malhotra is an NYU Courant computer science student building applied AI, robotics, quantitative systems, and financial infrastructure."
+      content="Rohan Malhotra is an NYU Courant computer science student building applied AI, robotics, and quantitative systems. Past work includes IBM and Kalshi."
     />
-    <meta name="theme-color" content="#050505" />
+    <meta name="theme-color" content="#f3f2ee" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="canonical" href="https://rohanm.org/" />
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://rohanm.org/" />
-    <meta property="og:title" content="Rohan's Portfolio" />
+    <meta property="og:title" content="Rohan Malhotra" />
     <meta
       property="og:description"
-      content="Production work across IBM robotics, Oracle financial systems, prediction markets, and more than twenty software projects."
+      content="Applied AI, robotics, and quantitative systems. IBM, Kalshi, NYU Courant, and more than twenty projects."
     />
     <meta property="og:image" content="https://rohanm.org/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Rohan Malhotra portfolio social card with a monochrome robotic form" />
+    <meta property="og:image:alt" content="Rohan Malhotra — applied AI, robotics, and quantitative systems" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Rohan's Portfolio" />
+    <meta name="twitter:title" content="Rohan Malhotra" />
     <meta
       name="twitter:description"
-      content="Production work across IBM robotics, Oracle financial systems, prediction markets, and more than twenty software projects."
+      content="Applied AI, robotics, and quantitative systems. IBM, Kalshi, NYU Courant, and more than twenty projects."
     />
     <meta name="twitter:image" content="https://rohanm.org/og.png" />
-
-    <link rel="preload" as="image" href="/robot-poster.webp" type="image/webp" fetchpriority="high" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
 
-    <title>Rohan's Portfolio</title>
+    <title>Rohan Malhotra</title>
+
+    <!-- Apply the saved theme (or the OS preference) before first paint. -->
+    <script>
+      (function () {
+        var theme;
+        try {
+          theme = localStorage.getItem('rm-theme');
+        } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute('content', theme === 'dark' ? '#0e0e0d' : '#f3f2ee');
+
+        // The hero's robot poster is the largest thing on the first screen;
+        // start fetching the right theme's copy before any JS runs.
+        if (location.hash !== '#/resume') {
+          var poster = document.createElement('link');
+          poster.rel = 'preload';
+          poster.as = 'image';
+          poster.href = 'img/hero/robot-' + theme + '.webp';
+          poster.setAttribute('fetchpriority', 'high');
+          document.head.appendChild(poster);
+        }
+      })();
+    </script>
 
     <script type="application/ld+json">
       {
@@ -51,7 +75,7 @@
         "@type": "Person",
         "name": "Rohan Malhotra",
         "url": "https://rohanm.org",
-        "image": "https://rohanm.org/website-photos/me/01-headshot.png",
+        "image": "https://rohanm.org/img/me/portrait.webp",
         "jobTitle": "Software Engineer and Computer Science Student",
         "alumniOf": {
           "@type": "CollegeOrUniversity",
@@ -64,14 +88,29 @@
         "knowsAbout": [
           "Applied artificial intelligence",
           "Robotics",
-          "Quantitative systems",
-          "Oracle EPM",
-          "Computer vision"
+          "Computer vision",
+          "Quantitative finance",
+          "Oracle EPM"
         ]
       }
     </script>
   </head>
   <body>
+    <noscript>
+      <main style="max-width: 40rem; margin: 4rem auto; padding: 0 1rem; font-family: system-ui, sans-serif; line-height: 1.6">
+        <h1>Rohan Malhotra</h1>
+        <p>
+          I'm a computer science student at NYU Courant. Lately I've been building Oracle finance
+          tools, computer-vision systems for Boston Dynamics Spot, and quantitative research software.
+        </p>
+        <p>
+          <a href="https://github.com/rohanmalhotra0">GitHub</a> ·
+          <a href="https://www.linkedin.com/in/rohanamal">LinkedIn</a> ·
+          <a href="mailto:rohanm8974@gmail.com">Email</a> ·
+          <a href="Rohan_Malhotra_Resume.pdf">Résumé (PDF)</a>
+        </p>
+      </main>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

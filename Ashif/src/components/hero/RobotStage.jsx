@@ -1,0 +1,119 @@
+import { useState } from 'react';
+import { assetUrl } from '@/data/portfolioData';
+import Button from '@/components/primitives/Button';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import { useTheme } from '@/lib/theme';
+import { cn } from '@/lib/utils';
+import useRobotScene from './useRobotScene';
+
+const LIVE_LABEL =
+  'Interactive 3D model of a four-legged robot with an arm. Throw it a toy and it walks over, picks it up with its gripper and brings it back.';
+const STILL_LABEL = 'A four-legged robot with an arm, standing on a lab floor.';
+// Small button on desktop, a full 44 px target on touch layouts.
+const TAP = 'max-lg:h-11 max-lg:px-4';
+
+/**
+ * The robot stage: a poster still that paints immediately, cross-faded to
+ * the live three.js scene once its chunk has loaded and drawn a frame.
+ */
+export default function RobotStage({ className }) {
+  const { theme } = useTheme();
+  const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const coarse = useMediaQuery('(pointer: coarse)');
+  const stage = useRobotScene({ reducedMotion: reduced });
+  const [posterFailed, setPosterFailed] = useState(false);
+  const { live, touched } = stage;
+
+  return (
+    <div
+      className={cn(
+        'relative -mx-[var(--gutter)] [--gutter:clamp(1rem,4vw,2.5rem)]',
+        'lg:mx-0 lg:-mr-[var(--bleed)] lg:h-[min(calc(100svh-7rem),54rem)] lg:[--bleed:calc(max(0px,(100vw_-_78rem)/2)_+_var(--gutter)_-_1rem)]',
+        className
+      )}
+    >
+      <div className="relative h-[40svh] max-h-[440px] min-h-[280px] lg:absolute lg:inset-0 lg:h-auto lg:max-h-none lg:min-h-0">
+        <div role="img" aria-label={live ? LIVE_LABEL : STILL_LABEL} className="absolute inset-0">
+          {posterFailed ? null : (
+            <img
+              ref={stage.posterRef}
+              src={assetUrl(`img/hero/robot-${theme}.webp`)}
+              alt=""
+              width={1600}
+              height={1600}
+              fetchPriority="high"
+              draggable={false}
+              onError={() => setPosterFailed(true)}
+              // The poster is the scene's first frame: it stays opaque under
+              // the canvas while that fades in, then drops out (no ghosting).
+              className={cn(
+                'absolute inset-0 size-full select-none object-contain transition-opacity duration-0',
+                live && 'opacity-0 delay-300'
+              )}
+            />
+          )}
+          <div
+            ref={stage.hostRef}
+            className={cn('absolute inset-0 opacity-0 transition-opacity duration-250 ease-out', live && 'opacity-100')}
+          />
+        </div>
+
+        {/* Inset for the robot's camera; the canvas draws its view into this rect. */}
+        <div
+          ref={stage.frameRef}
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute bottom-2 right-[var(--gutter)] h-[72px] w-[128px] opacity-0 transition-opacity duration-500 sm:h-[90px] sm:w-[160px]',
+            'lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]',
+            live && 'opacity-100'
+          )}
+        >
+          <div className="absolute inset-0 overflow-hidden rounded-lg ring-1 ring-inset ring-fg/10">
+            <div ref={stage.boxRef} className="absolute left-0 top-0 rounded-[3px] border border-accent opacity-0">
+              <span className="absolute left-0 top-0 rounded-br-[3px] bg-accent px-1 font-mono text-[9px] leading-[14px] text-accent-ink">
+                toy
+              </span>
+            </div>
+          </div>
+          <p
+            ref={stage.hudRef}
+            className="absolute bottom-full right-0 mb-1.5 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:text-[11px]"
+          >
+            cam0 · simulated · idle
+          </p>
+        </div>
+
+        <p className="sr-only" aria-live="polite">
+          {stage.message}
+        </p>
+      </div>
+
+      {live || stage.canRun ? (
+        <div
+          ref={stage.controlsRef}
+          className="mt-3 flex items-center gap-4 px-[var(--gutter)] lg:absolute lg:bottom-4 lg:left-0 lg:mt-0 lg:flex-col-reverse lg:items-start lg:gap-1.5 lg:px-0"
+        >
+          {live ? (
+            <>
+              <Button variant="secondary" size="sm" onClick={stage.throwToy} className={TAP}>
+                Throw a toy
+              </Button>
+              <p
+                className={cn(
+                  'text-[13px] leading-5 text-subtle transition-opacity duration-500',
+                  touched && 'opacity-0'
+                )}
+              >
+                {coarse ? 'Tap' : 'Click'} the floor to throw a toy.
+              </p>
+            </>
+          ) : (
+            <Button variant="secondary" size="sm" onClick={stage.runDemo} className={TAP}>
+              Run demo
+            </Button>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
