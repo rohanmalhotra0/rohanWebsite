@@ -5,9 +5,9 @@ import FeaturedWork from './FeaturedWork';
 import ProjectArchive from './ProjectArchive';
 import { featuredProjects } from './projectData';
 import { useProjectViewer } from './useProjectViewer';
-import { loadViewer } from './viewerLoader';
+import { lazyViewer } from './viewerLoader';
 
-const ProjectViewer = lazy(loadViewer);
+const ProjectViewer = lazy(lazyViewer);
 
 const DESCRIPTION = `${projects.length} projects, from internship work to small tools I built for myself.`;
 

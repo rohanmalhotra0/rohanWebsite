@@ -52,17 +52,8 @@ export const focalPoint = (project) => FOCAL_POINTS[project.slug] ?? '50% 50%';
 /** Shared layoutId for a featured cover and the viewer image it flies into. */
 export const mediaLayoutId = (slug) => `project-media-${slug}`;
 
-/** "AI & Systems" → "AI & systems". Keeps acronyms and the first word as written. */
-export function sentenceCase(label = '') {
-  return label
-    .split(' ')
-    .map((word, i) => (i === 0 || /^[A-Z0-9]{2,}$/.test(word) ? word : word.toLowerCase()))
-    .join(' ');
-}
-
 /** "AI & systems · 2026", or just the category when the year is unknown. */
-export const projectMeta = (project) =>
-  [sentenceCase(project.category), project.year].filter(Boolean).join(' · ');
+export const projectMeta = (project) => [project.category, project.year].filter(Boolean).join(' · ');
 
 // A repoUrl that points at a GitHub profile rather than a repository is not a
 // project's source, so it is not shown as one.
@@ -114,7 +105,7 @@ export function categoryOptions(all, matching) {
 
   return [
     { value: 'all', label: 'All', count: matching.length },
-    ...order.map((name) => ({ value: name, label: sentenceCase(name), count: counts.get(name) || 0 })),
+    ...order.map((name) => ({ value: name, label: name, count: counts.get(name) || 0 })),
   ];
 }
 

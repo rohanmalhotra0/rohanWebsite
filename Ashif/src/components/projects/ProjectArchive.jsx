@@ -24,7 +24,7 @@ import {
   EASE,
   matchesQuery,
   projectHash,
-  sentenceCase,
+  projectMeta,
 } from './projectData';
 import { preloadImage } from './viewerDom';
 
@@ -32,9 +32,10 @@ const MotionDiv = motion.div;
 const MotionButton = motion.button;
 
 // One column template for the header, the rows, and the toggle:
-// year | project | category (md+) | stack (lg+) | links.
+// project | category · year (md+) | stack (lg+) | links. Below md the
+// category and year sit under the title, as on the featured cards.
 const COLUMNS =
-  'grid grid-cols-[3.25rem_minmax(0,1fr)_auto] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto] sm:gap-x-6 md:grid-cols-[4.5rem_minmax(0,1.5fr)_minmax(0,1fr)_auto] lg:grid-cols-[4.5rem_minmax(0,1.3fr)_minmax(0,0.8fr)_minmax(0,1.2fr)_auto]';
+  'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 sm:gap-x-6 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.3fr)_auto]';
 
 const LAYOUT = { layout: { duration: 0.4, ease: EASE } };
 
@@ -61,7 +62,7 @@ const ArchiveRow = memo(function ArchiveRow({
   onOpen,
   onHover,
 }) {
-  const category = sentenceCase(project.category);
+  const meta = projectMeta(project);
 
   return (
     <MotionDiv
@@ -85,14 +86,6 @@ const ArchiveRow = memo(function ArchiveRow({
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 -inset-x-3 -z-10 rounded-lg bg-surface opacity-0 transition-opacity duration-150 group-hover:opacity-100"
       />
-      <span role="cell" className="text-sm tabular-nums text-subtle">
-        {project.year ?? (
-          <>
-            <span aria-hidden="true">&mdash;</span>
-            <span className="sr-only">No year</span>
-          </>
-        )}
-      </span>
       <span role="cell" className="min-w-0">
         {/* Links to the project's deep link; its ::after covers the row, so the
             whole row opens the viewer (a modified click opens a new tab). */}
@@ -109,10 +102,10 @@ const ArchiveRow = memo(function ArchiveRow({
         >
           {project.title}
         </a>
-        <span className="mt-0.5 block truncate text-[13px] text-subtle md:hidden">{category}</span>
+        <span className="mt-0.5 block truncate text-[13px] text-subtle md:hidden">{meta}</span>
       </span>
       <span role="cell" className="hidden truncate text-sm text-muted md:block">
-        {category}
+        {meta}
       </span>
       <span role="cell" className="hidden truncate text-[13px] text-subtle lg:block">
         {project.tags.join(' · ')}
@@ -283,7 +276,6 @@ function ProjectArchive({ projects, onOpen, onPreload }) {
               role="row"
               className={cn(COLUMNS, 'border-b border-line-strong pb-3 text-[13px] text-subtle')}
             >
-              <span role="columnheader">Year</span>
               <span role="columnheader">Project</span>
               <span role="columnheader" className="hidden md:block">
                 Category
@@ -322,8 +314,7 @@ function ProjectArchive({ projects, onOpen, onPreload }) {
         </div>
 
         {results.length === 0 ? (
-          // Indented to the Project column (year column + gap) at every size.
-          <div className="border-b border-line py-14 pl-16 sm:pl-24">
+          <div className="border-b border-line py-14">
             <p className="text-pretty text-[15px] text-muted">
               No projects match &ldquo;<span className="text-fg">{deferredQuery.trim()}</span>&rdquo;
               {category !== 'all' ? ' in this category' : ''}.
@@ -353,7 +344,6 @@ function ProjectArchive({ projects, onOpen, onPreload }) {
               aria-hidden="true"
               className="pointer-events-none absolute inset-y-0 -inset-x-3 -z-10 rounded-lg bg-surface opacity-0 transition-opacity duration-150 group-hover:opacity-100"
             />
-            <span aria-hidden="true" />
             <span className="inline-flex items-center gap-1.5">
               {expanded ? 'Show fewer' : `Show all ${results.length}`}
               <ChevronDown
