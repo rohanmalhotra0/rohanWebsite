@@ -11,6 +11,12 @@ const LIVE_LABEL =
 const STILL_LABEL = 'A four-legged robot with an arm, standing on a lab floor.';
 // Small button on desktop, a full 44 px target on touch layouts.
 const TAP = 'max-lg:h-11 max-lg:px-4';
+// The poster fills the stage width on phones and about 55vw from lg up; an
+// 800px copy covers 1x screens and most phones below 2x. Keep in sync with
+// the preload in index.html.
+const POSTER_SIZES = '(min-width: 1024px) 55vw, 100vw';
+const posterSrcSet = (theme) =>
+  `${assetUrl(`img/hero/robot-${theme}-800.webp`)} 800w, ${assetUrl(`img/hero/robot-${theme}.webp`)} 1600w`;
 
 /**
  * The robot stage: a poster still that paints immediately, cross-faded to
@@ -37,6 +43,8 @@ export default function RobotStage({ className }) {
             <img
               ref={stage.posterRef}
               src={assetUrl(`img/hero/robot-${theme}.webp`)}
+              srcSet={posterSrcSet(theme)}
+              sizes={POSTER_SIZES}
               alt=""
               width={1600}
               height={1600}

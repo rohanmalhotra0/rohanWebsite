@@ -88,6 +88,13 @@
           poster.rel = 'preload';
           poster.as = 'image';
           poster.href = 'img/hero/robot-' + theme + '.webp';
+          // Same candidates and sizes as the <img> (RobotStage.jsx), so the
+          // preload and the image pick the same file.
+          poster.setAttribute(
+            'imagesrcset',
+            'img/hero/robot-' + theme + '-800.webp 800w, img/hero/robot-' + theme + '.webp 1600w'
+          );
+          poster.setAttribute('imagesizes', '(min-width: 1024px) 55vw, 100vw');
           poster.setAttribute('fetchpriority', 'high');
           document.head.appendChild(poster);
         }
