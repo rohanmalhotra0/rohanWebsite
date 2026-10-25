@@ -57,7 +57,6 @@ export function createController({ root, body, legs, arm }) {
     rate: 7,
     neck: 0,
     clock: 0,
-    face: 0,
   };
   const q = { yaw: 0, sh: 0, el: 0, wr: 0, roll: 0, grip: 0 };
   const qt = { yaw: 0, sh: 0, el: 0, wr: 0, roll: 0 };
@@ -225,9 +224,11 @@ export function createController({ root, body, legs, arm }) {
     else if (armCtl.mode === 'reach') aimWrist(qt);
     else if (armCtl.mode === 'carry') pose(qt, 0, 0.27, 0.1, -0.78);
     else {
-      // Wave: arm up, gripper swinging side to side and snapping.
+      // Wave: arm up toward the gaze target, gripper swinging and snapping.
       const k = armCtl.clock;
-      pose(qt, armCtl.face + 0.36 * Math.sin(k * 8.5), 0.13, 0.5, 0.45);
+      v.copy(gaze.pos).applyMatrix4(inv);
+      const face = clamp(Math.atan2(v.x - SHOULDER.x, v.z - SHOULDER.z), -1.2, 1.2);
+      pose(qt, face + 0.36 * Math.sin(k * 8.5), 0.13, 0.5, 0.45);
       qt.roll = 0.45 * Math.sin(k * 8.5 + 0.9);
       grip = 0.22 + 0.22 * Math.sin(k * 15);
     }
@@ -271,28 +272,37 @@ export function createController({ root, body, legs, arm }) {
     const dz = tz - s.z;
     const err = wrap(Math.atan2(dx, dz) - s.yaw);
     const gap = Math.hypot(dx, dz) - stopAt;
+    if (Math.abs(gap) < 0.03 && Math.abs(err) < 0.05) {
+      stop();
+      return true;
+    }
     // Turn in place for large heading errors, otherwise steer while walking.
     s.cmdW = clamp(err * 3.2, -MAX_TURN, MAX_TURN);
     s.cmdF = Math.abs(err) < 0.8 ? clamp(gap * 1.8, -0.2, MAX_SPEED) * Math.cos(err) ** 2 : 0;
     s.cmdL = 0;
-    return Math.abs(gap) < 0.03 && Math.abs(err) < 0.05;
+    return false;
   }
 
   /** Walk to a point, then finish omnidirectionally and turn to `yaw`. */
   function goToPose(tx, tz, yaw) {
     const dx = tx - s.x;
     const dz = tz - s.z;
-    if (Math.hypot(dx, dz) > 0.3) {
+    const dist = Math.hypot(dx, dz);
+    if (dist > 0.3) {
       approachPoint(tx, tz, 0);
       return false;
     }
+    const err = wrap(yaw - s.yaw);
+    if (dist < 0.03 && Math.abs(err) < 0.04) {
+      stop();
+      return true;
+    }
     const c = Math.cos(s.yaw);
     const sn = Math.sin(s.yaw);
-    const err = wrap(yaw - s.yaw);
     s.cmdF = clamp((dx * sn + dz * c) * 1.6, -0.25, 0.25);
     s.cmdL = clamp((dx * c - dz * sn) * 1.6, -0.2, 0.2);
     s.cmdW = clamp(err * 3, -MAX_TURN, MAX_TURN);
-    return Math.hypot(dx, dz) < 0.03 && Math.abs(err) < 0.04;
+    return false;
   }
 
   function stop() {
@@ -319,15 +329,14 @@ export function createController({ root, body, legs, arm }) {
       gaze.target.copy(look);
       gaze.pos.copy(look);
       gaze.vel.set(0, 0, 0);
-      updateBody(0);
       root.position.set(x, 0, z);
       root.rotation.y = yaw;
+      // Converge the head-led posture so the poster and frame one agree.
+      for (let i = 0; i < 60; i++) updateBody(0.1);
       body.updateWorldMatrix(true, false);
       inv.copy(body.matrixWorld).invert();
       aimGaze(qt);
-      Object.assign(q, qt, { grip: armCtl.grip });
-      // Converge the head-led posture so the poster and frame one agree.
-      for (let i = 0; i < 60; i++) updateBody(0.1);
+      Object.assign(q, qt, { roll: 0, grip: armCtl.grip });
       apply(0);
     },
 

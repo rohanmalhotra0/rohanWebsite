@@ -56,7 +56,7 @@ const frame = (p, r = ZERO) =>
   new Matrix4().compose(_p.fromArray(p), _q.setFromEuler(_e.fromArray(r)), _s.set(1, 1, 1));
 
 /** Bake a primitive into link space (non-indexed so links can be merged). */
-function place(geometry, p = ZERO, r = ZERO, s = ONE, parent) {
+export function place(geometry, p = ZERO, r = ZERO, s = ONE, parent) {
   _m.compose(_p.fromArray(p), _q.setFromEuler(_e.fromArray(r)), _s.fromArray(s));
   if (parent) _m.premultiply(parent);
   const g = geometry.index ? geometry.toNonIndexed() : geometry;
@@ -65,8 +65,8 @@ function place(geometry, p = ZERO, r = ZERO, s = ONE, parent) {
 }
 
 const box = (w, h, d, r, seg = 3) => new RoundedBoxGeometry(w, h, d, seg, r);
-const cyl = (r, h, seg = 28, r2 = r) => new CylinderGeometry(r, r2, h, seg);
-const ball = (r) => new SphereGeometry(r, 24, 16);
+export const cyl = (r, h, seg = 28, r2 = r) => new CylinderGeometry(r, r2, h, seg);
+export const ball = (r) => new SphereGeometry(r, 24, 16);
 
 /**
  * A tapered, bevelled link: circles r1 at z = 0 and r2 at z = len joined by
@@ -92,7 +92,7 @@ function taper(r1, r2, len, thick, bevel = 0.006) {
   return g;
 }
 
-function merge(list) {
+export function merge(list) {
   let count = 0;
   for (const g of list) count += g.attributes.position.array.length;
   const position = new Float32Array(count);
