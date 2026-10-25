@@ -28,7 +28,7 @@ export function useProjectViewer() {
   const returnFocusRef = useRef(null);
   // We pushed the current #project entry, so closing should step back over it.
   const pushedRef = useRef(false);
-  // scrollRestoration to put back once our history.back() has landed.
+  // The page's own scrollRestoration, put back once we have stepped back.
   const restoreRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -46,6 +46,11 @@ export function useProjectViewer() {
       if (project.featured) revealCard(project.slug);
       else revealElement(document.getElementById('projects-archive'));
     } else {
+      // Scroll restoration is stored per history entry. Turn it off on the
+      // entry we leave, so stepping back to it on close doesn't scroll the page
+      // away from the card the image is flying back to.
+      restoreRef.current ??= window.history.scrollRestoration;
+      window.history.scrollRestoration = 'manual';
       window.history.pushState(window.history.state, '', projectHash(project.slug));
       pushedRef.current = true;
     }
@@ -96,10 +101,6 @@ export function useProjectViewer() {
 
     if (!fromHistory) {
       if (pushedRef.current) {
-        // Step back over our entry. Manual restoration stops the browser from
-        // scrolling to where the page was when the entry was pushed.
-        restoreRef.current = window.history.scrollRestoration;
-        window.history.scrollRestoration = 'manual';
         window.history.back();
       } else if (slugFromHash(window.location.hash)) {
         window.history.replaceState(window.history.state, '', stripHash());
@@ -119,14 +120,15 @@ export function useProjectViewer() {
 
   useEffect(() => {
     const onHashChange = () => {
-      if (restoreRef.current) {
-        window.history.scrollRestoration = restoreRef.current;
-        restoreRef.current = null;
-      }
       const slug = slugFromHash(window.location.hash);
       const current = viewerRef.current;
       if (!slug) {
         if (current) close(true);
+        // Back on the entry we left: give it its scroll restoration back once
+        // the traversal has settled.
+        const mode = restoreRef.current;
+        restoreRef.current = null;
+        if (mode) window.setTimeout(() => (window.history.scrollRestoration = mode), 100);
         return;
       }
       if (!current) {

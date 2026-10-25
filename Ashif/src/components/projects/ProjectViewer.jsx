@@ -126,9 +126,7 @@ function ViewerMedia({ project, paired, first, fromHover, custom }) {
   );
 }
 
-// `ref` comes from AnimatePresence's popLayout, which measures the leaving
-// slide to take it out of the flow while the next one comes in.
-function Slide({ ref, project, viewer, titleId, reduceMotion }) {
+function Slide({ project, viewer, titleId, reduceMotion }) {
   const isPresent = useIsPresent();
   const first = viewer.step === 0;
   const custom = { first, dir: viewer.dir, reduce: reduceMotion };
@@ -136,8 +134,7 @@ function Slide({ ref, project, viewer, titleId, reduceMotion }) {
 
   return (
     <MotionArticle
-      ref={ref}
-      className="grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8"
+      className="col-start-1 row-start-1 grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8"
     >
       {/* Above the details, so the flying image passes over the text. */}
       <div className="relative z-10 lg:col-span-7 xl:col-span-8">
@@ -272,9 +269,11 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
             {step > 0 ? `${project.title}, ${index + 1} of ${count}` : ''}
           </p>
 
-          {/* No scroll container in here: one would clip the image mid-flight. */}
-          <div className="relative">
-            <AnimatePresence mode="popLayout" custom={viewer.dir} propagate>
+          {/* Slides share one grid cell, so the leaving and arriving slides
+              overlap without either leaving the flow. No scroll container in
+              here: one would clip the image mid-flight. */}
+          <div className="grid">
+            <AnimatePresence custom={viewer.dir} propagate>
               <Slide
                 key={project.slug}
                 project={project}
