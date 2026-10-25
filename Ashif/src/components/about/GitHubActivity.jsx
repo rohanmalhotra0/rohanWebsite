@@ -7,8 +7,12 @@ import useGitHubActivity from './useGitHubActivity';
 
 const EASE = [0.16, 1, 0.3, 1];
 const MotionDiv = motion.div;
-const listFormat = new Intl.ListFormat('en', { type: 'conjunction' });
-const exactTime = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+// Built on first use, when the activity shows, not while the router preloads
+// this module on another page (see clock.js).
+let lists = null;
+let exact = null;
+const listFormat = () => (lists ??= new Intl.ListFormat('en', { type: 'conjunction' }));
+const exactTime = () => (exact ??= new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }));
 
 /**
  * Latest public GitHub activity in a sentence. The box is sized by the caller
@@ -66,7 +70,7 @@ function Activity({ activity, fadeIn }) {
 
   // "a, b, and c" with each repo name as a link.
   let next = 0;
-  const otherLinks = listFormat
+  const otherLinks = listFormat()
     .formatToParts(others.map(shortRepoName))
     .map((part, index) =>
       part.type === 'element' ? (
@@ -85,7 +89,7 @@ function Activity({ activity, fadeIn }) {
         Last pushed to <RepoLink repo={repo}>{repo}</RepoLink>{' '}
         <time
           dateTime={new Date(pushedAt).toISOString()}
-          title={exactTime.format(pushedAt)}
+          title={exactTime().format(pushedAt)}
           className="whitespace-nowrap"
         >
           {timeAgo(pushedAt, now ?? Date.now())}

@@ -787,9 +787,14 @@ export function findFollowUp(input, lastId) {
 /* Live endpoint                                                       */
 /* ------------------------------------------------------------------ */
 
-const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-const SYSTEM_PROMPT = `You are the assistant on Rohan Malhotra's portfolio site (rohanm.org). Answer as Rohan, in a plain, specific, first-person voice. Keep answers short: two to five sentences, or a few bullets. Markdown is fine (bold, inline code, links, bullet lists).
+// The live endpoint's instructions, built on first use: the month in them
+// sets up the date formats (a long task on a phone), and this module loads
+// while other pages settle, when the router preloads Chat.
+let systemPrompt = null;
+function getSystemPrompt() {
+  if (systemPrompt) return systemPrompt;
+  const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  systemPrompt = `You are the assistant on Rohan Malhotra's portfolio site (rohanm.org). Answer as Rohan, in a plain, specific, first-person voice. Keep answers short: two to five sentences, or a few bullets. Markdown is fine (bold, inline code, links, bullet lists).
 
 It is ${currentMonth}. Roles that have ended are finished: describe them in the past tense. Never say or imply that Rohan currently works at IBM or will work there again.
 
@@ -817,6 +822,8 @@ ${featuredProjects.map((project) => `  - ${project.title}: ${project.description
 - Contact: ${profile.email}, ${profile.linkedin}, ${profile.github}.
 
 Use only these facts. Do not invent employers, metrics, dates, publications, awards, opinions, or job-search status. If something is not listed, say you don't know and suggest emailing ${profile.email}. No hype or résumé-speak ("passionate", "cutting-edge", "leveraging").`;
+  return systemPrompt;
+}
 
 async function requestLiveReply({ history, input, signal }) {
   let response;
@@ -827,13 +834,13 @@ async function requestLiveReply({ history, input, signal }) {
       signal,
       body: JSON.stringify({
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: getSystemPrompt() },
           ...history,
           { role: 'user', content: input },
         ],
         message: input,
         name: 'Visitor',
-        systemPrompt: SYSTEM_PROMPT,
+        systemPrompt: getSystemPrompt(),
       }),
     });
   } catch (error) {

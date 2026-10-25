@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
+import { whenIdle } from '@/lib/idle';
 import { findRoute, loadedPage, loadRoute, navRoutes, normalizePath, notFoundRoute, routeById } from '@/routes';
 import {
   ensureEntryKey,
@@ -181,26 +182,31 @@ export default function RouterProvider({ initialPath, children }) {
   }, [go]);
 
   // Once the page has loaded and the browser is idle, fetch the other pages
-  // ahead of time so every page change is instant. Not with Save-Data on.
+  // ahead of time so every page change is instant. One page at a time, each
+  // in an idle moment of its own, so their code never runs in one long task
+  // while the visitor might tap. Not with Save-Data on.
   useEffect(() => {
     if (navigator.connection?.saveData) return undefined;
+    const queue = [...navRoutes, routeById('resume')];
+    let stopped = false;
     let cancel = () => {};
-    const warm = () => {
-      for (const route of [...navRoutes, routeById('resume')]) loadRoute(route).catch(() => {});
+    const next = () => {
+      const route = queue.shift();
+      if (!route || stopped) return;
+      loadRoute(route)
+        .catch(() => {})
+        .then(() => {
+          if (!stopped) cancel = whenIdle(next, { timeout: 5000 });
+        });
     };
-    const schedule = () => {
-      if (window.requestIdleCallback) {
-        const id = window.requestIdleCallback(warm, { timeout: 5000 });
-        cancel = () => window.cancelIdleCallback(id);
-      } else {
-        const id = window.setTimeout(warm, 2000);
-        cancel = () => window.clearTimeout(id);
-      }
+    const start = () => {
+      cancel = whenIdle(next, { timeout: 5000, fallback: 2000 });
     };
-    if (document.readyState === 'complete') schedule();
-    else window.addEventListener('load', schedule, { once: true });
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
     return () => {
-      window.removeEventListener('load', schedule);
+      stopped = true;
+      window.removeEventListener('load', start);
       cancel();
     };
   }, []);
