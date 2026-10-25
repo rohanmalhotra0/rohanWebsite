@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const KEY = 'rm-contact-draft';
 const SAVE_DELAY_MS = 300;
@@ -33,10 +33,18 @@ function writeDraft(values) {
  * #/resume): restored on mount, saved to sessionStorage after a short pause and
  * again on unmount. clear() empties the form and the saved copy.
  * `empty` must be a stable object.
+ *
+ * The first render is always empty, like the prerendered HTML; the saved draft
+ * is restored in a layout effect, before paint and before the save effect runs.
  */
 export default function useFormDraft(empty) {
-  const [values, setValues] = useState(() => readDraft(empty));
+  const [values, setValues] = useState(empty);
   const latest = useRef(values);
+
+  useLayoutEffect(() => {
+    const draft = readDraft(empty);
+    if (draft !== empty) setValues(draft);
+  }, [empty]);
 
   useEffect(() => {
     latest.current = values;

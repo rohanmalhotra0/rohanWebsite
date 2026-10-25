@@ -86,7 +86,7 @@ export default function About() {
 }
 
 function MetaLine({ className }) {
-  const { label, iso } = useNewYorkTime();
+  const time = useNewYorkTime();
 
   return (
     <div
@@ -96,11 +96,16 @@ function MetaLine({ className }) {
       )}
     >
       <p className="text-muted">
-        {profile.location} · It’s{' '}
-        <time dateTime={iso} className="tabular-nums">
-          {label}
-        </time>{' '}
-        here
+        {profile.location}
+        {time ? (
+          <>
+            {' '}· It’s{' '}
+            <time dateTime={time.iso} className="tabular-nums">
+              {time.label}
+            </time>{' '}
+            here
+          </>
+        ) : null}
       </p>
       <p className="flex gap-x-5">
         <ExternalLink href={profile.linkedin}>LinkedIn</ExternalLink>

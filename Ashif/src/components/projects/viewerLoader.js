@@ -27,4 +27,4 @@ export function lazyViewer() {
 }
 
 // A deep link needs the viewer at once: start loading it alongside the page.
-if (/^#project\//.test(window.location.hash)) loadViewer();
+if (typeof window !== 'undefined' && /^#project\//.test(window.location.hash)) loadViewer();

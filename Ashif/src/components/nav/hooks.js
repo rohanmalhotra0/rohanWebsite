@@ -8,9 +8,12 @@ import { OPEN_PALETTE } from '@/lib/events';
  */
 export const useReducedMotion = () => useMediaQuery('(prefers-reduced-motion: reduce)');
 
-/** True once the page has scrolled more than `threshold` px. rAF-throttled. */
+/**
+ * True once the page has scrolled more than `threshold` px. rAF-throttled.
+ * Starts false (as in the prerendered HTML); the effect syncs it on mount.
+ */
 export function useScrolled(threshold = 4) {
-  const [scrolled, setScrolled] = useState(() => window.scrollY > threshold);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     let frame = 0;

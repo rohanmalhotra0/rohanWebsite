@@ -1,12 +1,20 @@
 import { cn } from '@/lib/utils';
 import Reveal from './Reveal';
 
-/** Page section. Sections are separated by a hairline rule, like a printed spec. */
+/**
+ * Page section. Sections are separated by a hairline rule, like a printed spec.
+ * Off-screen sections skip style, layout and paint until they come near the
+ * viewport (content-visibility: auto); `auto` in the intrinsic size remembers
+ * each section's real height once it has rendered.
+ */
 export function Section({ id, className, children, ...props }) {
   return (
     <section
       id={id}
-      className={cn('relative border-t border-line py-20 sm:py-28', className)}
+      className={cn(
+        'relative border-t border-line py-20 [contain-intrinsic-size:auto_1200px] [content-visibility:auto] sm:py-28',
+        className
+      )}
       {...props}
     >
       {children}

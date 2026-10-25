@@ -35,8 +35,13 @@ function subscribe(listener) {
 }
 
 /** Start of the current minute (ms since epoch); re-renders when the minute changes. */
+/**
+ * The current minute as a timestamp, or null while hydrating: the prerendered
+ * HTML was made at build time, so it carries no clock reading.
+ */
 export function useMinute() {
-  return useSyncExternalStore(subscribe, currentMinute, currentMinute) * MINUTE;
+  const minute = useSyncExternalStore(subscribe, currentMinute, () => null);
+  return minute === null ? null : minute * MINUTE;
 }
 
 const newYorkTime = new Intl.DateTimeFormat('en-US', {
@@ -45,10 +50,14 @@ const newYorkTime = new Intl.DateTimeFormat('en-US', {
   minute: '2-digit',
 });
 
-/** Live New York time, e.g. { label: '7:16 pm', iso: '2026-10-24T23:16:00.000Z' }. */
+/**
+ * Live New York time, e.g. { label: '7:16 pm', iso: '2026-10-24T23:16:00.000Z' },
+ * or null before the first client render.
+ */
 export function useNewYorkTime() {
   const now = useMinute();
   return useMemo(() => {
+    if (now === null) return null;
     const label = newYorkTime
       .formatToParts(now)
       .map(({ type, value }) => {

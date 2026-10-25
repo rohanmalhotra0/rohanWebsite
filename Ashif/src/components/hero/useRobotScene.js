@@ -101,8 +101,11 @@ export default function useRobotScene({ reducedMotion }) {
   const [live, setLive] = useState(false);
   const [message, setMessage] = useState('');
   const [touched, setTouched] = useState(false);
+  // Only read inside the effect, so the server value never reaches the markup.
   const [mobile] = useState(
-    () => window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
+    () =>
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768)
   );
 
   useEffect(() => {

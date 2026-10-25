@@ -8,13 +8,21 @@ import { loadActivity, readCache } from './githubActivity';
  * there is an answer either way, so the caller can show a fallback.
  */
 export default function useGitHubActivity(ref) {
-  const [cached] = useState(readCache);
+  // undefined = not checked yet (the prerendered HTML and hydration render
+  // match); the session cache is read once mounted.
+  const [cached, setCached] = useState(undefined);
+  const [checked, setChecked] = useState(false);
   const [fetched, setFetched] = useState(null);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    setCached(readCache());
+    setChecked(true);
+  }, []);
+
+  useEffect(() => {
     const element = ref.current;
-    if (cached !== undefined || !element || !('IntersectionObserver' in window)) return;
+    if (!checked || cached !== undefined || !element || !('IntersectionObserver' in window)) return;
 
     let active = true;
     const observer = new IntersectionObserver(
@@ -35,7 +43,7 @@ export default function useGitHubActivity(ref) {
       active = false;
       observer.disconnect();
     };
-  }, [cached, ref]);
+  }, [checked, cached, ref]);
 
   return cached === undefined
     ? { activity: fetched, fromCache: false, settled: done }

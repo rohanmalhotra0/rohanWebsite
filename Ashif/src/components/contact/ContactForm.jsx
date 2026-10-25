@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Check, CircleAlert, LoaderCircle } from 'lucide-react';
 import Button from '@/components/primitives/Button';
-import { Kbd } from '@/components/primitives/Tag';
+import { Kbd, ModKey } from '@/components/primitives/Tag';
 import { formspreeUrl } from '@/data/portfolioData';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
@@ -24,8 +24,6 @@ const MotionSpan = motion.span;
 
 const EMPTY = { name: '', email: '', message: '' };
 const TIMEOUT_MS = 15000;
-const IS_MAC =
-  typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const inputClass = cn(
   'block w-full rounded-lg border border-input bg-surface px-3.5 text-base text-fg',
@@ -335,7 +333,9 @@ export default function ContactForm() {
                 {/* Visual hint only; the textarea exposes the shortcut via aria-keyshortcuts. */}
                 {showShortcut ? (
                   <p aria-hidden="true" className="flex items-center gap-1 text-[13px] text-subtle">
-                    <Kbd>{IS_MAC ? '⌘' : 'Ctrl'}</Kbd>
+                    <Kbd>
+                      <ModKey />
+                    </Kbd>
                     <Kbd>↵</Kbd>
                     <span className="ml-1">to send</span>
                   </p>

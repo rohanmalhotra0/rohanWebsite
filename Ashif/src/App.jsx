@@ -29,7 +29,7 @@ function focusWhenReady(id, framesLeft = 120) {
 
 function useResumeRoute() {
   const [isResume, setIsResume] = useState(
-    () => window.location.hash === RESUME_HASH
+    () => typeof window !== 'undefined' && window.location.hash === RESUME_HASH
   );
   const wasResume = useRef(isResume);
   // Where the portfolio was scrolled when the résumé opened, and what to do

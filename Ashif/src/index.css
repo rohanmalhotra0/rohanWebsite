@@ -32,6 +32,8 @@
    from the saved choice or the OS preference (see index.html). */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+/* Apple devices (set in index.html), for ⌘ vs Ctrl shortcut labels. */
+@custom-variant apple (&:where(.apple, .apple *));
 
 @theme {
   --font-sans:
@@ -223,6 +225,19 @@
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+/* The prerendered portfolio stays hidden when the page opens on #/resume
+   (index.html sets the class); main.jsx then renders the résumé instead. */
+.route-resume #root[data-prerendered] {
+  display: none;
+}
+
+/* The prerendered hero poster gets its theme's src from an inline script
+   (scripts/prerender.mjs); without JavaScript it stays hidden instead of
+   drawing an empty image box. */
+img[data-hero-poster]:not([src]) {
+  visibility: hidden;
 }
 
 /* Printing the portfolio: content that never scrolled into view would
