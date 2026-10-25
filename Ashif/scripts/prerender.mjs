@@ -31,10 +31,10 @@ function stripHoisted(html) {
 }
 
 // The hero poster depends on the theme, which is only known in the browser.
-// Its src is set by an inline script right after #root (before first paint),
-// so the preload scanner never fetches the wrong theme's image.
-const POSTER = /<img\b([^>]*?)\ssrc="(\.\/img\/hero\/robot-)light(\.webp)"/;
-const POSTER_SCRIPT = `<script>(function(){var i=document.querySelector('#root img[data-hero-poster]');if(i)i.src=i.getAttribute(document.documentElement.dataset.theme==='dark'?'data-src-dark':'data-src-light');})();</script>`;
+// Its srcset and src are set by an inline script right after #root (before
+// first paint), so the preload scanner never fetches the wrong theme's image.
+const POSTER = /<img\b([^>]*?)\ssrc="(\.\/img\/hero\/robot-)light(\.webp)"([^>]*?)\ssrcSet="([^"]*)"/;
+const POSTER_SCRIPT = `<script>(function(){var i=document.querySelector('#root img[data-hero-poster]');if(!i)return;var t=document.documentElement.dataset.theme==='dark'?'dark':'light';i.srcset=i.getAttribute('data-srcset-'+t);i.src=i.getAttribute('data-src-'+t);})();</script>`;
 
 try {
   const { render } = await import(pathToFileURL(serverEntry).href);
@@ -43,8 +43,9 @@ try {
   if (!POSTER.test(app)) throw new Error('hero poster <img> not found in the rendered markup');
   app = app.replace(
     POSTER,
-    (_, attrs, base, ext) =>
-      `<img${attrs} data-hero-poster="" data-src-light="${base}light${ext}" data-src-dark="${base}dark${ext}"`
+    (_, before, base, ext, between, srcset) =>
+      `<img${before} data-hero-poster="" data-src-light="${base}light${ext}" data-src-dark="${base}dark${ext}"${between}` +
+      ` data-srcset-light="${srcset}" data-srcset-dark="${srcset.replaceAll('robot-light', 'robot-dark')}"`
   );
 
   let index = await readFile(indexPath, 'utf8');
