@@ -132,6 +132,8 @@ routes.push({
   parent: 'research',
   block: routes.find((route) => route.id === 'research').block,
   tagline: 'My Kalshi research, interactive',
+  // Its link-preview card is the lab: the hedge moving the downturn years.
+  ogAlt: 'Hedge your paycheck, Rohan Malhotra’s Kalshi research: simulated years, a dot for each job loss, and a hedge moving the downturn years right. rohanm.org',
   title: 'Hedge your paycheck — Rohan Malhotra',
   description:
     'How a prediction-market contract could cushion a job loss, and what it can’t cover. An interactive version of my Kalshi research.',
@@ -166,9 +168,9 @@ const HOME_ALT =
   'Rohan Malhotra, math & CS at NYU Courant, IBM, Kalshi. rohanm.org: a yellow robot dog in a graphite lab.';
 
 /**
- * A page's link-preview card (og:image): public/og/<id>.jpg, drawn from the
- * page's block by `npm run og` (scripts/og). Pages without a block of their
- * own (home, résumé, 404) share the home page's.
+ * A page's link-preview card (og:image): public/og/<id>.jpg, drawn by
+ * `npm run og` (scripts/og). Navbar pages, case studies and pages with an
+ * `ogAlt` have their own; the rest (home, résumé, 404) share the home page's.
  */
 export function ogCard(route) {
   const project = route.project && projects.find((p) => p.slug === route.project);
@@ -178,7 +180,7 @@ export function ogCard(route) {
       alt: `${project.title}, a case study by Rohan Malhotra: the robot's camera view, the pink toy boxed at 0.91.`,
     };
   }
-  if (route.label) {
+  if (route.label || route.ogAlt) {
     return { id: route.id, alt: route.ogAlt ?? `${route.label}, Rohan Malhotra: ${route.tagline}. rohanm.org` };
   }
   return { id: 'home', alt: HOME_ALT };

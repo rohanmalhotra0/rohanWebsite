@@ -1,4 +1,6 @@
 import SpotPoster from '@/components/projects/spot/SpotPoster';
+import { bestForWorstYears, PRICE, simulate, WEEKS } from '@/components/research/hedge/hedge';
+import { swarm } from '@/components/research/hedge/swarm';
 import { breakEven, kelly, perBet } from '@/components/research/kelly/kelly';
 import { projects } from '@/data/portfolioData';
 import { BLOCK_CLASS, notFoundRoute, ogCard, routeNumber, routes } from '@/routes';
@@ -23,6 +25,9 @@ const TITLE_SIZE = 150;
 const CONTEXT = ['Math & CS', 'NYU Courant', 'IBM · Kalshi'];
 // The research page's default bet: a 50¢ contract you give a 60% chance.
 const KELLY = { p: 0.6, c: 0.5 };
+// The hedge page's default job: a 4% chance a year of losing it, three times
+// that in a downturn.
+const JOB = { base: 0.04, mult: 3 };
 
 function Frame({ className, children }) {
   return (
@@ -169,6 +174,87 @@ function ResearchCard({ route }) {
 }
 
 /**
+ * The hedge page's lab at card size: a dot for each year with a job loss, at
+ * the pay it got (normal years above, downturns below), and the bar for the
+ * years without one. The hedge that does most for the worst years moves the
+ * downturns right by its payout less its cost, and normal years left by its
+ * cost. No axis or labels: a feed shows the card too small for them.
+ */
+function HedgeLanes({ width, height }) {
+  const { counts, sample } = simulate(JOB);
+  const hedge = bestForWorstYears(counts);
+  const cost = PRICE * hedge;
+  // The weeks of pay in view: every dot, before and after the hedge moves it.
+  const [from, to] = [8, 72];
+  const r = 8;
+  const gap = 16;
+  const lane = (height - gap) / 2;
+  const perWeek = width / (to - from);
+  const x = (weeks) => (weeks - from) * perWeek;
+  const bar = { width: 12, inset: 20 };
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
+      {[false, true].map((down, index) => {
+        const top = index * (lane + gap);
+        const mid = top + lane / 2;
+        const shift = (down ? hedge - cost : -cost) * perWeek;
+        const tone = down ? 'var(--mark)' : 'var(--fg)';
+        const losses = sample
+          .filter((year) => year.down === down && year.laidOff >= 0)
+          .map((year) => ({ id: year.id, x: x(year.paid) }))
+          .sort((a, b) => a.x - b.x || a.id - b.id);
+        const dots = swarm(losses, r, lane / 2 - bar.inset - r);
+        const fullPay = { x: x(WEEKS) - bar.width / 2, y: top + bar.inset, width: bar.width, height: lane - 2 * bar.inset, rx: bar.width / 2 };
+        return (
+          <g key={down ? 'down' : 'fine'}>
+            <rect y={top} width={width} height={lane} rx="20" fill="var(--surface-2)" />
+            {down ? <rect y={top} width={width} height={lane} rx="20" fill="var(--mark)" opacity="0.09" /> : null}
+            {/* Where the full-pay bar sat before the hedge. */}
+            <rect {...fullPay} fill="none" stroke="var(--line-strong)" strokeWidth="2" strokeDasharray="6 6" />
+            <g transform={`translate(${shift.toFixed(1)} 0)`}>
+              <rect {...fullPay} fill={down ? 'var(--mark)' : 'var(--muted)'} />
+              {dots.map((dot) => (
+                <circle key={dot.id} cx={dot.x} cy={mid + dot.y} r={r} fill={tone} stroke="var(--surface)" strokeWidth="2" />
+              ))}
+            </g>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/** Hedge your paycheck: its name, and the lab with the hedge moving the years. */
+function HedgeCard({ route }) {
+  return (
+    <Frame className="bg-bg">
+      <div
+        className={cn('grain mesh', BLOCK_CLASS[route.block])}
+        style={{ position: 'absolute', inset: 28, borderRadius: 56, overflow: 'hidden', padding: '60px 72px' }}
+      >
+        <p className="font-mono text-on-block-muted" style={{ position: 'relative', margin: 0, fontSize: 48, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          My Kalshi research
+        </p>
+        <p className="type-display" style={{ position: 'relative', margin: '24px 0 0', fontSize: 88, lineHeight: 0.95 }}>
+          {['Hedge', 'your', 'paycheck'].map((line) => (
+            <span key={line} style={{ display: 'block', whiteSpace: 'nowrap' }}>
+              {line}
+            </span>
+          ))}
+        </p>
+        <p className="text-on-block-muted" style={{ position: 'absolute', left: 72, bottom: 56, margin: 0, fontSize: 48, fontWeight: 500 }}>
+          {SITE}
+        </p>
+        {/* The lab, dark as on the page; its edges line up with the name and the address. */}
+        <div data-theme="dark" className="bg-surface" style={{ position: 'absolute', right: 56, top: 142, bottom: 56, width: 470, borderRadius: 36, padding: 16 }}>
+          <HedgeLanes width={438} height={344} />
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
+/**
  * A case study: the drawing of what the robot's camera saw, and the title
  * in the corner the drawing leaves free (left of the toy's box).
  */
@@ -196,6 +282,7 @@ export default function Card({ id }) {
   const route = [...routes, notFoundRoute].find((r) => ogCard(r).id === id);
   if (route.project) return <CaseCard route={route} />;
   if (route.id === 'research') return <ResearchCard route={route} />;
+  if (route.id === 'hedge') return <HedgeCard route={route} />;
   if (route.label) return <BlockCard route={route} />;
   return <HomeCard />;
 }

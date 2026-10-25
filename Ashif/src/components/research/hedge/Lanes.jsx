@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { WEEKS } from './hedge';
 import { percent } from './format';
+import { swarm } from './swarm';
 
 // "1,000 versions of next year": two lanes, normal years above and downturns
 // below, on one axis of pay received over the next 12 months. Each dot is a
@@ -18,33 +19,6 @@ const LAYOUTS = {
 const X_MAX = 74;
 const LABEL_ROW = 30;
 const mono = { fontFamily: 'var(--font-mono)' };
-
-/**
- * Lay dots out along x without overlaps: each one takes the free spot
- * nearest the lane's midline. Squeezed vertically if a lane overflows.
- */
-function swarm(points, r, room) {
-  const gap = 2 * r + 0.75;
-  const placed = [];
-  for (const point of points) {
-    const blocked = [];
-    for (const other of placed) {
-      const dx = point.x - other.x;
-      if (Math.abs(dx) < gap) {
-        const dy = Math.sqrt(gap * gap - dx * dx);
-        blocked.push([other.y - dy, other.y + dy]);
-      }
-    }
-    const options = [0];
-    for (const [a, b] of blocked) options.push(a, b);
-    options.sort((a, b) => Math.abs(a) - Math.abs(b) || a - b);
-    const y = options.find((c) => blocked.every(([a, b]) => c <= a + 1e-6 || c >= b - 1e-6)) ?? 0;
-    placed.push({ ...point, y });
-  }
-  const tallest = placed.reduce((most, point) => Math.max(most, Math.abs(point.y)), 0);
-  const squeeze = tallest > room ? room / tallest : 1;
-  return placed.map((point) => ({ ...point, y: point.y * squeeze }));
-}
 
 export default function Lanes({ sample, shares, hedge, cost, compact = false, label, className = '' }) {
   const { W, X0, X1, LANE, GAP, AXIS, R, BAR, ticks } = LAYOUTS[compact ? 'compact' : 'wide'];
