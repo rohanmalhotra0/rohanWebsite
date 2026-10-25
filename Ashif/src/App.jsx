@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import ThemeProvider from './components/theme/ThemeProvider';
 import Navbar from './components/nav/Navbar';
 import Hero from './components/hero/Hero';
@@ -32,23 +32,47 @@ function useResumeRoute() {
     () => window.location.hash === RESUME_HASH
   );
   const wasResume = useRef(isResume);
+  // Where the portfolio was scrolled when the résumé opened, and what to do
+  // once the portfolio renders again: restore that offset or jump to an anchor.
+  const savedScroll = useRef(0);
+  const pendingReturn = useRef(null);
 
   useEffect(() => {
     const onHashChange = () => {
       const next = window.location.hash === RESUME_HASH;
       setIsResume(next);
-      // Only reset scroll when switching views; in-page anchors also fire hashchange.
+      // Only react when switching views; in-page anchors also fire hashchange.
       if (wasResume.current !== next) {
-        window.scrollTo({ top: 0 });
-        // Move keyboard and screen-reader focus into the résumé once its lazy
-        // chunk has rendered, so the view change is announced.
-        if (next) focusWhenReady('resume-content');
+        if (next) {
+          savedScroll.current = window.scrollY;
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          // Move keyboard and screen-reader focus into the résumé once its lazy
+          // chunk has rendered, so the view change is announced.
+          focusWhenReady('resume-content');
+        } else {
+          // "Back to portfolio" (#top) and history back return to where the
+          // reader was; any other anchor is honoured once the page exists.
+          const id = decodeURIComponent(window.location.hash.slice(1));
+          pendingReturn.current =
+            id === '' || id === 'top' ? { top: savedScroll.current } : { id };
+        }
       }
       wasResume.current = next;
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
+
+  // Runs after the portfolio has committed, before paint, so there's no flash
+  // of the page at the top.
+  useLayoutEffect(() => {
+    const target = pendingReturn.current;
+    if (isResume || !target) return;
+    pendingReturn.current = null;
+    const element = target.id ? document.getElementById(target.id) : null;
+    if (element) element.scrollIntoView({ behavior: 'instant', block: 'start' });
+    else window.scrollTo({ top: target.top ?? 0, behavior: 'instant' });
+  }, [isResume]);
 
   useEffect(() => {
     document.title = isResume ? 'Résumé — Rohan Malhotra' : 'Rohan Malhotra';

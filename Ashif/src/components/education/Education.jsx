@@ -2,7 +2,6 @@ import Reveal from '@/components/primitives/Reveal';
 import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import { education, skillGroups } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
-import DegreeProgress from './DegreeProgress';
 
 // Labels and list items share one line height so baselines line up across columns.
 const LABEL = 'text-[15px] leading-7 text-subtle';
@@ -16,8 +15,6 @@ export default function Education() {
     minor,
     gpa,
     gpaScale,
-    start,
-    end,
     dates,
     location,
     logoUrl,
@@ -78,7 +75,6 @@ export default function Education() {
           {accelerated ? (
             <Row delay={0.05} label={<h4 className={LABEL}>Accelerated path</h4>}>
               <p className="max-w-xl text-pretty text-base leading-7 text-fg">{accelerated}</p>
-              <DegreeProgress start={start} end={end} className="mt-6" />
             </Row>
           ) : null}
 

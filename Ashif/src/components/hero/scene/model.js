@@ -38,7 +38,7 @@ export const DIMS = {
 /** Downward tilt of the palm camera relative to the jaw axis. */
 export const EYE_TILT = 0.21;
 
-export const LEGS = [
+const LEGS = [
   { side: 1, end: 1, pair: 0 },
   { side: -1, end: 1, pair: 1 },
   { side: 1, end: -1, pair: 1 },

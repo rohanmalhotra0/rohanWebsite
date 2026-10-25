@@ -18,7 +18,7 @@ export function lockScroll() {
   };
 }
 
-/** The button that opens a project: `kind` is 'card' (featured) or 'row' (archive). */
+/** The link that opens a project: `kind` is 'card' (featured) or 'row' (archive). */
 export const findTrigger = (kind, slug) =>
   document.querySelector(`[data-project-trigger="${kind}:${slug}"]`);
 

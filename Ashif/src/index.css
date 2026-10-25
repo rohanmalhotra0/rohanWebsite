@@ -12,8 +12,10 @@
   --font-display:
     "Hubot Sans Variable", "Mona Sans Variable", ui-sans-serif, system-ui,
     sans-serif;
+  /* System mono: it only shows up in key caps and the robot HUD, so a
+     webfont isn't worth the download. */
   --font-mono:
-    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
     monospace;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);

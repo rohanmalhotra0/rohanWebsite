@@ -2,7 +2,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@fontsource-variable/mona-sans/wght.css';
 import '@fontsource-variable/hubot-sans/wdth.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
 import './index.css';
 import App from './App.jsx';
 

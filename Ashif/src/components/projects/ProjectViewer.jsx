@@ -21,7 +21,10 @@ const MotionImg = motion.img;
 const PANEL_SHADOW = '0 40px 100px -32px rgb(0 0 0 / 0.32), 0 16px 32px -16px rgb(0 0 0 / 0.16)';
 
 const FADE_IN = { duration: 0.3, ease: EASE };
-const FADE_OUT = { duration: 0.2, ease: EASE };
+// On close the text goes first, then the panel and scrim reveal the page, so
+// the two never overlap.
+const TEXT_OUT = { duration: 0.1, ease: 'easeIn' };
+const FADE_OUT = { duration: 0.2, delay: 0.08, ease: EASE };
 
 // `custom` is { first, dir, reduce }: the first slide rises with the panel;
 // later slides come in from the side being browsed toward.
@@ -41,7 +44,7 @@ const DETAILS = {
     y: 0,
     transition: { duration: reduce ? 0.2 : 0.4, ease: EASE, delay: first && !reduce ? 0.12 : 0.05 },
   }),
-  exit: { opacity: 0, transition: { duration: 0.12, ease: 'easeIn' } },
+  exit: { opacity: 0, transition: TEXT_OUT },
 };
 
 /** Toolbar icon button; `shortcut` is the key that does the same thing. */
@@ -209,7 +212,7 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
         className="fixed inset-0 bg-bg/[0.97]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: FADE_IN }}
-        exit={{ opacity: 0, transition: { duration: 0.25, ease: EASE } }}
+        exit={{ opacity: 0, transition: { ...FADE_OUT, duration: 0.25 } }}
       />
 
       {/* A click on the margin around the panel closes the viewer. */}
@@ -234,12 +237,14 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
             exit={{ opacity: 0, transition: FADE_OUT }}
           />
 
-          {/* Sticky so Close stays in reach while a long project scrolls on phones. */}
+          {/* Sticky so Close stays in reach while a long project scrolls on phones;
+              above the image column (z-10), which must clear the details text.
+              On a featured open it fades in as the image lands, not under it. */}
           <MotionDiv
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: FADE_IN }}
-            exit={{ opacity: 0, transition: { duration: 0.12 } }}
-            className="sticky top-0 z-10 box-content flex h-14 shrink-0 items-center gap-4 border-b border-line bg-surface pl-4 pr-1.5 pt-[env(safe-area-inset-top)] sm:mx-px sm:mt-px sm:rounded-t-[11px] sm:pl-6 sm:pr-2"
+            animate={{ opacity: 1, transition: { ...FADE_IN, delay: viewer.paired ? 0.15 : 0 } }}
+            exit={{ opacity: 0, transition: TEXT_OUT }}
+            className="sticky top-0 z-20 box-content flex h-14 shrink-0 items-center gap-4 border-b border-line bg-surface pl-4 pr-1.5 pt-[env(safe-area-inset-top)] sm:mx-px sm:mt-px sm:rounded-t-[11px] sm:pl-6 sm:pr-2"
           >
             <p className="text-sm tabular-nums text-subtle">
               {index + 1} of {count}

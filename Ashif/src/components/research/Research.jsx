@@ -4,6 +4,7 @@ import Reveal from '@/components/primitives/Reveal';
 import { Container, Section, SectionHeader } from '@/components/primitives/Section';
 import { TechList } from '@/components/primitives/Tag';
 import { research } from '@/data/portfolioData';
+import { dropSrcSetOnError, THUMBNAIL_SIZES, thumbnailSrcSet } from './thumbnail';
 
 export default function Research() {
   return (
@@ -99,8 +100,10 @@ const PAGE =
 
 /** The first page of the paper. A mouse shortcut to the PDF; the text link is the accessible one. */
 function Thumbnail({ paper }) {
+  const srcSet = thumbnailSrcSet(paper.imageUrl);
   const imageProps = {
     src: paper.imageUrl,
+    ...(srcSet ? { srcSet, sizes: THUMBNAIL_SIZES, onError: dropSrcSetOnError } : null),
     alt: paper.imageAlt ?? '',
     width: 600,
     height: 400,

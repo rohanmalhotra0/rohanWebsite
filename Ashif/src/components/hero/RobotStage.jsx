@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { assetUrl } from '@/data/portfolioData';
 import Button from '@/components/primitives/Button';
 import useMediaQuery from '@/hooks/useMediaQuery';
@@ -19,69 +20,78 @@ export default function RobotStage({ className }) {
   const { theme } = useTheme();
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
   const coarse = useMediaQuery('(pointer: coarse)');
-  const stage = useRobotScene({ reducedMotion: reduced, theme });
+  const stage = useRobotScene({ reducedMotion: reduced });
+  const [posterFailed, setPosterFailed] = useState(false);
   const { live, touched } = stage;
 
   return (
     <div
       className={cn(
-        'relative -mx-[var(--gutter)] h-[58svh] max-h-[560px] min-h-[340px] [--gutter:clamp(1rem,4vw,2.5rem)]',
-        'lg:mx-0 lg:-mr-[var(--bleed)] lg:h-[min(calc(100svh-7rem),54rem)] lg:max-h-none lg:[--bleed:calc(max(0px,(100vw_-_78rem)/2)_+_var(--gutter)_-_1rem)]',
+        'relative -mx-[var(--gutter)] [--gutter:clamp(1rem,4vw,2.5rem)]',
+        'lg:mx-0 lg:-mr-[var(--bleed)] lg:h-[min(calc(100svh-7rem),54rem)] lg:[--bleed:calc(max(0px,(100vw_-_78rem)/2)_+_var(--gutter)_-_1rem)]',
         className
       )}
     >
-      <div role="img" aria-label={live ? LIVE_LABEL : STILL_LABEL} className="absolute inset-0">
-        <img
-          ref={stage.posterRef}
-          src={assetUrl(`img/hero/robot-${theme}.webp`)}
-          alt=""
-          width={1600}
-          height={1333}
-          fetchPriority="high"
-          draggable={false}
-          className={cn(
-            'absolute inset-0 size-full select-none object-contain transition-opacity duration-500 ease-out',
-            live && 'opacity-0'
+      <div className="relative h-[40svh] max-h-[440px] min-h-[280px] lg:absolute lg:inset-0 lg:h-auto lg:max-h-none lg:min-h-0">
+        <div role="img" aria-label={live ? LIVE_LABEL : STILL_LABEL} className="absolute inset-0">
+          {posterFailed ? null : (
+            <img
+              ref={stage.posterRef}
+              src={assetUrl(`img/hero/robot-${theme}.webp`)}
+              alt=""
+              width={1600}
+              height={1600}
+              fetchPriority="high"
+              draggable={false}
+              onError={() => setPosterFailed(true)}
+              // The poster is the scene's first frame: it stays opaque under
+              // the canvas while that fades in, then drops out (no ghosting).
+              className={cn(
+                'absolute inset-0 size-full select-none object-contain transition-opacity duration-0',
+                live && 'opacity-0 delay-300'
+              )}
+            />
           )}
-        />
-        <div
-          ref={stage.hostRef}
-          className={cn('absolute inset-0 opacity-0 transition-opacity duration-500 ease-out', live && 'opacity-100')}
-        />
-      </div>
-
-      {/* Inset for the robot's camera feed; the canvas draws into this rect. */}
-      <div
-        ref={stage.frameRef}
-        aria-hidden="true"
-        className={cn(
-          'pointer-events-none absolute bottom-2 right-[var(--gutter)] h-[90px] w-[160px] opacity-0 transition-opacity duration-500 sm:h-[108px] sm:w-[192px]',
-          'lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]',
-          live && 'opacity-100'
-        )}
-      >
-        <div className="absolute inset-0 overflow-hidden rounded-lg ring-1 ring-inset ring-fg/10">
-          <div ref={stage.boxRef} className="absolute left-0 top-0 rounded-[3px] border border-accent opacity-0">
-            <span
-              ref={stage.labelRef}
-              className="absolute left-0 top-0 whitespace-nowrap rounded-br-[3px] bg-accent px-1 font-mono text-[9px] leading-[14px] text-accent-ink"
-            >
-              toy 0.97
-            </span>
-          </div>
+          <div
+            ref={stage.hostRef}
+            className={cn('absolute inset-0 opacity-0 transition-opacity duration-250 ease-out', live && 'opacity-100')}
+          />
         </div>
-        <p
-          ref={stage.hudRef}
-          className="absolute bottom-full left-0 mb-1.5 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:text-[11px]"
+
+        {/* Inset for the robot's camera; the canvas draws its view into this rect. */}
+        <div
+          ref={stage.frameRef}
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute bottom-2 right-[var(--gutter)] h-[72px] w-[128px] opacity-0 transition-opacity duration-500 sm:h-[90px] sm:w-[160px]',
+            'lg:bottom-4 lg:right-[var(--bleed)] lg:h-[144px] lg:w-[256px]',
+            live && 'opacity-100'
+          )}
         >
-          cam0 · 30 fps · idle
+          <div className="absolute inset-0 overflow-hidden rounded-lg ring-1 ring-inset ring-fg/10">
+            <div ref={stage.boxRef} className="absolute left-0 top-0 rounded-[3px] border border-accent opacity-0">
+              <span className="absolute left-0 top-0 rounded-br-[3px] bg-accent px-1 font-mono text-[9px] leading-[14px] text-accent-ink">
+                toy
+              </span>
+            </div>
+          </div>
+          <p
+            ref={stage.hudRef}
+            className="absolute bottom-full right-0 mb-1.5 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:text-[11px]"
+          >
+            cam0 · simulated · idle
+          </p>
+        </div>
+
+        <p className="sr-only" aria-live="polite">
+          {stage.message}
         </p>
       </div>
 
       {live || stage.canRun ? (
         <div
           ref={stage.controlsRef}
-          className="absolute bottom-2 left-[var(--gutter)] flex flex-col-reverse items-start gap-1.5 sm:flex-row sm:items-center sm:gap-4 lg:bottom-4 lg:left-0"
+          className="mt-3 flex items-center gap-4 px-[var(--gutter)] lg:absolute lg:bottom-4 lg:left-0 lg:mt-0 lg:flex-col-reverse lg:items-start lg:gap-1.5 lg:px-0"
         >
           {live ? (
             <>
@@ -104,10 +114,6 @@ export default function RobotStage({ className }) {
           )}
         </div>
       ) : null}
-
-      <p className="sr-only" aria-live="polite">
-        {stage.message}
-      </p>
     </div>
   );
 }

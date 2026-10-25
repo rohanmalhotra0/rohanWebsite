@@ -1,4 +1,4 @@
-export const TAU = Math.PI * 2;
+const TAU = Math.PI * 2;
 
 export const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 export const lerp = (a, b, t) => a + (b - a) * t;
@@ -24,10 +24,6 @@ export const dampAngle = (a, b, rate, dt) =>
 
 /** Move toward b by at most `step`. */
 export const approach = (a, b, step) => a + clamp(b - a, -step, step);
-
-/** 0 → 1 → 0 envelope over [0, total] with ramps of length `edge`. */
-export const envelope = (t, total, edge) =>
-  smooth(t / edge) * smooth((total - t) / edge);
 
 const AXES = ['x', 'y', 'z'];
 

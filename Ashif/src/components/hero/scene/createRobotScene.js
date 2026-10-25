@@ -21,6 +21,7 @@ import { boneGeometry, createToy, TOY_REST } from './toy';
 import { createStage } from './stage';
 import { createFeed } from './feed';
 import { clamp, damp, smooth } from './math';
+import { readPalette } from '../palette';
 
 const HOME = { x: 0, z: 0, yaw: -0.62 };
 const TARGET = new Vector3(0, 0.17, 0.02);
@@ -48,7 +49,7 @@ const yieldToPage = () => new Promise((resolve) => setTimeout(resolve, 0));
  * stays responsive. Returns null when a WebGL 2 renderer can't be created.
  *
  * `overlay` holds React refs to the DOM over the canvas (camera inset frame,
- * detection box and label, HUD line, controls). `onSlow` fires when the
+ * detection box, HUD line, controls). `onSlow` fires when the
  * device can't keep up even at the lowest quality (unless `forced`). In
  * poster mode it renders one still frame and exposes `capture()`.
  */
@@ -181,8 +182,10 @@ export function createRobotScene({
   const raycaster = new Raycaster();
   raycaster.layers.enable(1);
   const floorPlane = new Plane(UP, 0);
+  // Idle gaze: pointer rays meet a camera-facing plane in front of the robot,
+  // so screen left/right/up/down map to the robot looking that way at you.
   const wallNormal = new Vector3(Math.sin(VIEW.az), 0, Math.cos(VIEW.az));
-  const wallPlane = new Plane(wallNormal, -wallNormal.dot(TARGET));
+  const wallPlane = new Plane(wallNormal, -wallNormal.dot(TARGET) - 1.3);
   const hit = new Vector3();
   const look = new Vector3();
   const probe = new Vector3();
@@ -264,7 +267,7 @@ export function createRobotScene({
 
   // Input ------------------------------------------------------------------
 
-  const input = { x: 0, y: 0, mouse: false, moved: 0, down: null, dragging: false };
+  const input = { x: 0, y: 0, mouse: false, moved: 0, down: null, dragging: false, released: 0 };
 
   function setNdc(clientX, clientY) {
     const r = canvas.getBoundingClientRect();
@@ -318,12 +321,14 @@ export function createRobotScene({
         throwTo(hit.clone());
       }
     }
+    if (input.dragging) input.released = performance.now();
     input.down = null;
     input.dragging = false;
     canvas.style.cursor = '';
   }
 
   function onPointerCancel() {
+    if (input.dragging) input.released = performance.now();
     input.down = null;
     input.dragging = false;
   }
@@ -337,6 +342,11 @@ export function createRobotScene({
     const active = input.mouse && performance.now() - input.moved < 6000;
     orbit.goalPx = active ? clamp((input.x / window.innerWidth) * 2 - 1, -1, 1) : 0;
     orbit.goalPy = active ? clamp((input.y / window.innerHeight) * 2 - 1, -1, 1) : 0;
+    // A few seconds after a drag, drift back to the composed view.
+    if (!input.dragging && input.released && performance.now() - input.released > 5000) {
+      orbit.goalAz = damp(orbit.goalAz, 0, 0.8, dt);
+      orbit.goalEl = damp(orbit.goalEl, 0, 0.8, dt);
+    }
     orbit.px = damp(orbit.px, orbit.goalPx, 2.5, dt);
     orbit.py = damp(orbit.py, orbit.goalPy, 2.5, dt);
     orbit.az = damp(orbit.az, orbit.goalAz, 7, dt);
@@ -346,8 +356,12 @@ export function createRobotScene({
     if (active) {
       setNdc(input.x, input.y);
       const ray = raycaster.ray;
-      if (ray.intersectPlane(floorPlane, hit) && hit.distanceTo(homeVec) < 3.2) look.copy(hit).setY(0.04);
-      else if (ray.intersectPlane(wallPlane, hit)) look.copy(hit).setY(clamp(hit.y, 0.05, 1.5));
+      // Floor points count only if they are not behind the robot.
+      const s = ctl.state;
+      const floorHit = ray.intersectPlane(floorPlane, hit) !== null;
+      if (floorHit && hit.distanceTo(homeVec) < 2.6 && (hit.x - s.x) * wallNormal.x + (hit.z - s.z) * wallNormal.z > -0.2) {
+        look.copy(hit).setY(0.04);
+      } else if (ray.intersectPlane(wallPlane, hit)) look.copy(hit).setY(clamp(hit.y, 0.05, 1.6));
       else look.copy(camera.position);
       brain.setPointer(look);
 
@@ -370,10 +384,6 @@ export function createRobotScene({
   const detection = { x: 0, y: 0, w: 0, h: 0 };
   const toyWorld = new Vector3();
   let feedClock = Infinity;
-  let feedFrames = 0;
-  let fpsClock = 0;
-  let fps = 30;
-  let confClock = 0;
   let hudText = '';
   let boxShown = false;
 
@@ -394,9 +404,10 @@ export function createRobotScene({
     scene.updateMatrixWorld();
   }
 
-  function updateOverlay(dt) {
+  // The "detection" is the toy's real projected bounds in the robot camera;
+  // there is no model here, so the inset says so and shows no score.
+  function updateOverlay() {
     const box = el('box');
-    const label = el('label');
     const hud = el('hud');
     const toy = brain.toy;
     let found = toy && toy.state !== 'held' ? feed.detect(toy.mesh, detection) : null;
@@ -413,12 +424,7 @@ export function createRobotScene({
         box.style.opacity = boxShown ? '1' : '0';
       }
     }
-    confClock -= dt;
-    if (label && found && confClock <= 0) {
-      confClock = 0.3;
-      label.textContent = `toy ${(0.95 + Math.random() * 0.04).toFixed(2)}`;
-    }
-    const text = `cam0 · ${fps} fps · ${status}`;
+    const text = `cam0 · simulated · ${status}`;
     if (hud && text !== hudText) {
       hudText = text;
       hud.textContent = text;
@@ -429,18 +435,11 @@ export function createRobotScene({
     renderer.shadowMap.needsUpdate = true;
     if (feed) {
       feedClock += dt;
-      fpsClock += dt;
       if (feedClock >= feedInterval) {
         feedClock = feedClock === Infinity ? 0 : feedClock % feedInterval;
-        feedFrames++;
         stage.setView(width, height, false);
         feed.capture(scene);
-        updateOverlay(feedInterval);
-      }
-      if (fpsClock >= 1) {
-        fps = Math.min(30, Math.round(feedFrames / fpsClock));
-        feedFrames = 0;
-        fpsClock = 0;
+        updateOverlay();
       }
     }
     stage.setView(width * pixelRatio, height * pixelRatio, true);
@@ -487,7 +486,8 @@ export function createRobotScene({
     const ms = last ? now - last : 0;
     last = now;
     frame(Math.min(ms / 1000, 1 / 20));
-    if (ms && !calm) measure(ms);
+    // Calm frames are spaced out on purpose; only count them when slow.
+    if (ms) measure(calm && ms < 50 ? 16 : ms);
   }
 
   function sync() {
@@ -651,47 +651,44 @@ export function createRobotScene({
     { rootMargin: '120px' }
   );
 
-  function onContextLost(e) {
-    e.preventDefault();
+  // A lost context ends this instance: the owner disposes it (GL calls on a
+  // lost context are no-ops) and mounts a fresh one on a new canvas.
+  function onContextLost() {
     lost = true;
     sync();
     onLost?.();
   }
 
-  function onContextRestored() {
-    // three re-creates GPU resources lazily; only the baked environment
-    // (a render target) has to be rendered again.
-    stage?.bake();
-    lost = false;
-    first = true;
-    sync();
-    if (ready && !running) frame(0);
+  canvas.addEventListener('webglcontextlost', onContextLost);
+
+  function setPalette(p) {
+    palette = p;
+    applyPalette(p);
+    feedClock = Infinity;
+    if (ready && !lost) frame(0);
   }
 
-  canvas.addEventListener('webglcontextlost', onContextLost);
-  canvas.addEventListener('webglcontextrestored', onContextRestored);
+  // Follow the theme attribute directly, so the canvas recolours in the same
+  // frame as the page (including inside the theme view transition).
+  const themeObserver = new MutationObserver(() => setPalette(readPalette()));
+  if (!poster) themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   return {
     canvas,
     ready: boot(),
     throwRandom,
+    setPalette,
     capture: poster ? (type = 'image/webp', q = 0.9) => canvas.toDataURL(type, q) : undefined,
-
-    setPalette(p) {
-      palette = p;
-      applyPalette(p);
-      if (ready && !lost) frame(0);
-    },
 
     dispose() {
       if (disposed) return;
       disposed = true;
       sync();
+      themeObserver.disconnect();
       resizeObserver.disconnect();
       intersection.disconnect();
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('webglcontextlost', onContextLost);
-      canvas.removeEventListener('webglcontextrestored', onContextRestored);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerCancel);
@@ -703,7 +700,7 @@ export function createRobotScene({
       stage?.dispose();
       feed?.dispose();
       renderer.dispose();
-      renderer.forceContextLoss();
+      if (!renderer.getContext().isContextLost()) renderer.forceContextLoss();
       canvas.remove();
     },
   };

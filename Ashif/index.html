@@ -55,6 +55,17 @@
         document
           .querySelector('meta[name="theme-color"]')
           .setAttribute('content', theme === 'dark' ? '#0e0e0d' : '#f3f2ee');
+
+        // The hero's robot poster is the largest thing on the first screen;
+        // start fetching the right theme's copy before any JS runs.
+        if (location.hash !== '#/resume') {
+          var poster = document.createElement('link');
+          poster.rel = 'preload';
+          poster.as = 'image';
+          poster.href = 'img/hero/robot-' + theme + '.webp';
+          poster.setAttribute('fetchpriority', 'high');
+          document.head.appendChild(poster);
+        }
       })();
     </script>
 
@@ -96,7 +107,7 @@
           <a href="https://github.com/rohanmalhotra0">GitHub</a> ·
           <a href="https://www.linkedin.com/in/rohanamal">LinkedIn</a> ·
           <a href="mailto:rohanm8974@gmail.com">Email</a> ·
-          <a href="website-photos/resume/Rohan_Malhotra_Resume_2026.pdf">Résumé (PDF)</a>
+          <a href="Rohan_Malhotra_Resume.pdf">Résumé (PDF)</a>
         </p>
       </main>
     </noscript>

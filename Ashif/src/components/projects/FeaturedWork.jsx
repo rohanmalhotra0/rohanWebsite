@@ -78,13 +78,16 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
 
   return (
     <li
-      className={
+      className={cn(
+        // From md the list has no row gap (it would leak into the subgrid
+        // rows); items space themselves with bottom padding instead.
+        layout === 'end' ? '' : 'md:pb-16 lg:pb-20',
         wide
           ? 'md:col-span-2 lg:col-span-12'
           : // Image, title, description and meta are rows of a subgrid, so
             // captions of different lengths still line up across the pair.
-            'md:row-span-4 md:grid md:grid-rows-subgrid md:gap-y-0 lg:col-span-6'
-      }
+            'md:row-span-4 md:grid md:grid-rows-subgrid lg:col-span-6'
+      )}
     >
       <article
         data-project-card={project.slug}
@@ -92,7 +95,7 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
           'group relative',
           wide
             ? 'lg:grid lg:grid-cols-12 lg:gap-x-8'
-            : 'md:row-span-4 md:grid md:grid-rows-subgrid md:gap-y-0'
+            : 'md:row-span-4 md:grid md:grid-rows-subgrid'
         )}
       >
         {/* Sits above the title's stretched area so the image itself takes the
@@ -152,7 +155,7 @@ function FeaturedWork({ projects, viewerOpen, onOpen }) {
   const endWide = (projects.length - 1) % 2 === 1;
 
   return (
-    <ul className="mt-14 grid gap-x-8 gap-y-14 sm:mt-20 sm:gap-y-16 md:grid-cols-2 lg:grid-cols-12 lg:gap-y-20">
+    <ul className="mt-14 grid gap-x-8 gap-y-14 sm:mt-20 sm:gap-y-16 md:grid-cols-2 md:gap-y-0 lg:grid-cols-12">
       {projects.map((project, i) => (
         <FeaturedCard
           key={project.slug}

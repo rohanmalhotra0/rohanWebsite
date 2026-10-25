@@ -49,8 +49,10 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       output: {
+        // Vendor chunks cache across deploys; the app chunk changes often.
         manualChunks: {
-          motion: ['motion'],
+          react: ['react', 'react-dom'],
+          motion: ['motion', 'framer-motion'],
         },
       },
     },

@@ -31,7 +31,9 @@ export default function CategoryFilter({ options, value, onChange, className }) 
       <MotionDiv
         ref={scrollerRef}
         layoutScroll
-        className="-mx-4 overflow-x-auto px-4 [mask-image:linear-gradient(to_right,transparent,var(--fg)_16px,var(--fg)_calc(100%-24px),transparent)] [scrollbar-width:none] sm:mx-0 sm:px-0 sm:[mask-image:none] [&::-webkit-scrollbar]:hidden"
+        // Eight segments only fit from lg; below that the row scrolls, with
+        // faded edges as the hint. Positioned, so segment offsets are relative to it.
+        className="relative -mx-4 overflow-x-auto px-4 [mask-image:linear-gradient(to_right,transparent,var(--fg)_16px,var(--fg)_calc(100%-24px),transparent)] [scrollbar-width:none] lg:mx-0 lg:px-0 lg:[mask-image:none] [&::-webkit-scrollbar]:hidden"
       >
         <div className="inline-flex gap-0.5 rounded-lg bg-surface-2 p-1 dark:bg-surface">
           {options.map((option) => {

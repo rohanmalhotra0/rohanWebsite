@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { readPalette } from './palette';
 
 /** WebGL 2 check on a throwaway canvas, so no renderer is built (or logs) without it. */
@@ -42,23 +42,23 @@ function whenSettled(img, signal) {
 
 /**
  * Owns the lazily loaded robot scene: loads the three.js chunk after first
- * paint, mounts it into `hostRef`, keeps its colours in sync with the theme
- * and disposes it on unmount.
+ * paint, mounts it into `hostRef` (the scene follows the theme attribute
+ * itself) and disposes it on unmount.
  *
  * `mode` is 'auto' (run unless the user prefers reduced motion), 'paused'
  * (the device was too slow) or 'forced' (the user pressed "Run demo").
  */
-export default function useRobotScene({ reducedMotion, theme }) {
+export default function useRobotScene({ reducedMotion }) {
   const hostRef = useRef(null);
   const posterRef = useRef(null);
   const frameRef = useRef(null);
   const boxRef = useRef(null);
-  const labelRef = useRef(null);
   const hudRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
   const [webgl, setWebgl] = useState(null);
   const [mode, setMode] = useState('auto');
+  const [generation, setGeneration] = useState(0);
   const [live, setLive] = useState(false);
   const [message, setMessage] = useState('');
   const [touched, setTouched] = useState(false);
@@ -76,6 +76,7 @@ export default function useRobotScene({ reducedMotion, theme }) {
     if (!active) return undefined;
     const controller = new AbortController();
     let scene = null;
+    let retry = 0;
 
     whenSettled(posterRef.current, controller.signal)
       .then(() => import('./scene/createRobotScene.js'))
@@ -83,12 +84,16 @@ export default function useRobotScene({ reducedMotion, theme }) {
         if (controller.signal.aborted || !hostRef.current) return;
         scene = createRobotScene({
           host: hostRef.current,
-          overlay: { frame: frameRef, box: boxRef, label: labelRef, hud: hudRef, controls: controlsRef },
+          overlay: { frame: frameRef, box: boxRef, hud: hudRef, controls: controlsRef },
           palette: readPalette(),
           mobile,
           forced: mode === 'forced',
           onReady: () => setLive(true),
-          onLost: () => setLive(false),
+          // A lost GPU context: show the poster, then rebuild on a fresh canvas.
+          onLost: () => {
+            setLive(false);
+            retry = setTimeout(() => setGeneration((g) => g + 1), 1000);
+          },
           onSlow: () => setMode('paused'),
           onAnnounce: setMessage,
           onInteract: () => setTouched(true),
@@ -102,17 +107,12 @@ export default function useRobotScene({ reducedMotion, theme }) {
 
     return () => {
       controller.abort();
+      clearTimeout(retry);
       scene?.dispose();
       sceneRef.current = null;
       setLive(false);
     };
-  }, [active, mode, mobile]);
-
-  // Layout effect so the canvas recolours in the same frame as the page
-  // (the theme switch is a view transition).
-  useLayoutEffect(() => {
-    sceneRef.current?.setPalette(readPalette());
-  }, [theme]);
+  }, [active, mode, mobile, generation]);
 
   const throwToy = useCallback(() => sceneRef.current?.throwRandom(), []);
   const runDemo = useCallback(() => setMode('forced'), []);
@@ -122,7 +122,6 @@ export default function useRobotScene({ reducedMotion, theme }) {
     posterRef,
     frameRef,
     boxRef,
-    labelRef,
     hudRef,
     controlsRef,
     live,

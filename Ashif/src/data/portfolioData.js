@@ -10,10 +10,11 @@ export const profile = {
   website: 'https://rohanm.org',
   github: 'https://github.com/rohanmalhotra0',
   linkedin: 'https://www.linkedin.com/in/rohanamal',
-  resumeUrl: assetUrl(
-    'website-photos/resume/Rohan_Malhotra_Resume_2026.pdf'
-  ),
+  resumeUrl: assetUrl('Rohan_Malhotra_Resume.pdf'),
   headline: 'Applied AI, quantitative systems, and robotics.',
+  /** Hero line: leads with the IBM robotics and Kalshi work, in past tense. */
+  intro:
+    'I’m a computer science student at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
   school: 'NYU Courant',
   graduation: 'May 2027',
   summary:
@@ -214,7 +215,7 @@ export const research = [
       'A macro-sensitive Poisson hazard model with jump-diffusion income dynamics, minimum-variance hedge ratios, and Monte Carlo simulation for measuring tail-risk reduction.',
     imageUrl: assetUrl('img/research/income-hedging.webp'),
     imageAlt: 'Quantitative model visualization for prediction-market hedging',
-    liveUrl: assetUrl('website-photos/Research/currentModel%20(2).pdf'),
+    liveUrl: assetUrl('papers/hedging-income-risk-prediction-markets.pdf'),
     tags: ['Prediction Markets', 'Poisson Process', 'Monte Carlo'],
   },
   {
@@ -224,9 +225,7 @@ export const research = [
       'NLP and regression models in Python measuring how r/wallstreetbets sentiment relates to equity returns and volatility.',
     imageUrl: assetUrl('img/research/reddit-sentiment.webp'),
     imageAlt: 'Reddit sentiment research paper figure',
-    liveUrl: assetUrl(
-      'website-photos/Research/Reddit%20Data%20in%20Quantitative%20Financial%20Models%20copy.pdf'
-    ),
+    liveUrl: assetUrl('papers/reddit-sentiment-financial-models.pdf'),
     externalUrl: 'https://hdl.handle.net/10919/124730',
     tags: ['NLP', 'Regression', 'Market Data'],
   },
@@ -237,9 +236,7 @@ export const research = [
       'Monte Carlo backtesting of fractional and full Kelly strategies with emphasis on drawdowns, path dependence, and risk-adjusted growth.',
     imageUrl: assetUrl('img/research/capital-allocation.webp'),
     imageAlt: 'Capital-allocation research visualization',
-    liveUrl: assetUrl(
-      'website-photos/Research/AnEconomic%20Approachto%20OptimizeCapital%20Allocation.pdf'
-    ),
+    liveUrl: assetUrl('papers/kelly-capital-allocation.pdf'),
     tags: ['Kelly Criterion', 'Optimization', 'Risk'],
   },
 ];
@@ -332,7 +329,7 @@ export const projects = [
     longDescription:
       'I labeled the data, trained and tested the model, connected it to the robot, and helped turn it into a live retrieval demo.',
     imageUrl: assetUrl('img/projects/spot-vision.webp'),
-    imageAlt: 'Boston Dynamics Spot quadruped robot in motion',
+    imageAlt: 'Render of a Spot-style quadruped robot with an arm, from the 3D demo on this site',
     repoUrl: 'https://github.com/rohanmalhotra0',
     tags: ['YOLO11', 'OpenCV', 'Spot SDK', 'gRPC'],
     featured: true,
@@ -345,8 +342,6 @@ export const projects = [
       'I turned my Kalshi research into a simulator that shows how prediction-market contracts could hedge job-loss risk.',
     longDescription:
       'You enter a few assumptions and it compares contract sizes, upfront cost, and tail risk before and after the hedge.',
-    imageUrl: assetUrl('img/projects/income-risk-hedging.webp'),
-    imageAlt: 'Prediction-market hedging model visualization',
     repoUrl: 'https://github.com/rohanmalhotra0/kalshiQR',
     tags: ['Next.js', 'Python', 'C++', 'Monte Carlo'],
   },
@@ -380,8 +375,6 @@ export const projects = [
     category: 'Web',
     description:
       'I worked on PIVOT, a site where students at different universities can post STEM projects and find collaborators.',
-    imageUrl: assetUrl('img/projects/pivot.webp'),
-    imageAlt: 'PIVOT student research platform',
     liveUrl: 'https://vtpivot.org',
     tags: ['React', 'Collaboration', 'Infrastructure'],
   },
@@ -403,8 +396,6 @@ export const projects = [
     category: 'Quant',
     description:
       'I built a scheduled Python pipeline that pulls option data, prices American contracts with a binomial tree, and saves each run for review.',
-    imageUrl: assetUrl('img/projects/american-options-pricing.webp'),
-    imageAlt: 'Binomial options model running on a Raspberry Pi',
     repoUrl: 'https://github.com/rohanmalhotra0/Discrete-Options-System',
     tags: ['Python', 'NumPy', 'Alpaca', 'Options'],
   },
@@ -414,18 +405,14 @@ export const projects = [
     category: 'Quant',
     description:
       'I experimented with wave-like cycles in market data to see whether they could help identify changing regimes and recurring signals.',
-    imageUrl: assetUrl('img/projects/oscillating-stock-model.webp'),
-    imageAlt: 'Oscillating stock-model visualization',
     tags: ['Time Series', 'Signals', 'Regime Detection'],
   },
   {
     title: 'RSI Predictor',
     slug: 'rsi-predictor',
-    category: 'AI & Robotics',
+    category: 'Quant',
     description:
       'I compared linear regression and random forests to see which one handled RSI prediction better from simple market features.',
-    imageUrl: assetUrl('img/projects/rsi-predictor.webp'),
-    imageAlt: 'RSI predictor market chart',
     repoUrl: 'https://github.com/rohanmalhotra0/rsi-random-forest',
     tags: ['Random Forest', 'Moving Averages', 'Holdout MAE'],
   },
@@ -446,8 +433,6 @@ export const projects = [
     year: '2026',
     description:
       'I made this so I could drop in a PDF or notes and get a usable set of quizzes, flashcards, and recall prompts.',
-    imageUrl: assetUrl('img/projects/ai-quiz-maker.webp'),
-    imageAlt: 'AI Quiz Maker project image',
     repoUrl: 'https://github.com/rohanmalhotra0/ai-quiz-generator',
     tags: ['Next.js', 'FastAPI', 'OpenAI', 'PDF Extraction'],
   },
@@ -458,8 +443,6 @@ export const projects = [
     year: '2026',
     description:
       'I built a live dashboard that streams Kalshi prices and lets me test position sizes with the Kelly criterion.',
-    imageUrl: assetUrl('img/projects/kalshi-live-kelly.webp'),
-    imageAlt: 'Kalshi Live Kelly Dashboard project image',
     repoUrl: 'https://github.com/rohanmalhotra0/KalshiHedgingDashboard',
     tags: ['FastAPI', 'WebSocket', 'Plotly', 'Kelly Criterion'],
   },
@@ -470,8 +453,6 @@ export const projects = [
     year: '2026',
     description:
       'I kept this nine-week tracker during my IBM internship to show what I was working on, what I learned, and what shipped each week.',
-    imageUrl: assetUrl('img/projects/ibm-internship-tracker.webp'),
-    imageAlt: 'IBM internship tracker interface',
     liveUrl: 'https://rohanmalhotra0.github.io/blogs/',
     repoUrl: 'https://github.com/rohanmalhotra0/blogs',
     tags: ['JavaScript', 'Dashboard', 'Documentation'],
@@ -483,8 +464,6 @@ export const projects = [
     year: '2025',
     description:
       'I compared sponsorship cost, audience size, and engagement across Love Island partnerships, then built an interactive page to show the trade-offs.',
-    imageUrl: assetUrl('img/projects/love-island-roi.webp'),
-    imageAlt: 'Love Island ROI analysis slide',
     liveUrl: 'https://rohanmalhotra0.github.io/BAC/',
     repoUrl: 'https://github.com/rohanmalhotra0/BAC',
     tags: ['PyTorch', 'Pandas', 'Plotly', 'Jupyter'],
@@ -496,8 +475,6 @@ export const projects = [
     year: '2025',
     description:
       'I trained a gradient-boosting model to estimate the next SPY close from EMA, RSI, MACD, and PCA-reduced features.',
-    imageUrl: assetUrl('img/projects/spy-gradient-boosting.webp'),
-    imageAlt: 'SPY gradient boosting model chart',
     repoUrl: 'https://github.com/rohanmalhotra0/GBM-Model-Python',
     tags: ['scikit-learn', 'PCA', 'Gradient Boosting', 'yfinance'],
   },
@@ -508,8 +485,6 @@ export const projects = [
     year: '2026',
     description:
       'I pulled my study tools into one place: notes, quizzes, flashcards, voice practice, and source material for everything from operating systems to German.',
-    imageUrl: assetUrl('img/projects/rohan-lab.webp'),
-    imageAlt: 'rohan.lab study notebooks interface',
     repoUrl: 'https://github.com/rohanmalhotra0/schoolwork',
     tags: ['JavaScript', 'Study Tools', 'Voice Chat'],
   },
@@ -520,8 +495,6 @@ export const projects = [
     year: '2026',
     description:
       'I made this for German II, with flashcards, quizzes, grammar references, and practice that focuses on my weak spots.',
-    imageUrl: assetUrl('img/projects/german-study-lab.webp'),
-    imageAlt: 'German II Study Lab interface',
     repoUrl: 'https://github.com/rohanmalhotra0/german',
     tags: ['JavaScript', 'Adaptive Practice', 'Education'],
   },
@@ -532,8 +505,6 @@ export const projects = [
     year: '2026',
     description:
       'I turned a political-science paper into a multimedia explainer, using South Korea as the main case study.',
-    imageUrl: assetUrl('img/projects/democracies-survive.webp'),
-    imageAlt: 'Why Do Democracies Survive multimedia page',
     repoUrl: 'https://github.com/rohanmalhotra0/Vox',
     tags: ['Multimedia', 'Research', 'Responsive Web'],
   },
@@ -544,8 +515,6 @@ export const projects = [
     year: '2025',
     description:
       'I built the backend for a task tracker, including users, due dates, alerts, notifications, and SQL persistence.',
-    imageUrl: assetUrl('img/projects/indytrack-api.webp'),
-    imageAlt: 'IndyTrack backend project image',
     repoUrl: 'https://github.com/rohanmalhotra0/IndyTrack1',
     tags: ['Flask', 'SQLAlchemy', 'PostgreSQL', 'API'],
   },
@@ -556,8 +525,6 @@ export const projects = [
     year: '2025',
     description:
       'I wrote a small Python calculator for kinematics and electric-field problems so I did not have to repeat the same setup by hand.',
-    imageUrl: assetUrl('img/projects/physics-calculator.webp'),
-    imageAlt: 'Physics Calculator project image',
     repoUrl: 'https://github.com/rohanmalhotra0/physicscalc',
     tags: ['Python', 'Physics', 'Utilities'],
   },
@@ -568,8 +535,6 @@ export const projects = [
     year: 'Ongoing',
     description:
       'This is where I keep my ongoing LeetCode and NeetCode work as I practice data structures and algorithms.',
-    imageUrl: assetUrl('img/projects/algorithms-practice.webp'),
-    imageAlt: 'Algorithms practice project image',
     repoUrl: 'https://github.com/rohanmalhotra0/leet-code-daily',
     tags: ['Algorithms', 'Data Structures', 'Practice'],
   },
