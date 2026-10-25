@@ -1,5 +1,5 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { StrictMode, startTransition } from 'react';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import '@fontsource-variable/mona-sans/wght.css';
 import './index.css';
 import App from './App.jsx';
@@ -19,8 +19,23 @@ window.addEventListener('vite:preloadError', (event) => {
   window.location.reload();
 });
 
-createRoot(document.getElementById('root')).render(
+const container = document.getElementById('root');
+const app = (
   <StrictMode>
     <App />
   </StrictMode>
 );
+
+// Production builds prerender the portfolio into #root (scripts/prerender.mjs),
+// so it paints before any JavaScript runs. Hydrating inside a transition lets
+// React split that work into small slices instead of one long task. The résumé
+// route starts from an empty root instead.
+if (container.hasAttribute('data-prerendered') && window.location.hash !== '#/resume') {
+  startTransition(() => {
+    hydrateRoot(container, app);
+  });
+} else {
+  container.removeAttribute('data-prerendered');
+  container.replaceChildren();
+  createRoot(container).render(app);
+}

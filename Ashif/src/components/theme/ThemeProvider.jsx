@@ -1,13 +1,21 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import { flushSync } from 'react-dom';
 import { THEME_COLORS, THEME_STORAGE_KEY, ThemeContext } from '@/lib/theme';
 
-function readTheme() {
-  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-}
+// The theme lives on <html data-theme> (set before first paint, see
+// index.html). Components read it through a tiny store: the prerendered HTML
+// and hydration use 'light', then React re-renders with the real value.
+const listeners = new Set();
+const subscribe = (listener) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+const readTheme = () =>
+  document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+const serverTheme = () => 'light';
 
 export default function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(readTheme);
+  const theme = useSyncExternalStore(subscribe, readTheme, serverTheme);
 
   const setTheme = useCallback((next) => {
     document.documentElement.dataset.theme = next;
@@ -19,7 +27,8 @@ export default function ThemeProvider({ children }) {
     } catch {
       // Private mode or blocked storage: the choice just won't persist.
     }
-    setThemeState(next);
+    // Synchronous, so flushSync inside the view transition sees the change.
+    listeners.forEach((listener) => listener());
   }, []);
 
   const toggleTheme = useCallback(

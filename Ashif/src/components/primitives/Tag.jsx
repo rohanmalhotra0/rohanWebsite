@@ -10,6 +10,20 @@ export function TechList({ items, className }) {
   );
 }
 
+/**
+ * The shortcut modifier: ⌘ on Apple devices, Ctrl elsewhere. Both labels are
+ * in the markup and CSS picks one (index.html marks <html class="apple">), so
+ * the prerendered HTML and the first client render are identical.
+ */
+export function ModKey({ space = false }) {
+  return (
+    <>
+      <span className="apple:hidden">{space ? 'Ctrl\u00a0' : 'Ctrl'}</span>
+      <span className="hidden apple:inline">⌘</span>
+    </>
+  );
+}
+
 export function Kbd({ className, children }) {
   return (
     <kbd

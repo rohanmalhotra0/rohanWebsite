@@ -5,8 +5,11 @@ import { cn } from '@/lib/utils';
 const linkClass =
   'group inline-flex min-h-11 items-center gap-1 whitespace-nowrap text-muted transition-colors duration-150 hover:text-fg';
 
+// The build year (vite.config.js), so the prerendered HTML and the client agree.
+const YEAR = import.meta.env.VITE_BUILD_YEAR;
+
 export default function Footer() {
-  const year = new Date().getFullYear();
+  const year = YEAR;
 
   return (
     <footer className="border-t border-line">

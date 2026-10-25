@@ -88,7 +88,7 @@ function Activity({ activity, fadeIn }) {
           title={exactTime.format(pushedAt)}
           className="whitespace-nowrap"
         >
-          {timeAgo(pushedAt, now)}
+          {timeAgo(pushedAt, now ?? Date.now())}
         </time>
         .{others.length ? <> Also active in {otherLinks}.</> : null}
       </p>

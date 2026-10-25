@@ -1,4 +1,6 @@
-const BASE = import.meta.env.BASE_URL || '/';
+// The prerendered HTML has to match the client build, whose base is './'
+// (Vite always reports '/' while rendering on the server).
+const BASE = import.meta.env.SSR ? './' : import.meta.env.BASE_URL || '/';
 
 export const assetUrl = (path) =>
   `${BASE}${String(path || '').replace(/^\/+/, '')}`;

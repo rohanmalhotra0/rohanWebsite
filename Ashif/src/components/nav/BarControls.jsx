@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
-import { Kbd } from '@/components/primitives/Tag';
+import { Kbd, ModKey } from '@/components/primitives/Tag';
 import { cn } from '@/lib/utils';
-import { PALETTE_SHORTCUT, PALETTE_SHORTCUT_ARIA } from './platform';
+import { PALETTE_SHORTCUT_ARIA } from './platform';
 import { ICON_BUTTON } from './styles';
 
 /** The name, linking back to the top of the page. */
@@ -39,7 +39,9 @@ export function SearchButton({ ref, onClick, onIntent, className }) {
       className={cn(ICON_BUTTON, 'lg:w-auto lg:gap-2 lg:pl-2.5 lg:pr-2', className)}
     >
       <Search className="size-[18px] lg:size-4" strokeWidth={1.75} aria-hidden="true" />
-      <Kbd className="hidden lg:inline-flex">{PALETTE_SHORTCUT}</Kbd>
+      <Kbd className="hidden lg:inline-flex">
+        <ModKey space />K
+      </Kbd>
     </button>
   );
 }

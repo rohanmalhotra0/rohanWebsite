@@ -39,6 +39,9 @@ function preloadFonts() {
 
 export default defineConfig({
   base: './',
+  define: {
+    'import.meta.env.VITE_BUILD_YEAR': JSON.stringify(String(new Date().getFullYear())),
+  },
   plugins: [tailwindcss(), react(), preloadFonts()],
   resolve: {
     alias: {

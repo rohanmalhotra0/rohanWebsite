@@ -39,6 +39,16 @@
 
     <title>Rohan Malhotra</title>
 
+    <!-- Without JavaScript, the prerendered sections must not wait for a scroll reveal. -->
+    <noscript>
+      <style>
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
+
     <!-- Apply the saved theme before first paint. Light is the default; the toggle saves dark. -->
     <script>
       (function () {
@@ -54,6 +64,22 @@
         document
           .querySelector('meta[name="theme-color"]')
           .setAttribute('content', theme === 'dark' ? '#0e0e0d' : '#f3f2ee');
+
+        // ⌘ or Ctrl in shortcut hints (both are in the markup; CSS picks one).
+        var platform =
+          (navigator.userAgentData && navigator.userAgentData.platform) ||
+          navigator.platform ||
+          navigator.userAgent ||
+          '';
+        if (/mac|iphone|ipad|ipod/i.test(platform)) {
+          document.documentElement.classList.add('apple');
+        }
+
+        // The prerendered markup in #root is the portfolio; on the résumé
+        // route it stays hidden until the app replaces it.
+        if (location.hash === '#/resume') {
+          document.documentElement.classList.add('route-resume');
+        }
 
         // The hero's robot poster is the largest thing on the first screen;
         // start fetching the right theme's copy before any JS runs.
