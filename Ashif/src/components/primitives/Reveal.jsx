@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 const EASE = [0.16, 1, 0.3, 1];
 
@@ -15,7 +16,9 @@ export default function Reveal({
   children,
   ...rest
 }) {
-  const reduceMotion = useReducedMotion();
+  // Our own media query instead of motion's useReducedMotion, which logs a
+  // dev warning for every reduced-motion visitor.
+  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const Component = motion[as] ?? motion.div;
 
   if (reduceMotion) {

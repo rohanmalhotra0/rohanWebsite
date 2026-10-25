@@ -72,7 +72,7 @@ export default function Navbar() {
           <div className={cn(BAR_ROW, 'lg:grid lg:grid-cols-[1fr_auto_1fr]')}>
             <Wordmark onClick={onAnchorClick('top')} className="justify-self-start" />
 
-            <nav aria-label="Sections" className="hidden h-full lg:block">
+            <nav aria-label="Primary" className="hidden h-full lg:block">
               <ul className="flex h-full items-center">
                 {sections.map((section) => {
                   const isActive = active === section.id;

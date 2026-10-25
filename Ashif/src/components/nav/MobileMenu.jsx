@@ -131,7 +131,7 @@ function Sheet({ sheetRef, closeRef, active, onClose, onSectionClick, onLeave, o
         </div>
       </div>
 
-      <nav aria-label="Sections" className="container-page shrink-0 pt-5">
+      <nav aria-label="Mobile" className="container-page shrink-0 pt-5">
         <ul className="border-t border-line">
           {sections.map((section, i) => {
             const isActive = active === section.id;

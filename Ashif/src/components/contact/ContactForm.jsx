@@ -20,7 +20,8 @@ const IS_MAC =
 const inputClass = cn(
   'block w-full rounded-lg border border-line-strong bg-surface px-3.5 text-base text-fg',
   'transition-[border-color,box-shadow] duration-150 ease-out placeholder:text-subtle',
-  'hover:border-fg/30 focus-visible:outline-hidden focus:border-accent focus:ring-3 focus:ring-accent/25',
+  // accent-strong keeps the focused border at 3:1+ on paper; the soft ring carries the brand orange.
+  'hover:border-fg/30 focus-visible:outline-hidden focus:border-accent-strong focus:ring-3 focus:ring-accent/25',
   'aria-[invalid=true]:border-accent-strong',
   // Keep browser autofill from painting its own background over the theme.
   'autofill:inset-shadow-[0_0_0_100px_var(--surface)] autofill:[-webkit-text-fill-color:var(--fg)]'
@@ -195,7 +196,14 @@ export default function ContactForm() {
         </MotionDiv>
       ) : (
         <MotionDiv key="form" {...swap} transition={{ duration: 0.2, ease: EASE }}>
-          <form noValidate onSubmit={handleSubmit} aria-label="Send a message" aria-busy={sending}>
+          <form
+            action={formspreeUrl}
+            method="POST"
+            noValidate
+            onSubmit={handleSubmit}
+            aria-label="Send a message"
+            aria-busy={sending}
+          >
             <div className="grid gap-x-5 sm:grid-cols-2 lg:grid-cols-1">
               <Field id={fieldId('name')} label="Name" error={errors.name}>
                 <input
