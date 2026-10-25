@@ -197,8 +197,8 @@ export function createController({ root, body, legs, arm }) {
   function aimGaze(out) {
     v.copy(gaze.pos).applyMatrix4(inv);
     const yaw = clamp(Math.atan2(v.x - SHOULDER.x, v.z - SHOULDER.z), -1.35, 1.35);
-    const reach = 0.25;
-    const up = 0.19 + armCtl.neck;
+    const reach = 0.15;
+    const up = 0.12 + armCtl.neck;
     const sy = Math.sin(yaw);
     const cy = Math.cos(yaw);
     const ahead = (v.x - SHOULDER.x - sy * reach) * sy + (v.z - SHOULDER.z - cy * reach) * cy;

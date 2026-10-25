@@ -66,6 +66,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
   function letGo() {
     if (!holding) return;
     scene.attach(toy.mesh);
+    toy.mesh.layers.set(0);
     toy.spin.set(rand() - 0.5, 0, rand() - 0.5).multiplyScalar(4);
     toy.release(handVel);
     holding = false;
@@ -159,6 +160,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
         gaze.target.copy(p);
         if (time > 1.36) {
           rig.arm.grasp.attach(toy.mesh);
+          toy.mesh.layers.set(1);
           toy.state = 'held';
           holding = true;
           go('lift', MESSAGES.lift);

@@ -272,11 +272,12 @@ function buildArm(materials) {
   grasp.position.z = DIMS.grasp;
   roll.add(grasp);
 
-  // Mount for the feed camera: on the top camera, looking down the gripper.
+  // Palm camera mount, looking out between the jaws.
   const eye = new Object3D();
-  eye.position.set(0, 0.036, 0.128);
-  eye.rotation.set(0.2, Math.PI, 0);
+  eye.position.set(0, 0, 0.132);
+  eye.rotation.y = Math.PI;
   roll.add(eye);
+  roll.traverse((o) => o.layers.set(1));
 
   return { base, shoulder, elbow, wrist, roll, fingers, grasp, eye };
 }

@@ -36,7 +36,7 @@ function Field({ id, label, error, children }) {
       </label>
       {children}
       {/* The slot keeps its height, so a message never pushes the form around. */}
-      <p id={`${id}-error`} className="mt-1.5 min-h-5 text-[13px] leading-5 text-accent-strong">
+      <div id={`${id}-error`} className="mt-1.5 min-h-5 text-[13px] leading-5 text-accent-strong">
         {error ? (
           <MotionSpan
             key={error}
@@ -49,7 +49,7 @@ function Field({ id, label, error, children }) {
             {error}
           </MotionSpan>
         ) : null}
-      </p>
+      </div>
     </div>
   );
 }
@@ -247,6 +247,7 @@ export default function ContactForm() {
                 maxLength={5000}
                 placeholder="What are you working on?"
                 onKeyDown={handleMessageKeyDown}
+                aria-keyshortcuts="Control+Enter Meta+Enter"
                 className={cn(inputClass, 'min-h-36 resize-y py-3 leading-6')}
               />
             </Field>
@@ -304,8 +305,9 @@ export default function ContactForm() {
                   </span>
                 </span>
               </Button>
+              {/* Visual hint only; the textarea exposes the shortcut via aria-keyshortcuts. */}
               {showShortcut ? (
-                <p className="flex items-center gap-1 text-[13px] text-subtle">
+                <p aria-hidden="true" className="flex items-center gap-1 text-[13px] text-subtle">
                   <Kbd>{IS_MAC ? '⌘' : 'Ctrl'}</Kbd>
                   <Kbd>↵</Kbd>
                   <span className="ml-1">to send</span>

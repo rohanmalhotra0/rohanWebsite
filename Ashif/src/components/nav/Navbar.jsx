@@ -69,7 +69,14 @@ export default function Navbar() {
             scrolled ? 'border-line bg-bg/85 backdrop-blur-md' : 'border-transparent'
           )}
         >
-          <div className={cn(BAR_ROW, 'lg:grid lg:grid-cols-[1fr_auto_1fr]')}>
+          {/* Equal side columns center the links; max-content minimums mean that
+              when space runs short they drift off-center instead of overlapping. */}
+          <div
+            className={cn(
+              BAR_ROW,
+              'lg:grid lg:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)]'
+            )}
+          >
             <Wordmark onClick={onAnchorClick('top')} className="justify-self-start" />
 
             <nav aria-label="Primary" className="hidden h-full lg:block">
@@ -83,7 +90,8 @@ export default function Navbar() {
                         onClick={onAnchorClick(section.id)}
                         aria-current={isActive ? 'true' : undefined}
                         className={cn(
-                          'flex h-9 items-center rounded-md px-3 text-[13.5px] font-medium transition-colors duration-150 pointer-coarse:h-11',
+                          // Tighter between 1024 and 1280 so the centered links clear both sides.
+                          'flex h-9 items-center rounded-md px-2 text-[13px] font-medium transition-colors duration-150 pointer-coarse:h-11 xl:px-3 xl:text-[13.5px]',
                           isActive ? 'text-fg' : 'text-muted hover:text-fg'
                         )}
                       >
@@ -93,7 +101,7 @@ export default function Navbar() {
                         <MotionSpan
                           layoutId="nav-marker"
                           aria-hidden="true"
-                          className="pointer-events-none absolute inset-x-3 -bottom-px h-0.5 bg-accent"
+                          className="pointer-events-none absolute inset-x-2 -bottom-px h-0.5 bg-accent xl:inset-x-3"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: isActive ? 1 : 0 }}
                           transition={{
@@ -121,7 +129,7 @@ export default function Navbar() {
                 href="#/resume"
                 variant="secondary"
                 size="sm"
-                className="ml-2 hidden lg:inline-flex pointer-coarse:h-11"
+                className="ml-1 hidden lg:inline-flex pointer-coarse:h-11 xl:ml-2"
               >
                 Résumé
               </Button>

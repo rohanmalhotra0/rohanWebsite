@@ -61,11 +61,11 @@ export default function Gallery({ className }) {
                   height={photo.height}
                   loading="lazy"
                   decoding="async"
-                  className="block h-64 w-auto max-w-none transition-transform duration-500 ease-out-expo group-hover:scale-[1.03] sm:h-72 lg:h-auto lg:w-full"
+                  className="block h-64 w-auto max-w-none transition-transform duration-500 ease-out-expo motion-safe:group-hover:scale-[1.03] sm:h-72 lg:h-auto lg:w-full"
                 />
               </button>
               <figcaption className="mt-3 text-[13px] leading-5 text-subtle">
-                <span className="block font-medium text-muted">{photo.label}</span>
+                <span className="block font-medium">{photo.label}</span>
                 {photo.caption ? (
                   <span className="mt-0.5 block text-pretty">{photo.caption}</span>
                 ) : null}

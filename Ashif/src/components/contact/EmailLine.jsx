@@ -70,9 +70,9 @@ export default function EmailLine({ className }) {
         </button>
       </div>
       {/* Announces the result without moving focus. */}
-      <p className="sr-only" aria-live="polite">
+      <div className="sr-only" aria-live="polite">
         {ANNOUNCEMENT[status]}
-      </p>
+      </div>
     </div>
   );
 }

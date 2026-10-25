@@ -36,8 +36,21 @@ export function useScrolled(threshold = 4) {
 // is current. The hero (#top) is observed too, so nothing is active there.
 const SPY_MARGIN = '-35% 0px -64% 0px';
 const LOCK_TIMEOUT_MS = 2000;
-// Input that means the user has taken over from a click-triggered scroll.
-const TAKEOVER_EVENTS = ['wheel', 'touchstart', 'pointerdown'];
+const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
+const TAKEOVER_EVENTS = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+
+/** Input that means the user is now scrolling by hand. */
+function isTakeover(event) {
+  if (event.type === 'keydown') return SCROLL_KEYS.has(event.key);
+  // Pressing a link or button starts a new navigation, not a manual scroll.
+  if (event.type === 'pointerdown') return !event.target.closest?.('a, button');
+  return true;
+}
+
+const isOnScreen = (el) => {
+  const rect = el.getBoundingClientRect();
+  return rect.bottom > 0 && rect.top < window.innerHeight;
+};
 
 /**
  * Scrollspy over `ids` (a stable array of section ids).
@@ -51,7 +64,8 @@ export function useScrollSpy(ids) {
   const visible = useRef(new Map());
   const order = useRef([]);
   const atBottom = useRef(false);
-  const lock = useRef(null);
+  // The latest click-triggered navigation: { target, locked, stop }.
+  const navigation = useRef(null);
 
   const select = useCallback((id) => {
     const next = !id || id === 'top' ? null : id;
@@ -61,12 +75,15 @@ export function useScrollSpy(ids) {
   }, []);
 
   const sync = useCallback(() => {
-    if (lock.current) return;
+    const nav = navigation.current;
+    if (nav?.locked) return;
     const list = order.current;
     // Scrolled all the way down: the last section may be too short to ever
-    // reach the band, but it is clearly the one being read.
+    // reach the band, but it is clearly the one being read, unless the user
+    // just asked for an earlier section that is still on screen.
     if (atBottom.current) {
-      select(list[list.length - 1]);
+      const asked = nav?.target && document.getElementById(nav.target);
+      select(asked && isOnScreen(asked) ? nav.target : list[list.length - 1]);
       return;
     }
     const hit = list.find((id) => visible.current.get(id));
@@ -117,31 +134,48 @@ export function useScrollSpy(ids) {
 
   const lockTo = useCallback(
     (id) => {
-      lock.current?.release(false);
+      navigation.current?.stop();
+      const nav = { target: id, locked: true };
+      navigation.current = nav;
       select(id);
 
       let timer = 0;
-      const onDone = () => release();
-      const release = (resync = true) => {
-        window.removeEventListener('scrollend', onDone);
-        TAKEOVER_EVENTS.forEach((type) => window.removeEventListener(type, onDone));
+      // The smooth scroll is over: follow the page again.
+      const unlock = () => {
+        if (!nav.locked) return;
+        nav.locked = false;
+        window.removeEventListener('scrollend', unlock);
         window.clearTimeout(timer);
-        if (lock.current?.release === release) lock.current = null;
-        if (resync) sync();
+        sync();
       };
+      // The user scrolls by hand: forget the target too.
+      const onInput = (event) => {
+        if (!isTakeover(event)) return;
+        nav.target = null;
+        stopListening();
+        unlock();
+      };
+      const stopListening = () =>
+        TAKEOVER_EVENTS.forEach((type) => window.removeEventListener(type, onInput));
+      nav.stop = () => {
+        nav.locked = false;
+        window.removeEventListener('scrollend', unlock);
+        window.clearTimeout(timer);
+        stopListening();
+      };
+
       // `scrollend` is the precise signal; the timeout covers browsers without
       // it and clicks that don't scroll at all.
-      window.addEventListener('scrollend', onDone);
+      window.addEventListener('scrollend', unlock);
+      timer = window.setTimeout(unlock, LOCK_TIMEOUT_MS);
       TAKEOVER_EVENTS.forEach((type) =>
-        window.addEventListener(type, onDone, { passive: true })
+        window.addEventListener(type, onInput, { passive: true })
       );
-      timer = window.setTimeout(onDone, LOCK_TIMEOUT_MS);
-      lock.current = { release };
     },
     [select, sync]
   );
 
-  useEffect(() => () => lock.current?.release(false), []);
+  useEffect(() => () => navigation.current?.stop(), []);
 
   return { active: state.active, last: state.last, lockTo };
 }

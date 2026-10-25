@@ -1,29 +1,32 @@
 import {
   Box3,
   Color,
+  FramebufferTexture,
+  LinearFilter,
   Mesh,
   OrthographicCamera,
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
   ShaderMaterial,
-  SRGBColorSpace,
   Vector2,
   Vector3,
-  WebGLRenderTarget,
 } from 'three';
 
+// The capture is copied straight from the canvas, so it is already tone
+// mapped, sRGB encoded and premultiplied.
 const FEED_FRAGMENT = /* glsl */ `
 uniform sampler2D map;
+uniform vec3 uBack;
 uniform vec3 uDark;
 uniform vec3 uLight;
 uniform vec2 uSize;
 uniform float uRadius;
 varying vec2 vUv;
 void main() {
-  vec3 c = texture2D(map, vUv).rgb;
-  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
-  l = pow(clamp(l * 1.15 / (1.0 + l * 0.35), 0.0, 1.0), 0.72);
+  vec4 raw = texture2D(map, vUv);
+  vec3 c = raw.rgb + uBack * (1.0 - raw.a);
+  float l = smoothstep(0.03, 0.97, dot(c, vec3(0.299, 0.587, 0.114)));
   vec2 v = vUv - 0.5;
   l *= 1.0 - dot(v, v) * 0.55;
   vec2 p = abs((vUv - 0.5) * uSize) - (uSize * 0.5 - uRadius);
@@ -32,24 +35,30 @@ void main() {
   #include <colorspace_fragment>
 }`;
 
-// Mono tint per theme: ink-on-paper in light mode, cool graphite in dark.
+// Mono tint per theme: ink on paper in light mode, cool graphite in dark.
 const TINTS = {
-  light: { dark: 0x24221e, light: 0xf6f4ee, clear: 0x9b978d },
-  dark: { dark: 0x0b0c0b, light: 0xd4d7cf, clear: 0x4a4b47 },
+  light: { dark: 0x23211d, light: 0xf7f5ef, back: [0.62, 0.61, 0.58] },
+  dark: { dark: 0x0a0b0a, light: 0xd3d6ce, back: [0.3, 0.3, 0.29] },
 };
 
 const _box = new Box3();
 const _v = new Vector3();
+const ORIGIN = new Vector2(0, 0);
 
-/** The robot's own camera, drawn into a corner inset of the main canvas. */
-export function createFeed(renderer, { samples }) {
-  const target = new WebGLRenderTarget(16, 9, { samples });
-  target.texture.colorSpace = SRGBColorSpace;
+/**
+ * The robot's own camera. Each capture renders the gripper camera into the
+ * corner of the canvas, copies it to a texture, and is later composited,
+ * mono and rounded, into the inset after the main view is drawn. It reuses
+ * the main view's shader programs, so it costs no extra compiles.
+ */
+export function createFeed(renderer) {
   const camera = new PerspectiveCamera(60, 16 / 9, 0.03, 30);
-  const clear = new Color();
+  let texture = null;
+  let pixelRatio = 1;
 
   const uniforms = {
-    map: { value: target.texture },
+    map: { value: null },
+    uBack: { value: new Vector3() },
     uDark: { value: new Color() },
     uLight: { value: new Color() },
     uSize: { value: new Vector2(256, 144) },
@@ -83,33 +92,39 @@ export function createFeed(renderer, { samples }) {
       const t = TINTS[palette.theme];
       uniforms.uDark.value.set(t.dark);
       uniforms.uLight.value.set(t.light);
-      clear.set(t.clear);
+      uniforms.uBack.value.fromArray(t.back);
     },
 
-    setRect(x, y, w, h, pixelRatio) {
+    setRect(x, y, w, h, ratio) {
       Object.assign(rect, { x, y, w, h });
+      pixelRatio = ratio;
       if (!w || !h) return;
-      const scale = Math.min(pixelRatio, 1.5);
-      target.setSize(Math.round(w * scale), Math.round(h * scale));
+      // Capture at up to 1.25x: soft like a real camera, and cheap.
+      const scale = Math.min(ratio, 1.25);
+      texture?.dispose();
+      texture = new FramebufferTexture(Math.round(w * scale), Math.round(h * scale));
+      texture.minFilter = LinearFilter;
+      texture.magFilter = LinearFilter;
+      uniforms.map.value = texture;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      uniforms.uSize.value.set(w * pixelRatio, h * pixelRatio);
-      uniforms.uRadius.value = 8 * pixelRatio;
+      uniforms.uSize.value.set(w * ratio, h * ratio);
+      uniforms.uRadius.value = 8 * ratio;
     },
 
-    /** Render the camera's view into the offscreen target. */
-    capture(scene) {
-      if (!rect.w) return;
-      renderer.setRenderTarget(target);
-      renderer.setClearColor(clear, 1);
+    /** Render the gripper camera and keep the pixels (before the main view). */
+    capture(scene, width, height) {
+      if (!texture) return;
+      const { image } = texture;
+      renderer.setViewport(0, 0, image.width / pixelRatio, image.height / pixelRatio);
       renderer.render(scene, camera);
-      renderer.setRenderTarget(null);
-      renderer.setClearColor(0x000000, 0);
+      renderer.copyFramebufferToTexture(texture, ORIGIN);
+      renderer.setViewport(0, 0, width, height);
     },
 
-    /** Composite the last capture into the inset (after the main render). */
+    /** Composite the last capture into the inset (after the main view). */
     draw(width, height) {
-      if (!rect.w) return;
+      if (!texture) return;
       const y = height - rect.y - rect.h;
       renderer.autoClear = false;
       renderer.setScissorTest(true);
@@ -153,7 +168,7 @@ export function createFeed(renderer, { samples }) {
     },
 
     dispose() {
-      target.dispose();
+      texture?.dispose();
       quad.geometry.dispose();
       quad.material.dispose();
     },

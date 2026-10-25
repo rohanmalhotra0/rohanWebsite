@@ -11,9 +11,11 @@
   --rv-zoom: 1;
 }
 
-@media screen and (min-width: 1200px) {
-  .rv {
-    --rv-zoom: 1.2;
+@supports (zoom: 1) {
+  @media screen and (min-width: 1200px) {
+    .rv {
+      --rv-zoom: 1.2;
+    }
   }
 }
 
@@ -302,9 +304,11 @@
   font-weight: 520;
 }
 
-/* ---------- Narrower screens ---------- */
+/* ---------- Narrower screens ----------
+   Screen only: some browsers match width queries against the printed page
+   box (about 720px), which would restyle the printed sheet. */
 
-@media (max-width: 879px) {
+@media screen and (max-width: 879px) {
   .rv-paper {
     padding: 40px 36px 44px;
   }
@@ -335,7 +339,7 @@
   }
 }
 
-@media (max-width: 639px) {
+@media screen and (max-width: 639px) {
   .rv-paper {
     padding: 28px 20px 32px;
     font-size: 14px;
@@ -368,7 +372,7 @@
   .rv-contact-item {
     display: flex;
     align-items: center;
-    min-height: 36px;
+    min-height: 44px;
   }
 
   .rv-contact .rv-sep {

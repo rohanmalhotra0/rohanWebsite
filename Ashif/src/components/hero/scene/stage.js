@@ -27,7 +27,7 @@ const FLOOR_FRAGMENT = /* glsl */ `
 uniform vec3 uInk;
 uniform vec3 uTape;
 uniform vec3 uAccent;
-uniform vec4 uAlpha;   // grid, tape, shade, edge fade on/off
+uniform vec4 uAlpha;   // grid, tape, shade, main view (edge fade + reticle)
 uniform vec4 uHome;    // x, z, cos(yaw), sin(yaw)
 uniform vec4 uBody;    // x, z, yaw, strength
 uniform vec4 uFeet[4]; // x, z, contact, -
@@ -72,15 +72,9 @@ void main() {
 
   float lines = max(grid(vXZ, 0.25, 0.0012) * 0.55, grid(vXZ, 1.0, 0.002));
 
-  // Tape corners marking the robot's home square.
-  vec2 q = abs(mat2(uHome.z, -uHome.w, uHome.w, uHome.z) * rel);
-  vec2 corner = vec2(0.36, 0.62);
-  float w = 0.012;
-  float arm = 0.15;
-  float tape = fill(min(
-    box(q, corner - vec2(arm * 0.5 - w, 0.0), vec2(arm * 0.5, w)),
-    box(q, corner - vec2(0.0, arm * 0.5 - w), vec2(w, arm * 0.5))
-  ));
+  // A thin taped rectangle marking the robot's home spot.
+  vec2 q = mat2(uHome.z, -uHome.w, uHome.w, uHome.z) * rel;
+  float tape = fill(abs(box(q, vec2(0.0), vec2(0.42, 0.7))) - 0.006);
 
   // Soft contact shadow: body footprint, feet and toy.
   float c = cos(uBody.z);
@@ -99,11 +93,13 @@ void main() {
   float ring = abs(length(vXZ - uHover.xy) - 0.085);
   float hover = fill(ring - 0.004) * uHover.z;
 
-  vec4 col = vec4(uInk, 0.0);
-  col = over(col, uInk, lines * fade * uAlpha.x);
+  // The robot camera sees a solid floor with stronger markings.
+  float feed = 1.0 - uAlpha.w;
+  vec4 col = vec4(uInk, 0.14 * fade * feed);
+  col = over(col, uInk, lines * fade * uAlpha.x * (1.0 + feed * 3.0));
   col = over(col, uTape, tape * fade * uAlpha.y);
   col = over(col, vec3(0.0), shade * uAlpha.z);
-  col = over(col, uAccent, hover * fade);
+  col = over(col, uAccent, hover * fade * uAlpha.w);
   gl_FragColor = col;
   #include <colorspace_fragment>
 }`;
@@ -116,12 +112,19 @@ const LIGHTING = {
 };
 
 export function createStage(renderer, scene, { mobile, home }) {
-  const pmrem = new PMREMGenerator(renderer);
-  const room = new RoomEnvironment();
-  const envTarget = pmrem.fromScene(room, 0.04);
-  scene.environment = envTarget.texture;
-  room.dispose();
-  pmrem.dispose();
+  let envTarget = null;
+
+  // Soft studio reflections, baked once (and again after a context restore).
+  function bake() {
+    envTarget?.dispose();
+    const pmrem = new PMREMGenerator(renderer);
+    const room = new RoomEnvironment();
+    envTarget = pmrem.fromScene(room, 0.04);
+    scene.environment = envTarget.texture;
+    room.dispose();
+    pmrem.dispose();
+  }
+  bake();
 
   const hemi = new HemisphereLight(0xffffff, 0x808080, 1);
   const key = new DirectionalLight(0xfffaf2, 2.6);
@@ -133,6 +136,7 @@ export function createStage(renderer, scene, { mobile, home }) {
   key.shadow.bias = -0.0004;
   key.shadow.normalBias = 0.012;
   key.shadow.radius = mobile ? 3 : 4;
+  key.shadow.camera.layers.enable(1);
   const rim = new DirectionalLight(0xffffff, 1);
   rim.position.set(2.6, 2.4, -3.2);
   scene.add(hemi, key, key.target, rim);
@@ -172,6 +176,7 @@ export function createStage(renderer, scene, { mobile, home }) {
 
   return {
     uniforms,
+    bake,
 
     setPalette(palette) {
       const L = LIGHTING[palette.theme];
@@ -197,10 +202,10 @@ export function createStage(renderer, scene, { mobile, home }) {
       uniforms.uHover.value.copy(hover);
     },
 
-    /** Canvas size, and whether to fade the floor out at the canvas edges. */
-    setView(width, height, edgeFade) {
+    /** Canvas size in px, and main view (edge fade, reticle) or robot camera. */
+    setView(width, height, main) {
       uniforms.uView.value.set(width, height);
-      uniforms.uAlpha.value.w = edgeFade ? 1 : 0;
+      uniforms.uAlpha.value.w = main ? 1 : 0;
     },
 
     dispose() {

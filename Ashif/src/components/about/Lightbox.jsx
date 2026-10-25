@@ -68,7 +68,7 @@ export default function Lightbox({ photos, view, onNavigate, onClose }) {
       aria-label="Photos"
       onClose={() => onClose(index)}
       onKeyDown={handleKeyDown}
-      className="fixed inset-0 m-0 size-full max-h-none max-w-none overflow-hidden border-0 bg-bg/95 p-0 text-fg opacity-0 transition-[opacity,display,overlay] duration-200 ease-out transition-discrete backdrop:bg-transparent open:opacity-100 starting:open:opacity-0"
+      className="fixed inset-0 m-0 size-full max-h-none max-w-none overflow-hidden border-0 bg-bg p-0 text-fg opacity-0 transition-[opacity,display,overlay] duration-200 ease-out transition-discrete backdrop:bg-transparent open:opacity-100 starting:open:opacity-0"
     >
       {photo ? (
         <div className="flex size-full flex-col px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-[max(1.5rem,env(safe-area-inset-left),env(safe-area-inset-right))]">

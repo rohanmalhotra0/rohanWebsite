@@ -13,6 +13,9 @@ const EDGE_PX = 16;
 export default function useStickToBottom(scrollRef, contentRef, active) {
   const stickRef = useRef(true);
   const activeRef = useRef(active);
+  // Where revealReply put the view; its own scroll event must not re-stick.
+  const placedAtRef = useRef(null);
+
   // Updated before ResizeObserver callbacks run for the same commit.
   useLayoutEffect(() => {
     activeRef.current = active;
@@ -26,9 +29,13 @@ export default function useStickToBottom(scrollRef, contentRef, active) {
     let lastTop = scroller.scrollTop;
     const onScroll = () => {
       const top = scroller.scrollTop;
-      const distance = scroller.scrollHeight - top - scroller.clientHeight;
-      if (distance <= NEAR_BOTTOM_PX) stickRef.current = true;
-      else if (top < lastTop) stickRef.current = false;
+      const placedAt = placedAtRef.current;
+      placedAtRef.current = null;
+      if (placedAt === null || Math.abs(top - placedAt) > 1) {
+        const distance = scroller.scrollHeight - top - scroller.clientHeight;
+        if (distance <= NEAR_BOTTOM_PX) stickRef.current = true;
+        else if (top < lastTop) stickRef.current = false;
+      }
       lastTop = top;
     };
 
@@ -55,8 +62,9 @@ export default function useStickToBottom(scrollRef, contentRef, active) {
   }, [scrollRef]);
 
   /**
-   * Show a new reply: all of it when it fits; otherwise from its top (with
-   * the question above it, if that is short), so it reads from the start.
+   * Show a new reply: all of it when it fits. A reply taller than the view is
+   * shown from its top instead (with the question above it, if that is
+   * short), so it reads from the start rather than the end.
    */
   const revealReply = useCallback(
     (reply) => {
@@ -65,19 +73,18 @@ export default function useStickToBottom(scrollRef, contentRef, active) {
 
       const viewTop = scroller.getBoundingClientRect().top - scroller.scrollTop;
       const topOf = (element) => element.getBoundingClientRect().top - viewTop;
-      const question = reply.previousElementSibling;
-      let target = topOf(reply) - EDGE_PX;
-      if (question && target - topOf(question) < scroller.clientHeight / 3) {
-        target = topOf(question) - EDGE_PX;
+      const bottom = scroller.scrollHeight - scroller.clientHeight;
+      const replyTop = topOf(reply);
+      if (replyTop - EDGE_PX >= bottom) {
+        scroller.scrollTop = bottom;
+        return;
       }
 
-      const bottom = scroller.scrollHeight - scroller.clientHeight;
-      if (target >= bottom) {
-        scroller.scrollTop = bottom;
-      } else {
-        scroller.scrollTop = Math.max(0, target);
-        stickRef.current = false;
-      }
+      const question = reply.previousElementSibling;
+      const withQuestion = question && replyTop - topOf(question) < scroller.clientHeight / 3;
+      scroller.scrollTop = Math.max(0, (withQuestion ? topOf(question) : replyTop) - EDGE_PX);
+      placedAtRef.current = scroller.scrollTop;
+      stickRef.current = false;
     },
     [scrollRef]
   );
