@@ -17,6 +17,8 @@ const TURN_ACCEL = 5;
 const STANCE_X = DIMS.hipX + DIMS.legOffset;
 const SHOULDER = new Vector3(DIMS.armBase.x, DIMS.armBase.y + DIMS.shoulder, DIMS.armBase.z);
 const JOINTS = ['sh', 'el', 'wr'];
+// Arm folded flat along the back with the gripper resting over the nose.
+const STOW = { yaw: 0, sh: Math.PI + 0.06, el: -(Math.PI - 0.24), wr: -0.4 };
 
 /** Drives the rig: locomotion, gait, body pose, leg IK and the arm. */
 export function createController({ root, body, legs, arm }) {
@@ -49,7 +51,7 @@ export function createController({ root, body, legs, arm }) {
 
   const gaze = { target: new Vector3(), pos: new Vector3(), vel: new Vector3(), omega: 5 };
   const armCtl = {
-    mode: 'gaze',
+    mode: 'stow',
     wrist: new Vector3(),
     dir: new Vector3(0, -1, 0),
     align: null,
@@ -149,8 +151,8 @@ export function createController({ root, body, legs, arm }) {
     const gx = gaze.pos.x - s.x;
     const gz = gaze.pos.z - s.z;
     const bearing = wrap(Math.atan2(gx, gz) - s.yaw);
-    s.twist = damp(s.twist, clamp(bearing * 0.2, -0.12, 0.12) * s.look * still, 3, dt);
-    s.nod = damp(s.nod, clamp((0.45 - gaze.pos.y) * 0.07, -0.03, 0.05) * s.look, 3, dt);
+    s.twist = damp(s.twist, clamp(bearing * 0.32, -0.2, 0.2) * s.look * still, 3, dt);
+    s.nod = damp(s.nod, clamp((0.45 - gaze.pos.y) * 0.1, -0.05, 0.08) * s.look, 3, dt);
 
     const swayX = (0.011 * Math.sin(t * 0.47) + 0.005 * Math.sin(t * 1.21 + 1.3)) * still;
     const swayZ = 0.006 * Math.sin(t * 0.63 + 0.4) * still;
@@ -168,7 +170,8 @@ export function createController({ root, body, legs, arm }) {
       s.twist,
       -clamp(0.09 * s.vf * s.w, -0.06, 0.06) +
         0.012 * s.gaitMix * Math.sin(ph - SWING * Math.PI) -
-        swayX * 0.5
+        swayX * 0.5 -
+        s.twist * 0.25
     );
   }
 
@@ -197,8 +200,8 @@ export function createController({ root, body, legs, arm }) {
   function aimGaze(out) {
     v.copy(gaze.pos).applyMatrix4(inv);
     const yaw = clamp(Math.atan2(v.x - SHOULDER.x, v.z - SHOULDER.z), -1.35, 1.35);
-    const reach = 0.15;
-    const up = 0.12 + armCtl.neck;
+    const reach = 0.28;
+    const up = 0.15 + armCtl.neck;
     const sy = Math.sin(yaw);
     const cy = Math.cos(yaw);
     const ahead = (v.x - SHOULDER.x - sy * reach) * sy + (v.z - SHOULDER.z - cy * reach) * cy;
@@ -217,10 +220,11 @@ export function createController({ root, body, legs, arm }) {
     pose(out, yaw, Math.hypot(dx, dz), v.y - SHOULDER.y, pitch);
   }
 
-  function updateArm(dt) {
+  /** Joint targets for the current arm mode; returns the jaw opening. */
+  function armTargets() {
     qt.roll = 0;
-    let grip = armCtl.grip;
-    if (armCtl.mode === 'gaze') aimGaze(qt);
+    if (armCtl.mode === 'stow') Object.assign(qt, STOW);
+    else if (armCtl.mode === 'gaze') aimGaze(qt);
     else if (armCtl.mode === 'reach') aimWrist(qt);
     else if (armCtl.mode === 'carry') pose(qt, 0, 0.27, 0.1, -0.78);
     else {
@@ -230,9 +234,13 @@ export function createController({ root, body, legs, arm }) {
       const face = clamp(Math.atan2(v.x - SHOULDER.x, v.z - SHOULDER.z), -1.2, 1.2);
       pose(qt, face + 0.36 * Math.sin(k * 8.5), 0.13, 0.5, 0.45);
       qt.roll = 0.45 * Math.sin(k * 8.5 + 0.9);
-      grip = 0.22 + 0.22 * Math.sin(k * 15);
+      return 0.22 + 0.22 * Math.sin(k * 15);
     }
+    return armCtl.grip;
+  }
 
+  function updateArm(dt) {
+    const grip = armTargets();
     const rate = armCtl.rate;
     q.yaw = dampAngle(q.yaw, qt.yaw, rate, dt);
     for (const j of JOINTS) q[j] = damp(q[j], qt[j], rate, dt);
@@ -335,8 +343,8 @@ export function createController({ root, body, legs, arm }) {
       for (let i = 0; i < 60; i++) updateBody(0.1);
       body.updateWorldMatrix(true, false);
       inv.copy(body.matrixWorld).invert();
-      aimGaze(qt);
-      Object.assign(q, qt, { roll: 0, grip: armCtl.grip });
+      const grip = armTargets();
+      Object.assign(q, qt, { grip });
       apply(0);
     },
 

@@ -102,6 +102,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
     switch (state) {
       case 'idle':
         s.look = 1;
+        arm.mode = 'stow';
         if (pointer.on) {
           gaze.target.copy(pointer.at);
           gaze.omega = 6;
@@ -218,6 +219,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
       case 'trick':
         ctl.stop();
         s.look = 0.4;
+        arm.mode = 'stow';
         sit = time < 2.35 ? 1 : 0;
         gaze.target.copy(viewer());
         gaze.omega = 6;
