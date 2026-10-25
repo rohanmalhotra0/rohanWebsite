@@ -25,6 +25,7 @@ import {
   categoryOptions,
   EASE,
   matchesQuery,
+  caseStudyPath,
   projectHash,
   projectMeta,
 } from './projectData';
@@ -92,10 +93,12 @@ const ArchiveRow = memo(function ArchiveRow({
         {/* Links to the project's deep link; its ::after covers the row, so the
             whole row opens the viewer (a modified click opens a new tab). */}
         <a
-          href={projectHash(project.slug)}
-          aria-haspopup="dialog"
+          href={caseStudyPath(project) ?? projectHash(project.slug)}
+          aria-haspopup={project.caseStudy ? undefined : 'dialog'}
           data-project-trigger={`row:${project.slug}`}
           onClick={(event) => {
+            // A case study is a plain page link, which the router handles.
+            if (project.caseStudy) return;
             if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             event.preventDefault();
             onOpen(project.slug, event.currentTarget);

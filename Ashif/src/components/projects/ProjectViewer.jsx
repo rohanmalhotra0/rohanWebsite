@@ -10,6 +10,7 @@ import {
   focalPoint,
   imageSize,
   mediaLayoutId,
+  caseStudyPath,
   projectLinks,
   projectMeta,
 } from './projectData';
@@ -155,6 +156,7 @@ function Slide({ project, viewer, titleId, reduceMotion }) {
   const first = viewer.step === 0;
   const custom = { first, dir: viewer.dir, reduce: reduceMotion };
   const links = projectLinks(project);
+  const study = caseStudyPath(project);
 
   return (
     <article className="col-start-1 row-start-1 grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8">
@@ -203,13 +205,18 @@ function Slide({ project, viewer, titleId, reduceMotion }) {
             </p>
           ) : null}
           <TechList items={project.tags} className="mt-6" />
-          {links.length ? (
+          {study || links.length ? (
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              {study ? (
+                <Button href={study} size="lg">
+                  Read the case study
+                </Button>
+              ) : null}
               {links.map((link) => (
                 <Button
                   key={link.kind}
                   href={link.href}
-                  variant={link.kind === 'live' ? 'primary' : 'secondary'}
+                  variant={link.kind === 'live' && !study ? 'primary' : 'secondary'}
                   size="lg"
                 >
                   {link.label}

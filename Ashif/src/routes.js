@@ -2,6 +2,7 @@
 // file at build time (scripts/prerender.mjs). Each page's code is a separate
 // chunk that loads when a visitor is about to need it (see lib/router.js),
 // except the home page's, which is in the main chunk (see main.jsx).
+import { caseStudyPath } from '@/components/projects/projectData';
 import { projects } from '@/data/portfolioData';
 
 // One lazy loader per file in ./pages, keyed by './pages/<Name>.jsx'. Not the
@@ -102,6 +103,20 @@ export const routes = [
     chrome: false,
   },
 ];
+
+// A project with a case study gets a page of its own under /projects/
+// (no `label`, so it isn't in the navbar; `parent` marks Projects instead).
+for (const project of projects.filter((p) => p.caseStudy)) {
+  routes.push({
+    id: `case-${project.slug}`,
+    path: caseStudyPath(project),
+    page: 'CaseStudyPage',
+    parent: 'projects',
+    project: project.slug,
+    title: `${project.title} — Rohan Malhotra`,
+    description: project.description,
+  });
+}
 
 /** Shown for any other path (and written to 404.html for GitHub Pages). */
 export const notFoundRoute = {
