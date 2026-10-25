@@ -20,7 +20,8 @@
     </style>
   </head>
   <body>
-    <div id="host"></div>
+    <!-- In the hero's lab panel, as on the page (palettes.css). -->
+    <div class="hero-lab"><div id="host"></div></div>
     <script type="module">
       import '/src/index.css';
       import { createRobotScene } from '/src/components/hero/scene/createRobotScene.js';
@@ -33,7 +34,9 @@
         const context = out.getContext('2d');
         context.imageSmoothingQuality = 'high';
         context.drawImage(canvas, 0, 0, size, size);
-        return out.toDataURL('image/webp', 0.86);
+        // 0.75 looks the same as 0.86 here and saves ~15%: the still is the
+        // home page's largest paint on phones.
+        return out.toDataURL('image/webp', 0.75);
       };
 
       /** { full, small }: WebP data URLs at 1600 and 800 px for one palette and theme. */
@@ -43,7 +46,7 @@
         html.dataset.theme = theme;
         const host = document.getElementById('host');
         host.replaceChildren();
-        const scene = createRobotScene({ host, palette: readPalette(), poster: true });
+        const scene = createRobotScene({ host, palette: readPalette(host), poster: true });
         await scene.ready;
         const image = new Image();
         image.src = scene.capture('image/png');

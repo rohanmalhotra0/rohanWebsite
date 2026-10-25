@@ -871,7 +871,7 @@ export function createRobotScene({
 
   // Follow the theme and palette attributes directly, so the canvas recolours
   // in the same frame as the page (including inside the view transition).
-  const themeObserver = new MutationObserver(() => setPalette(readPalette()));
+  const themeObserver = new MutationObserver(() => setPalette(readPalette(host)));
   if (!poster) {
     themeObserver.observe(document.documentElement, {
       attributes: true,
