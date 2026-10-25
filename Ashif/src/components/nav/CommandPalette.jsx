@@ -401,7 +401,7 @@ function Option({ id, entry, active, copied, onHover, onSelect }) {
         )}
       </span>
       {meta ? (
-        <span className={cn('shrink-0 text-xs tabular-nums', copied ? 'text-fg' : 'text-subtle')}>
+        <span className={cn('shrink-0 text-xs', copied ? 'text-fg' : 'text-subtle')}>
           {meta}
         </span>
       ) : null}

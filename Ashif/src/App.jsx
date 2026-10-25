@@ -15,6 +15,18 @@ const ResumeView = lazy(() => import('./components/resume/ResumeView'));
 
 const RESUME_HASH = '#/resume';
 
+/** Focus an element by id as soon as it exists (waits up to ~2s of frames). */
+function focusWhenReady(id, framesLeft = 120) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.focus({ preventScroll: true });
+    return;
+  }
+  if (framesLeft > 0) {
+    requestAnimationFrame(() => focusWhenReady(id, framesLeft - 1));
+  }
+}
+
 function useResumeRoute() {
   const [isResume, setIsResume] = useState(
     () => window.location.hash === RESUME_HASH
@@ -26,7 +38,12 @@ function useResumeRoute() {
       const next = window.location.hash === RESUME_HASH;
       setIsResume(next);
       // Only reset scroll when switching views; in-page anchors also fire hashchange.
-      if (wasResume.current !== next) window.scrollTo({ top: 0 });
+      if (wasResume.current !== next) {
+        window.scrollTo({ top: 0 });
+        // Move keyboard and screen-reader focus into the résumé once its lazy
+        // chunk has rendered, so the view change is announced.
+        if (next) focusWhenReady('resume-content');
+      }
       wasResume.current = next;
     };
     window.addEventListener('hashchange', onHashChange);

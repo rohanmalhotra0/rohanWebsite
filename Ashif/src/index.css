@@ -165,6 +165,13 @@
   }
 }
 
+/* Mona Sans' tabular figures use a slashed zero and a serifed one that read
+   as code. Keep its default figures for sans text; mono stays tabular. This
+   rule is unlayered, so it wins over Tailwind's tabular-nums utility. */
+.tabular-nums:not(.font-mono) {
+  font-variant-numeric: normal;
+}
+
 /* Circular theme-switch reveal (see ThemeProvider). */
 ::view-transition-old(root),
 ::view-transition-new(root) {
