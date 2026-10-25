@@ -66,7 +66,7 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
         <div ref={contentRef} className="flex min-h-full flex-col justify-end p-4 sm:px-5 sm:py-5">
           <Greeting>{GREETING}</Greeting>
           {hasMessages ? null : (
-            <SuggestionList onAsk={onAsk} compact className="ml-10 mt-3 lg:hidden" />
+            <SuggestionList onAsk={onAsk} compact className="mt-3 lg:hidden" />
           )}
           <div
             role="log"
