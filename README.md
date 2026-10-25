@@ -113,12 +113,13 @@ colors near the top of `palettes.css`; then render its posters.
 ## Link previews
 
 Each page's `og:image` is its own 1200×630 card in `Ashif/public/og/`: the
-hero for Home (also used by the résumé and 404), and each page's color
-block, or the camera drawing for the Spot case study. `npm run og` draws
-them with Playwright from the site's own CSS and components
-(`Ashif/scripts/og/`), in the Spot palette, and `scripts/prerender.mjs`
-points each page at its card (`ogCard` in `Ashif/src/routes.js`). Re-run it
-after changing a page's name, tagline or block, or the hero; the build warns
+hero for Home (also used by the résumé and 404), each page's color block,
+the Kelly curve for Research, the lab for Hedge your paycheck, and the
+camera drawing for the Spot case study. `npm run og` draws them with
+Playwright from the site's own CSS and components (`Ashif/scripts/og/`), in
+the Spot palette, and `scripts/prerender.mjs` points each page at its card
+(`ogCard` in `Ashif/src/routes.js`). Re-run it after changing a page's name,
+tagline or block, the hero, or a lab's model or defaults; the build warns
 about a page whose card is missing and gives it the home page's.
 
 ## Editing content
