@@ -116,7 +116,7 @@
 .rv-name {
   grid-area: 1 / 1;
   color: var(--paper-ink);
-  font-size: 34px;
+  font-size: 37px;
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -167,7 +167,7 @@
 }
 
 .rv-section-body > * + * {
-  margin-top: 9px;
+  margin-top: 11px;
 }
 
 /* ---------- Entries ---------- */

@@ -91,9 +91,11 @@ function PaperLink({ href, title, children }) {
 }
 
 const FRAME = 'block overflow-hidden rounded-lg border border-line bg-surface';
-// White paper is dimmed a touch in dark mode so it doesn't glare.
+// Both ratios are narrower than the wider page scans, so cover trims their side
+// margins (one has a capture border on its right edge). White paper is dimmed
+// a touch in dark mode so it doesn't glare.
 const PAGE =
-  'aspect-video w-full object-cover object-top md:aspect-[3/2] dark:brightness-[0.85]';
+  'aspect-[16/10] w-full object-cover object-top md:aspect-[3/2] dark:brightness-[0.85]';
 
 /** The first page of the paper. A mouse shortcut to the PDF; the text link is the accessible one. */
 function Thumbnail({ paper }) {
