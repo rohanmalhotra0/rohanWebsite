@@ -187,101 +187,105 @@ function Slide({ project, viewer, titleId, reduceMotion }) {
   );
 }
 
-function ViewerContent({ viewer, titleId, bodyRef, reduceMotion, onNavigate, onClose }) {
+function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, onClose }) {
   const { list, index, step } = viewer;
   const project = list[index];
   const count = list.length;
   const settle = reduceMotion || viewer.paired ? false : { y: 16 };
 
-  // Each new project starts at the top of the scrollable body.
+  // Each new project starts at the top (the dialog scrolls on small screens).
   useLayoutEffect(() => {
-    if (step > 0) bodyRef.current?.scrollTo({ top: 0 });
-  }, [step, bodyRef]);
+    if (step > 0) dialogRef.current?.scrollTo({ top: 0 });
+  }, [step, dialogRef]);
 
   return (
-    <div className="relative flex size-full items-stretch justify-center sm:items-center sm:p-6 lg:p-10">
+    <>
       <MotionDiv
         aria-hidden="true"
-        className="absolute inset-0 bg-bg/90"
+        className="fixed inset-0 bg-bg/90"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: FADE_IN }}
         exit={{ opacity: 0, transition: { duration: 0.25, ease: EASE } }}
-        onClick={() => onClose()}
       />
 
-      <MotionDiv
-        initial={settle}
-        animate={{ y: 0, transition: { duration: 0.4, ease: EASE } }}
-        exit={settle ? { y: 8, transition: FADE_OUT } : undefined}
-        className="relative flex h-full w-full flex-col pt-[env(safe-area-inset-top)] sm:max-h-[56rem] sm:max-w-2xl sm:pt-0 lg:h-auto lg:max-h-full lg:max-w-[84rem]"
+      {/* A click on the margin around the panel closes the viewer. */}
+      <div
+        className="relative flex min-h-full justify-center sm:items-center sm:p-6 lg:p-10"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) onClose();
+        }}
       >
         <MotionDiv
-          aria-hidden="true"
-          className="absolute inset-0 bg-surface sm:rounded-xl sm:border sm:border-line"
-          style={{ boxShadow: PANEL_SHADOW }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: FADE_IN }}
-          exit={{ opacity: 0, transition: FADE_OUT }}
-        />
-
-        <MotionDiv
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: FADE_IN }}
-          exit={{ opacity: 0, transition: { duration: 0.12 } }}
-          className="relative flex h-14 shrink-0 items-center gap-4 border-b border-line pl-4 pr-1.5 sm:pl-6 sm:pr-2"
+          initial={settle}
+          animate={{ y: 0, transition: { duration: 0.4, ease: EASE } }}
+          exit={settle ? { y: 8, transition: FADE_OUT } : undefined}
+          className="relative flex w-full flex-col sm:max-w-2xl lg:max-w-[84rem]"
         >
-          <p className="text-sm tabular-nums text-subtle">
-            {index + 1} of {count}
-          </p>
-          {count > 1 ? (
-            <p
-              aria-hidden="true"
-              className="hidden items-center gap-1 [@media(hover:hover)_and_(pointer:fine)]:flex"
-            >
-              <Kbd>&larr;</Kbd>
-              <Kbd>&rarr;</Kbd>
+          <MotionDiv
+            aria-hidden="true"
+            className="absolute inset-0 bg-surface sm:rounded-xl sm:border sm:border-line"
+            style={{ boxShadow: PANEL_SHADOW }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: FADE_IN }}
+            exit={{ opacity: 0, transition: FADE_OUT }}
+          />
+
+          {/* Sticky so Close stays in reach while a long project scrolls on phones. */}
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: FADE_IN }}
+            exit={{ opacity: 0, transition: { duration: 0.12 } }}
+            className="sticky top-0 z-10 box-content flex h-14 shrink-0 items-center gap-4 border-b border-line bg-surface pl-4 pr-1.5 pt-[env(safe-area-inset-top)] sm:mx-px sm:mt-px sm:rounded-t-[11px] sm:pl-6 sm:pr-2"
+          >
+            <p className="text-sm tabular-nums text-subtle">
+              {index + 1} of {count}
             </p>
-          ) : null}
-          <div className="ml-auto flex items-center">
             {count > 1 ? (
-              <>
-                <IconButton label="Previous project" onClick={() => onNavigate(-1)}>
-                  <ArrowLeft aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
-                </IconButton>
-                <IconButton label="Next project" onClick={() => onNavigate(1)}>
-                  <ArrowRight aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
-                </IconButton>
-                <span aria-hidden="true" className="mx-1.5 h-5 w-px bg-line" />
-              </>
+              <p
+                aria-hidden="true"
+                className="hidden items-center gap-1 [@media(hover:hover)_and_(pointer:fine)]:flex"
+              >
+                <Kbd>&larr;</Kbd>
+                <Kbd>&rarr;</Kbd>
+              </p>
             ) : null}
-            <IconButton label="Close" onClick={() => onClose()}>
-              <X aria-hidden="true" className="size-5" strokeWidth={1.75} />
-            </IconButton>
+            <div className="ml-auto flex items-center">
+              {count > 1 ? (
+                <>
+                  <IconButton label="Previous project" onClick={() => onNavigate(-1)}>
+                    <ArrowLeft aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
+                  </IconButton>
+                  <IconButton label="Next project" onClick={() => onNavigate(1)}>
+                    <ArrowRight aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
+                  </IconButton>
+                  <span aria-hidden="true" className="mx-1.5 h-5 w-px bg-line" />
+                </>
+              ) : null}
+              <IconButton label="Close" onClick={() => onClose()}>
+                <X aria-hidden="true" className="size-5" strokeWidth={1.75} />
+              </IconButton>
+            </div>
+          </MotionDiv>
+
+          <p className="sr-only" aria-live="polite">
+            {step > 0 ? `${project.title}, ${index + 1} of ${count}` : ''}
+          </p>
+
+          {/* No scroll container in here: one would clip the image mid-flight. */}
+          <div className="relative">
+            <AnimatePresence mode="popLayout" custom={viewer.dir} propagate>
+              <Slide
+                key={project.slug}
+                project={project}
+                viewer={viewer}
+                titleId={titleId}
+                reduceMotion={reduceMotion}
+              />
+            </AnimatePresence>
           </div>
         </MotionDiv>
-
-        <p className="sr-only" aria-live="polite">
-          {step > 0 ? `${project.title}, ${index + 1} of ${count}` : ''}
-        </p>
-
-        {/* Takes focus on open, so arrow keys scroll it and Tab starts at the toolbar. */}
-        <div
-          ref={bodyRef}
-          tabIndex={-1}
-          className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain outline-none lg:overflow-visible"
-        >
-          <AnimatePresence mode="popLayout" custom={viewer.dir} propagate>
-            <Slide
-              key={project.slug}
-              project={project}
-              viewer={viewer}
-              titleId={titleId}
-              reduceMotion={reduceMotion}
-            />
-          </AnimatePresence>
-        </div>
-      </MotionDiv>
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -293,17 +297,17 @@ function ViewerContent({ viewer, titleId, bodyRef, reduceMotion, onNavigate, onC
  */
 export default function ProjectViewer({ viewer, open, onNavigate, onClose, onExited, returnFocusRef }) {
   const dialogRef = useRef(null);
-  const bodyRef = useRef(null);
   const titleId = useId();
   const reduceMotion = useReducedMotion();
 
   // Opened in a layout effect so the dialog is on screen before Motion
-  // measures the image it is about to fly in.
+  // measures the image it is about to fly in. The dialog itself takes focus,
+  // so arrow keys scroll it and Tab starts at the toolbar.
   useLayoutEffect(() => {
     if (!open) return undefined;
     const dialog = dialogRef.current;
     if (!dialog.open) dialog.showModal();
-    bodyRef.current?.focus({ preventScroll: true });
+    dialog.focus({ preventScroll: true });
     const unlock = lockScroll();
     return () => {
       unlock();
@@ -344,7 +348,8 @@ export default function ProjectViewer({ viewer, open, onNavigate, onClose, onExi
         if (viewer) onClose();
       }}
       onKeyDown={onKeyDown}
-      className="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 bg-transparent p-0 text-fg backdrop:bg-transparent"
+      tabIndex={-1}
+      className="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain border-0 bg-transparent p-0 text-fg outline-none backdrop:bg-transparent"
     >
       <AnimatePresence onExitComplete={onExited}>
         {viewer ? (
@@ -352,7 +357,7 @@ export default function ProjectViewer({ viewer, open, onNavigate, onClose, onExi
             key="viewer"
             viewer={viewer}
             titleId={titleId}
-            bodyRef={bodyRef}
+            dialogRef={dialogRef}
             reduceMotion={reduceMotion}
             onNavigate={onNavigate}
             onClose={onClose}
