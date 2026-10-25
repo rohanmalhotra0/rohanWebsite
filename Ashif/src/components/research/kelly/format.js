@@ -34,7 +34,9 @@ export function multiple(x) {
   if (x < 1_000_000) return `×${Math.round(x / 1000)}k`;
   if (x < 1e9) return `×${(x / 1e6).toFixed(1)}M`;
   if (x < 1e12) return `×${(x / 1e9).toFixed(1)}B`;
-  return `×${(x / 1e12).toFixed(1)}T`;
+  if (x < 1e15) return `×${(x / 1e12).toFixed(1)}T`;
+  // Huge edges at extreme prices compound past anything readable.
+  return '×1,000T+';
 }
 
 /** An axis label for a power of ten: ×0.01, ×1, ×100, ×10k, ×1M, ×1B. */
