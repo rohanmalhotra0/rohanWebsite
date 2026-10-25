@@ -184,23 +184,23 @@ export function createController({ root, body, legs, arm }) {
     const groove = Math.sin(beat) * d;
     const dip = Math.sin(beat) ** 2 * d;
     body.position.set(
-      swayX + 0.03 * groove,
+      swayX + 0.04 * groove,
       DIMS.height -
         0.07 * s.crouch -
         0.055 * s.sit -
-        0.035 * dip +
+        0.045 * dip +
         0.006 * s.gaitMix * Math.cos(2 * ph - SWING * Math.PI * 2) +
         0.0035 * Math.sin(t * 1.6) * still,
       swayZ - 0.05 * s.sit
     );
     body.rotation.set(
       0.1 * s.crouch - 0.25 * s.sit - clamp(0.035 * s.accel, -0.04, 0.04) + s.nod + 0.05 * Math.sin(2 * beat) * d,
-      s.twist + 0.12 * Math.sin(beat - Math.PI / 2) * d,
+      s.twist + 0.16 * Math.sin(beat - Math.PI / 2) * d,
       -clamp(0.09 * s.vf * s.w, -0.06, 0.06) +
         0.012 * s.gaitMix * Math.sin(ph - SWING * Math.PI) -
         swayX * 0.5 -
         s.twist * 0.25 -
-        0.09 * groove
+        0.12 * groove
     );
   }
 
@@ -258,10 +258,11 @@ export function createController({ root, body, legs, arm }) {
     else if (armCtl.mode === 'reach') aimWrist(qt);
     else if (armCtl.mode === 'carry') pose(qt, 0, 0.24, 0.12, -0.74);
     else if (armCtl.mode === 'dance') {
-      // Toy held up high, swung side to side on the beat and wiggled twice as fast.
+      // Toy held up at head height, swung side to side on the beat and
+      // wiggled twice as fast.
       const b = (armCtl.clock / BEAT) * Math.PI;
-      pose(qt, 0.38 * Math.sin(b), 0.2, 0.4 + 0.05 * Math.sin(2 * b), 0.45 + 0.22 * Math.sin(2 * b + 0.8));
-      qt.roll = 0.55 * Math.sin(2 * b + 0.3);
+      pose(qt, 0.55 * Math.sin(b), 0.3, 0.26 + 0.06 * Math.sin(2 * b), 0.25 + 0.3 * Math.sin(2 * b + 0.8));
+      qt.roll = 0.6 * Math.sin(2 * b + 0.3);
     } else {
       // Wave: arm up toward the gaze target, gripper swinging and snapping.
       const k = armCtl.clock;

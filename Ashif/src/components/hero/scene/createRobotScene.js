@@ -17,21 +17,27 @@ import {
 import { buildRobot, createMaterials } from './model';
 import { createController } from './robot';
 import { createBrain, STATUS } from './brain';
-import { boneGeometry, createToy, TOY_REST } from './toy';
+import { boneGeometry, createToy, DRAG_LIFT, TOY_REST } from './toy';
 import { createStage } from './stage';
 import { createFeed } from './feed';
-import { approach, clamp, damp, smooth } from './math';
+import { approach, clamp, damp, lerp, smooth } from './math';
 import { readPalette } from '../palette';
 
 const HOME = { x: 0, z: 0, yaw: -0.62 };
-const TARGET = new Vector3(0, 0.24, 0.02);
-// Camera framing: a 3/4 view of a square reference frame (the poster). Wide
-// stages crop its top and bottom by up to `crop`, narrow ones fit its width;
-// the poster is sized in CSS with the same rule (see RobotStage).
-export const VIEW = { az: 0.08, el: 0.32, dist: 3.85, fov: 27, crop: 0.72 };
-const BOUNDS = { minX: -1.7, maxX: 1.7, minZ: -1.25, maxZ: 1.4 };
-// Where the gripper camera looks on frame one (and in the poster).
+// The taped play field (metres): toys land, roll and are dragged inside it.
+// Deep rather than wide, so all of it fits the frame with the robot large.
+const FIELD = { minX: -0.9, maxX: 0.9, minZ: -1.5, maxZ: 0.75 };
+const MARGIN = 0.1;
+const TARGET = new Vector3(0, 0.14, 0.05);
+// Camera framing: a 3/4 view of a square reference frame (the poster) that
+// holds the whole field. Wide stages crop its top and bottom by up to
+// `crop`, narrow ones fit its width; the poster is sized in CSS with the
+// same rule (see RobotStage).
+export const VIEW = { az: 0.03, el: 0.33, dist: 6.6, fov: 20, crop: 0.72 };
+// Where the gripper camera looks on frame one (and in the poster), and the
+// toy lying on the floor before anyone throws one.
 const FIRST_LOOK = new Vector3(-0.95, 0.1, 1.15);
+const FIRST_TOY = { x: -0.5, z: 0.5, heading: 0.45 };
 const ROBOT_BOX = new Box3(new Vector3(-0.26, 0, -0.52), new Vector3(0.26, 0.9, 0.66));
 const UP = new Vector3(0, 1, 0);
 
@@ -44,7 +50,8 @@ const QUALITY = [
 ];
 
 // The camera inset shows only while there is something to watch: from a
-// throw until a moment after the toy is back on the floor.
+// throw or drag until a moment after the toy is back on the floor. It sits
+// out the dance, when the camera points at the sky.
 const WATCH = new Set(['track', 'approach', 'reach', 'lift', 'return', 'present']);
 const LINGER = 2.2;
 const FEED_FADE = 0.3; // seconds; matches the frame's CSS opacity transition
@@ -107,6 +114,7 @@ export function createRobotScene({
   const toys = [createToy(toyGeometry, toyMaterial), createToy(toyGeometry, toyMaterial)];
   for (const t of toys) scene.add(t.mesh);
   const feed = poster ? null : createFeed(renderer);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   // Built during boot.
   let rig = null;
@@ -234,18 +242,18 @@ export function createRobotScene({
   const hoverGoal = new Vector3();
   let hoverAlpha = 0;
 
-  const inBounds = (p) => p.x > BOUNDS.minX && p.x < BOUNDS.maxX && p.z > BOUNDS.minZ && p.z < BOUNDS.maxZ;
+  const inField = (p, m = MARGIN) =>
+    p.x > FIELD.minX + m && p.x < FIELD.maxX - m && p.z > FIELD.minZ + m && p.z < FIELD.maxZ - m;
 
-  // A throw target must keep the robot readable: not too close to the
-  // camera, inside the canvas margins, above the overlays and (on desktop)
-  // clear of the name.
+  // A throw target must be on the field, inside the canvas, clear of the
+  // overlays and (on desktop) clear of the name.
   function onScreen(p) {
-    if (p.z > HOME.z + 0.95) return false;
+    if (!inField(p)) return false;
     probe.copy(p).project(camera);
     const x = (probe.x * 0.5 + 0.5) * width;
     const y = (0.5 - probe.y * 0.5) * height;
-    const left = window.innerWidth >= 1024 ? 0.24 : 0.08;
-    if (x < width * left || x > width * 0.92 || y < height * 0.14 || y > height * 0.76) return false;
+    const left = window.innerWidth >= 1024 ? 0.14 : 0.03;
+    if (x < width * left || x > width * 0.97 || y < height * 0.05 || y > height * 0.95) return false;
     const c = canvas.getBoundingClientRect();
     for (const key of ['frame', 'controls']) {
       const r = el(key)?.getBoundingClientRect();
@@ -264,9 +272,10 @@ export function createRobotScene({
 
   const hitsRobot = () => nearRobot(raycaster.ray) && raycaster.intersectObject(rig.root, true).length > 0;
 
-  /** Keep a throw on the visible floor and off the robot's footprint. */
-  function clampTarget(p) {
-    p.set(clamp(p.x, BOUNDS.minX + 0.12, BOUNDS.maxX - 0.12), 0, clamp(p.z, BOUNDS.minZ + 0.12, BOUNDS.maxZ - 0.12));
+  /** Keep a spot on the field and off the robot's footprint. */
+  function clampToField(p) {
+    const m = MARGIN + 0.02;
+    p.set(clamp(p.x, FIELD.minX + m, FIELD.maxX - m), 0, clamp(p.z, FIELD.minZ + m, FIELD.maxZ - m));
     const s = ctl.state;
     const c = Math.cos(s.yaw);
     const sn = Math.sin(s.yaw);
@@ -279,13 +288,34 @@ export function createRobotScene({
       else lz = Math.sign(lz || 1) * 0.72;
       p.set(s.x + lx * c + lz * sn, 0, s.z - lx * sn + lz * c);
     }
+    return p;
+  }
+
+  /** A throw also has to stay readable: pull it toward home until it is. */
+  function clampTarget(p) {
+    clampToField(p);
     for (let i = 0; i < 14 && !onScreen(p); i++) p.lerp(homeVec, 0.15);
     return p;
   }
 
+  // Throws come from the viewer's side and out of frame, so the toy flies in.
+  const launch = new Vector3();
+  function launchFrom(p) {
+    for (let k = 0.3; k < 0.95; k += 0.05) {
+      launch.lerpVectors(p, camera.position, k);
+      launch.y = 0.25 + k * 0.6;
+      probe.copy(launch).project(camera);
+      if (probe.y < -1.1 || Math.abs(probe.x) > 1.1) break;
+    }
+    return launch;
+  }
+
   function throwTo(p) {
     if (!ready) return;
-    brain.throwTo(clampTarget(p));
+    endDrag(false);
+    clampTarget(p);
+    const from = launchFrom(p);
+    brain.throwTo(p, from, clamp(0.45 + from.distanceTo(p) * 0.12, 0.7, 1.1));
     onInteract?.();
     if (!running && !lost) frame(0);
   }
@@ -294,13 +324,81 @@ export function createRobotScene({
     if (!ready) return;
     const s = ctl.state;
     const p = new Vector3();
-    for (let i = 0; i < 30; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const r = 0.7 + Math.random() * 0.8;
-      p.set(HOME.x + Math.sin(a) * r * 1.3, 0, HOME.z + Math.cos(a) * r);
-      if (inBounds(p) && onScreen(p) && Math.hypot(p.x - s.x, p.z - s.z) > 0.85) break;
+    for (let i = 0; i < 40; i++) {
+      p.set(lerp(FIELD.minX, FIELD.maxX, Math.random()), 0, lerp(FIELD.minZ, FIELD.maxZ, Math.random()));
+      if (onScreen(p) && Math.hypot(p.x - s.x, p.z - s.z) > 0.85) break;
     }
     throwTo(p);
+  }
+
+  // Dragging the toy ---------------------------------------------------------
+  // A small handle element follows the toy on screen. It alone has
+  // touch-action: none, so a finger that lands on the toy drags it while a
+  // swipe anywhere else still scrolls the page.
+
+  const dragPlane = new Plane(UP, -(TOY_REST + DRAG_LIFT));
+  let dragId = null;
+  let handleShown = false;
+  let handleX = -1;
+  let handleY = -1;
+
+  function onHandleDown(e) {
+    if (e.button !== 0 || !ready || dragId !== null || !brain.grab()) return;
+    const handle = e.currentTarget;
+    handle.setPointerCapture(e.pointerId);
+    handle.style.cursor = 'grabbing';
+    dragId = e.pointerId;
+    onInteract?.();
+    if (!running && !lost) frame(0);
+  }
+
+  function onHandleMove(e) {
+    if (e.pointerId !== dragId) return;
+    const toy = brain.toy;
+    if (toy?.state !== 'dragged') {
+      endDrag(false);
+      return;
+    }
+    setNdc(e.clientX, e.clientY);
+    if (raycaster.ray.intersectPlane(dragPlane, hit)) toy.goal.copy(clampToField(hit));
+  }
+
+  function onHandleUp(e) {
+    if (e.pointerId === dragId) endDrag(true);
+  }
+
+  function endDrag(drop) {
+    if (dragId === null) return;
+    const handle = el('handle');
+    if (handle) {
+      if (handle.hasPointerCapture?.(dragId)) handle.releasePointerCapture(dragId);
+      handle.style.cursor = '';
+    }
+    dragId = null;
+    if (drop) brain.drop();
+  }
+
+  /** Keep the handle over the toy while it can be picked up. */
+  function updateHandle() {
+    const handle = el('handle');
+    if (!handle) return;
+    const toy = dragId !== null ? brain.toy : brain.draggable;
+    let show = false;
+    if (toy?.mesh.visible) {
+      probe.copy(toy.mesh.position).project(camera);
+      const x = (probe.x * 0.5 + 0.5) * width;
+      const y = (0.5 - probe.y * 0.5) * height;
+      show = x > 0 && x < width && y > 0 && y < height;
+      if (show && (Math.abs(x - handleX) > 0.25 || Math.abs(y - handleY) > 0.25)) {
+        handleX = x;
+        handleY = y;
+        handle.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%)`;
+      }
+    }
+    if (show !== handleShown) {
+      handleShown = show;
+      handle.style.display = show ? 'block' : 'none';
+    }
   }
 
   // Input ------------------------------------------------------------------
@@ -378,8 +476,9 @@ export function createRobotScene({
   /** Pointer-driven gaze, parallax and the floor reticle (once per frame). */
   function updatePointer(dt) {
     const active = input.mouse && performance.now() - input.moved < 6000;
-    orbit.goalPx = active ? clamp((input.x / window.innerWidth) * 2 - 1, -1, 1) : 0;
-    orbit.goalPy = active ? clamp((input.y / window.innerHeight) * 2 - 1, -1, 1) : 0;
+    const parallax = active && !reducedMotion.matches;
+    orbit.goalPx = parallax ? clamp((input.x / window.innerWidth) * 2 - 1, -1, 1) : 0;
+    orbit.goalPy = parallax ? clamp((input.y / window.innerHeight) * 2 - 1, -1, 1) : 0;
     // A few seconds after a drag, drift back to the composed view.
     if (!input.dragging && input.released && performance.now() - input.released > 5000) {
       orbit.goalAz = damp(orbit.goalAz, 0, 0.8, dt);
@@ -404,9 +503,9 @@ export function createRobotScene({
       brain.setPointer(look);
 
       const inside = Math.abs(ndc.x) <= 1 && Math.abs(ndc.y) <= 1;
-      if (inside && !input.dragging) {
+      if (inside && !input.dragging && dragId === null) {
         const overRobot = nearRobot(ray);
-        floorHover = !overRobot && ray.intersectPlane(floorPlane, hit) !== null && inBounds(hit) && onScreen(hit);
+        floorHover = !overRobot && ray.intersectPlane(floorPlane, hit) !== null && onScreen(hit);
         if (floorHover) hoverGoal.copy(hit);
         canvas.style.cursor = overRobot || floorHover ? 'pointer' : '';
       }
@@ -432,7 +531,7 @@ export function createRobotScene({
   /** Fade the inset in for a fetch and out a moment after (WebGL quad and DOM frame together). */
   function updateInset(dt) {
     clock += dt;
-    if (WATCH.has(brain.state)) watchUntil = clock + LINGER;
+    if (WATCH.has(brain.state)) watchUntil = clock + (brain.state === 'present' ? LINGER : 0);
     const want = Boolean(feed?.rect.w) && clock < watchUntil;
     feedFade = approach(feedFade, want ? 1 : 0, dt / FEED_FADE);
     if (want === feedShown) return;
@@ -446,7 +545,7 @@ export function createRobotScene({
     if (!poster) updatePointer(dt);
     brain.update(dt);
     ctl.update(dt);
-    for (const t of toys) t.update(dt, BOUNDS);
+    for (const t of toys) t.update(dt, FIELD);
     placeCamera();
 
     const toy = brain.toy;
@@ -459,6 +558,7 @@ export function createRobotScene({
     scene.updateMatrixWorld();
     frameRobot(dt);
     if (feed) updateInset(dt);
+    if (!poster) updateHandle();
   }
 
   // The "detection" is the toy's real projected bounds in the robot camera;
@@ -617,6 +717,7 @@ export function createRobotScene({
     });
     const meshes = [...groups.values()].flat();
     const shown = new Map(meshes.map((m) => [m, m.visible]));
+    const placed = toys.map((t) => t.mesh.position.clone());
     for (const t of toys) t.mesh.position.set(HOME.x, TOY_REST, HOME.z + 0.8);
     for (const list of groups.values()) {
       for (const m of meshes) m.visible = false;
@@ -632,6 +733,7 @@ export function createRobotScene({
       if (disposed) return;
     }
     for (const [m, v] of shown) m.visible = v;
+    toys.forEach((t, i) => t.mesh.position.copy(placed[i]));
     if (target) feed.draw(width, height, 0);
   }
 
@@ -655,6 +757,7 @@ export function createRobotScene({
       scene,
       home: HOME,
       viewer: () => camera.position,
+      canDance: () => !reducedMotion.matches,
       onChange(state, message) {
         lastEvent = performance.now();
         status = STATUS[state];
@@ -662,10 +765,11 @@ export function createRobotScene({
       },
     });
     ctl.reset(HOME.x, HOME.z, HOME.yaw, FIRST_LOOK);
+    brain.place(FIRST_TOY, FIRST_TOY.heading);
 
     await yieldToPage();
     if (disposed) return;
-    stage = createStage(renderer, scene, { mobile, home: HOME });
+    stage = createStage(renderer, scene, { mobile, home: HOME, field: FIELD });
     applyPalette(palette);
     placeCamera();
     scene.updateMatrixWorld();
@@ -693,6 +797,14 @@ export function createRobotScene({
     window.addEventListener('pointercancel', onPointerCancel);
     document.documentElement.addEventListener('pointerleave', onPointerLeave);
     document.addEventListener('visibilitychange', sync);
+    const handle = el('handle');
+    if (handle) {
+      handle.addEventListener('pointerdown', onHandleDown);
+      handle.addEventListener('pointermove', onHandleMove);
+      handle.addEventListener('pointerup', onHandleUp);
+      handle.addEventListener('pointercancel', onHandleUp);
+      handle.addEventListener('lostpointercapture', onHandleUp);
+    }
 
     // Test hook for the Playwright checks (deterministic stepping); stripped
     // from production builds.
@@ -778,6 +890,16 @@ export function createRobotScene({
       document.removeEventListener('visibilitychange', sync);
       const frameEl = el('frame');
       if (frameEl) frameEl.style.opacity = '';
+      const handle = el('handle');
+      if (handle) {
+        handle.removeEventListener('pointerdown', onHandleDown);
+        handle.removeEventListener('pointermove', onHandleMove);
+        handle.removeEventListener('pointerup', onHandleUp);
+        handle.removeEventListener('pointercancel', onHandleUp);
+        handle.removeEventListener('lostpointercapture', onHandleUp);
+        handle.style.display = '';
+        handle.style.cursor = '';
+      }
       scene.traverse((o) => o.geometry?.dispose());
       for (const m of Object.values(materials)) m.dispose();
       toyMaterial.dispose();

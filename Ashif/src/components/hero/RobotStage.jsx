@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import useRobotScene from './useRobotScene';
 
 const LIVE_LABEL =
-  'Interactive 3D model of a four-legged robot with an arm. Throw it a toy and it walks over, picks it up with its gripper and brings it back.';
+  'Interactive 3D model of a four-legged robot with an arm. Throw or drag its toy and it walks over, picks it up with its gripper and brings it back.';
 const STILL_LABEL = 'A four-legged robot with an arm, standing on a lab floor.';
 // Small button on desktop, a full 44 px target on touch layouts.
 const TAP = 'max-lg:h-11 max-lg:px-4';
@@ -59,6 +59,15 @@ export default function RobotStage({ className }) {
           />
         </div>
 
+        {/* Grab handle that the scene keeps over the toy while it lies on the
+            floor (shown and positioned by the scene). Only this small area
+            blocks touch scrolling, so dragging the toy works on phones. */}
+        <div
+          ref={stage.handleRef}
+          aria-hidden="true"
+          className="absolute left-0 top-0 hidden size-11 cursor-grab touch-none rounded-full pointer-coarse:size-16"
+        />
+
         {/* Inset for the robot's camera: the canvas draws its view into this
             rect and fades it in (opacity set by the scene) only during a
             fetch. Phones skip it; the stage is too short to share. */}
@@ -109,8 +118,8 @@ export default function RobotStage({ className }) {
               Throw a toy
             </Button>
             <p className={cn('text-[13px] leading-5 text-subtle transition-opacity duration-500', touched && 'opacity-0')}>
-              <span className="pointer-coarse:hidden">Click</span>
-              <span className="hidden pointer-coarse:inline">Tap</span> the floor to throw a toy.
+              Drag the toy or <span className="pointer-coarse:hidden">click</span>
+              <span className="hidden pointer-coarse:inline">tap</span> the floor
             </p>
           </>
         )}

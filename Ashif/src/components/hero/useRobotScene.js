@@ -93,6 +93,7 @@ export default function useRobotScene({ reducedMotion }) {
   const boxRef = useRef(null);
   const hudRef = useRef(null);
   const controlsRef = useRef(null);
+  const handleRef = useRef(null);
   const sceneRef = useRef(null);
   const [webgl, setWebgl] = useState(null);
   const [mode, setMode] = useState('auto');
@@ -105,11 +106,20 @@ export default function useRobotScene({ reducedMotion }) {
   );
 
   useEffect(() => {
-    const gl = probeWebGL();
-    setWebgl(gl !== 'none');
-    // Without a GPU the scene would block the main thread for seconds: keep
-    // the poster and let the visitor opt in.
-    if (gl === 'software') setMode('paused');
+    // Probe when the page is idle, not inside the first render's effects.
+    const run = () => {
+      const gl = probeWebGL();
+      setWebgl(gl !== 'none');
+      // Without a GPU the scene would block the main thread for seconds:
+      // keep the poster and let the visitor opt in.
+      if (gl === 'software') setMode('paused');
+    };
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(run, { timeout: 1500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(run, 200);
+    return () => clearTimeout(id);
   }, []);
 
   const active = webgl === true && (mode === 'forced' || (mode === 'auto' && !reducedMotion));
@@ -126,7 +136,7 @@ export default function useRobotScene({ reducedMotion }) {
         if (controller.signal.aborted || !hostRef.current) return;
         scene = createRobotScene({
           host: hostRef.current,
-          overlay: { frame: frameRef, box: boxRef, hud: hudRef, controls: controlsRef },
+          overlay: { frame: frameRef, box: boxRef, hud: hudRef, controls: controlsRef, handle: handleRef },
           palette: readPalette(),
           mobile,
           forced: mode === 'forced',
@@ -166,6 +176,7 @@ export default function useRobotScene({ reducedMotion }) {
     boxRef,
     hudRef,
     controlsRef,
+    handleRef,
     live,
     message,
     touched,
