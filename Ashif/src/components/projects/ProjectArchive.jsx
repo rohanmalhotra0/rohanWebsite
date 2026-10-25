@@ -99,7 +99,7 @@ const ArchiveRow = memo(function ArchiveRow({
           aria-haspopup="dialog"
           data-project-trigger={`row:${project.slug}`}
           onClick={(event) => onOpen(project.slug, event.currentTarget)}
-          className="max-w-full text-left text-[15px] font-medium text-fg decoration-fg/30 underline-offset-[0.2em] outline-none after:absolute after:inset-y-0 after:-inset-x-3 after:rounded-lg after:content-[''] focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-accent group-hover:underline"
+          className="max-w-full text-left text-[15px] font-medium text-fg decoration-fg/30 underline-offset-[0.2em] outline-none after:absolute after:inset-y-0 after:-inset-x-3 after:rounded-lg after:content-[''] focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-accent-strong group-hover:underline"
         >
           {project.title}
         </button>
@@ -212,7 +212,7 @@ function ProjectArchive({ projects, onOpen }) {
   };
 
   return (
-    <div id="projects-archive" className="mt-24 scroll-mt-24 border-t border-line pt-12 sm:mt-32 sm:pt-16">
+    <div id="projects-archive" className="mt-24 border-t border-line pt-12 sm:mt-32 sm:pt-16">
       <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-8">
         <h3 className="type-heading text-[1.75rem] text-fg sm:text-3xl">All projects</h3>
         <div className="relative w-full md:w-72">
@@ -240,7 +240,7 @@ function ProjectArchive({ projects, onOpen }) {
             autoComplete="off"
             spellCheck="false"
             enterKeyHint="search"
-            className="h-11 w-full rounded-lg border border-line bg-surface pl-10 pr-11 text-base text-fg transition-colors duration-150 placeholder:text-subtle hover:border-line-strong focus:border-line-strong sm:h-10 sm:text-sm [&::-webkit-search-cancel-button]:appearance-none"
+            className="h-11 w-full rounded-lg border border-input bg-surface pl-10 pr-11 text-base text-fg transition-colors duration-150 placeholder:text-subtle hover:border-fg/60 focus:border-accent-strong sm:h-10 sm:text-sm [&::-webkit-search-cancel-button]:appearance-none"
           />
           {query ? (
             <button

@@ -56,7 +56,7 @@ export default function CategoryFilter({ options, value, onChange, className }) 
                 ) : null}
                 <span
                   className={cn(
-                    'relative flex h-11 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-md px-3 text-sm transition-colors duration-150 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent sm:h-9',
+                    'relative flex h-11 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-md px-3 text-sm transition-colors duration-150 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent-strong sm:h-9',
                     checked ? 'text-fg' : 'text-muted hover:text-fg'
                   )}
                 >

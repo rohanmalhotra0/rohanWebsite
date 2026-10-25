@@ -17,8 +17,8 @@ export default function RobotStage({ className }) {
   const { theme } = useTheme();
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
   const coarse = useMediaQuery('(pointer: coarse)');
-  const { hostRef, posterRef, frameRef, boxRef, labelRef, hudRef, live, message, touched, throwToy } =
-    useRobotScene({ enabled: !reduced, theme });
+  const stage = useRobotScene({ enabled: !reduced, theme });
+  const { live, touched } = stage;
 
   return (
     <div
@@ -30,7 +30,7 @@ export default function RobotStage({ className }) {
     >
       <div role="img" aria-label={live ? LIVE_LABEL : STILL_LABEL} className="absolute inset-0">
         <img
-          ref={posterRef}
+          ref={stage.posterRef}
           src={assetUrl(`img/hero/robot-${theme}.webp`)}
           alt=""
           width={1600}
@@ -43,14 +43,14 @@ export default function RobotStage({ className }) {
           )}
         />
         <div
-          ref={hostRef}
+          ref={stage.hostRef}
           className={cn('absolute inset-0 opacity-0 transition-opacity duration-500 ease-out', live && 'opacity-100')}
         />
       </div>
 
       {/* Inset for the robot's camera feed; the canvas draws into this rect. */}
       <div
-        ref={frameRef}
+        ref={stage.frameRef}
         aria-hidden="true"
         className={cn(
           'pointer-events-none absolute right-[var(--gutter)] top-1 h-[90px] w-[160px] opacity-0 transition-opacity duration-500 sm:h-[108px] sm:w-[192px]',
@@ -59,9 +59,9 @@ export default function RobotStage({ className }) {
         )}
       >
         <div className="absolute inset-0 overflow-hidden rounded-lg ring-1 ring-inset ring-fg/10">
-          <div ref={boxRef} className="absolute left-0 top-0 rounded-[3px] border border-accent opacity-0">
+          <div ref={stage.boxRef} className="absolute left-0 top-0 rounded-[3px] border border-accent opacity-0">
             <span
-              ref={labelRef}
+              ref={stage.labelRef}
               className="absolute left-0 top-0 whitespace-nowrap rounded-br-[3px] bg-accent px-1 font-mono text-[9px] leading-[14px] text-accent-ink"
             >
               toy 0.97
@@ -69,7 +69,7 @@ export default function RobotStage({ className }) {
           </div>
         </div>
         <p
-          ref={hudRef}
+          ref={stage.hudRef}
           className="absolute left-0 top-full mt-1.5 whitespace-nowrap font-mono text-[10px] leading-4 text-subtle lg:bottom-full lg:mb-1.5 lg:mt-0 lg:top-auto lg:text-[11px]"
         >
           cam0 · 30 fps · idle
@@ -77,8 +77,11 @@ export default function RobotStage({ className }) {
       </div>
 
       {live ? (
-        <div className="absolute bottom-2 left-[var(--gutter)] flex items-center gap-4 lg:bottom-4 lg:left-0">
-          <Button variant="secondary" size="sm" onClick={throwToy} className="max-lg:h-11 max-lg:px-4">
+        <div
+          ref={stage.controlsRef}
+          className="absolute bottom-2 left-[var(--gutter)] flex items-center gap-4 lg:bottom-4 lg:left-0"
+        >
+          <Button variant="secondary" size="sm" onClick={stage.throwToy} className="max-lg:h-11 max-lg:px-4">
             Throw a toy
           </Button>
           <p
@@ -93,7 +96,7 @@ export default function RobotStage({ className }) {
       ) : null}
 
       <p className="sr-only" aria-live="polite">
-        {message}
+        {stage.message}
       </p>
     </div>
   );

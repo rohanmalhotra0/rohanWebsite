@@ -41,6 +41,7 @@ export default function useRobotScene({ enabled, theme }) {
   const boxRef = useRef(null);
   const labelRef = useRef(null);
   const hudRef = useRef(null);
+  const controlsRef = useRef(null);
   const sceneRef = useRef(null);
   const [live, setLive] = useState(false);
   const [message, setMessage] = useState('');
@@ -60,12 +61,7 @@ export default function useRobotScene({ enabled, theme }) {
         if (controller.signal.aborted || !hostRef.current) return;
         scene = createRobotScene({
           host: hostRef.current,
-          overlay: {
-            frame: frameRef.current,
-            box: boxRef.current,
-            label: labelRef.current,
-            hud: hudRef.current,
-          },
+          overlay: { frame: frameRef, box: boxRef, label: labelRef, hud: hudRef, controls: controlsRef },
           palette: readPalette(),
           mobile,
           onReady: () => setLive(true),
@@ -95,5 +91,17 @@ export default function useRobotScene({ enabled, theme }) {
 
   const throwToy = useCallback(() => sceneRef.current?.throwRandom(), []);
 
-  return { hostRef, posterRef, frameRef, boxRef, labelRef, hudRef, live, message, touched, throwToy };
+  return {
+    hostRef,
+    posterRef,
+    frameRef,
+    boxRef,
+    labelRef,
+    hudRef,
+    controlsRef,
+    live,
+    message,
+    touched,
+    throwToy,
+  };
 }

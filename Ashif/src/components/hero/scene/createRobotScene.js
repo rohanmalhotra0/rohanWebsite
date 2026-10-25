@@ -36,6 +36,8 @@ const UP = new Vector3(0, 1, 0);
 
 /**
  * Mounts the robot stage into `host`. Returns null when WebGL is unavailable.
+ * `overlay` holds React refs to the DOM layered over the canvas (camera inset
+ * frame, detection box and label, HUD line, controls), read when needed.
  * In poster mode it renders one still frame and exposes `capture()`.
  */
 export function createRobotScene({
@@ -50,6 +52,7 @@ export function createRobotScene({
   onInteract,
   onLost,
 }) {
+  const el = (key) => overlay[key]?.current;
   const canvas = document.createElement('canvas');
   canvas.style.cssText = 'display:block;width:100%;height:100%;touch-action:pan-y;outline:none';
   let renderer;
@@ -141,8 +144,9 @@ export function createRobotScene({
         ? VIEW.fov
         : (Math.atan(Math.tan((VIEW.fov * Math.PI) / 360) * (VIEW.aspect / aspect)) * 360) / Math.PI;
     camera.updateProjectionMatrix();
-    if (feed && overlay.frame) {
-      const f = overlay.frame.getBoundingClientRect();
+    const inset = el('frame');
+    if (feed && inset) {
+      const f = inset.getBoundingClientRect();
       const c = canvas.getBoundingClientRect();
       feed.setRect(f.left - c.left, f.top - c.top, f.width, f.height, pixelRatio);
     }
@@ -169,9 +173,20 @@ export function createRobotScene({
 
   const inBounds = (p) => p.x > BOUNDS.minX && p.x < BOUNDS.maxX && p.z > BOUNDS.minZ && p.z < BOUNDS.maxZ;
 
+  // A throw target must land where it stays readable: inside the canvas
+  // margins, clear of the overlays, and (on desktop) clear of the name.
   function onScreen(p) {
     probe.copy(p).project(camera);
-    return Math.abs(probe.x) < 0.86 && probe.y > -0.82 && probe.y < 0.78;
+    const x = (probe.x * 0.5 + 0.5) * width;
+    const y = (0.5 - probe.y * 0.5) * height;
+    const left = window.innerWidth >= 1024 ? 0.22 : 0.07;
+    if (x < width * left || x > width * 0.93 || y < height * 0.14 || y > height * 0.9) return false;
+    const c = canvas.getBoundingClientRect();
+    for (const key of ['frame', 'controls']) {
+      const r = el(key)?.getBoundingClientRect();
+      if (r && x > r.left - c.left - 32 && x < r.right - c.left + 32 && y > r.top - c.top - 32 && y < r.bottom - c.top + 32) return false;
+    }
+    return true;
   }
 
   // Cheap box test for the hover cursor; clicks confirm against the meshes.
@@ -342,9 +357,13 @@ export function createRobotScene({
   }
 
   function updateOverlay(dt) {
-    const { box, label, hud } = overlay;
+    const box = el('box');
+    const label = el('label');
+    const hud = el('hud');
     const toy = brain.toy;
-    const found = toy && toy.state !== 'held' ? feed.detect(toy.mesh, detection) : null;
+    let found = toy && toy.state !== 'held' ? feed.detect(toy.mesh, detection) : null;
+    // At point-blank range the box would fill the inset; a detector loses it.
+    if (found && found.w * found.h > feed.rect.w * feed.rect.h * 0.65) found = null;
     if (box) {
       if (found) {
         box.style.transform = `translate3d(${found.x.toFixed(1)}px, ${found.y.toFixed(1)}px, 0)`;

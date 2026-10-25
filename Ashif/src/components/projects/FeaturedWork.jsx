@@ -30,7 +30,7 @@ const FeaturedCard = memo(function FeaturedCard({ project, index, layout, viewer
         <div
           data-project-media
           className={cn(
-            'relative rounded-lg outline-offset-4 outline-accent group-has-[button:focus-visible]:outline-2',
+            'relative rounded-lg outline-offset-4 outline-accent-strong group-has-[button:focus-visible]:outline-2',
             wide && 'lg:col-span-8',
             flipped && 'lg:col-start-5 lg:row-start-1'
           )}
