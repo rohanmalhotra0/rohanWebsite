@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { sections } from '@/data/portfolioData';
-import Button from '@/components/primitives/Button';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { MenuIcon, SearchButton, Wordmark } from './BarControls';
@@ -16,7 +15,7 @@ import {
 } from './hooks';
 import { loadPalette } from './loadPalette';
 import { goToSection, isPlainClick } from './navigation';
-import { BAR_ROW, ICON_BUTTON } from './styles';
+import { BAR_ROW, ICON_BUTTON, NAV_LINK } from './styles';
 
 const MotionSpan = motion.span;
 const SECTION_IDS = sections.map((section) => section.id);
@@ -89,8 +88,8 @@ export default function Navbar() {
       <header className="fixed left-0 right-[var(--scroll-lock-gap,0px)] top-0 z-50">
         <div
           className={cn(
-            'border-b pt-[env(safe-area-inset-top)] transition-[background-color,border-color,backdrop-filter] duration-200 ease-out',
-            scrolled ? 'border-line bg-bg/85 backdrop-blur-md' : 'border-transparent'
+            'border-b pt-[env(safe-area-inset-top)] transition-[background-color,border-color] duration-200 ease-out',
+            scrolled ? 'border-line bg-bg' : 'border-transparent'
           )}
         >
           {/* Equal side columns center the links; max-content minimums mean that
@@ -113,11 +112,7 @@ export default function Navbar() {
                         href={`#${section.id}`}
                         onClick={onAnchorClick(section.id)}
                         aria-current={isActive ? 'true' : undefined}
-                        className={cn(
-                          // Tighter between 1024 and 1280 so the centered links clear both sides.
-                          'flex h-9 items-center rounded-md px-2 text-[13px] font-medium transition-colors duration-150 pointer-coarse:h-11 xl:px-3 xl:text-[13.5px]',
-                          isActive ? 'text-fg' : 'text-muted hover:text-fg'
-                        )}
+                        className={cn(NAV_LINK, isActive ? 'text-fg' : 'text-muted hover:text-fg')}
                       >
                         {section.label}
                       </a>
@@ -150,14 +145,14 @@ export default function Navbar() {
                 }}
               />
               <ThemeToggle className={ICON_BUTTON} />
-              <Button
+              {/* A plain link like the sections; the negative margin puts its
+                  text, not its padding, on the page's right edge. */}
+              <a
                 href="#/resume"
-                variant="secondary"
-                size="sm"
-                className="ml-1 hidden lg:inline-flex pointer-coarse:h-11 xl:ml-2"
+                className={cn(NAV_LINK, '-mr-2 hidden text-muted hover:text-fg lg:flex xl:-mr-3')}
               >
                 Résumé
-              </Button>
+              </a>
               <button
                 ref={menuButtonRef}
                 type="button"

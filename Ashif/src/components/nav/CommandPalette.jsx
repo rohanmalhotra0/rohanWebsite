@@ -236,7 +236,7 @@ function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
-          aria-label="Command palette"
+          aria-label="Search"
           data-nav-dialog=""
           onKeyDown={onKeyDown}
           // Clicks on non-interactive parts must not pull focus out of the field.
@@ -285,12 +285,6 @@ function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
             </button>
           </div>
 
-          {hasQuery && count === 0 ? (
-            <p className="shrink-0 px-4 pt-3 text-[13px] text-muted">
-              Nothing matches “{query.trim()}”.
-            </p>
-          ) : null}
-
           <div
             ref={listRef}
             id={listboxId}
@@ -335,17 +329,11 @@ function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
             aria-hidden="true"
             className="hidden h-10 shrink-0 items-center justify-between gap-4 border-t border-line px-4 text-xs text-subtle sm:flex pointer-coarse:hidden"
           >
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5">
-                <Kbd>↑</Kbd>
-                <Kbd>↓</Kbd>
-                Navigate
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Kbd>Esc</Kbd>
-                Close
-              </span>
-            </div>
+            <span className="flex items-center gap-1.5">
+              <Kbd>↑</Kbd>
+              <Kbd>↓</Kbd>
+              Navigate
+            </span>
             {activeEntry ? (
               <span className="flex items-center gap-1.5">
                 {activeEntry.item.verb}
@@ -366,7 +354,7 @@ function Palette({ dialogRef, inputRef, requestClose, onNavigate }) {
 function Option({ id, entry, active, copied, onHover, onSelect }) {
   const { item, indices } = entry;
   const Icon = copied?.ok ? Check : item.icon;
-  const meta = copied ? (copied.ok ? 'Copied' : 'Couldn’t copy') : item.meta;
+  const meta = copied ? (copied.ok ? 'Copied' : 'Couldn’t copy') : entry.meta;
 
   return (
     <div
@@ -383,14 +371,19 @@ function Option({ id, entry, active, copied, onHover, onSelect }) {
         active && 'bg-fg/[0.06] dark:bg-fg/[0.08]'
       )}
     >
-      <Icon
-        className={cn(
-          'size-4 shrink-0 transition-colors duration-150',
-          copied?.ok ? 'text-accent-strong' : active ? 'text-fg' : 'text-subtle'
-        )}
-        strokeWidth={1.75}
-        aria-hidden="true"
-      />
+      {Icon ? (
+        <Icon
+          className={cn(
+            'size-4 shrink-0 transition-colors duration-150',
+            copied?.ok ? 'text-accent-strong' : active ? 'text-fg' : 'text-subtle'
+          )}
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
+      ) : (
+        // Keeps titles aligned with the rows that have an icon.
+        <span className="size-4 shrink-0" aria-hidden="true" />
+      )}
       <span className="min-w-0 flex-1 truncate text-fg">
         {item.quote === undefined ? (
           <Highlight text={item.title} indices={indices} />
@@ -401,7 +394,12 @@ function Option({ id, entry, active, copied, onHover, onSelect }) {
         )}
       </span>
       {meta ? (
-        <span className={cn('shrink-0 text-xs', copied ? 'text-fg' : 'text-subtle')}>
+        <span
+          className={cn(
+            'max-w-[45%] shrink-0 truncate text-xs',
+            copied ? 'text-fg' : 'text-subtle'
+          )}
+        >
           {meta}
         </span>
       ) : null}
