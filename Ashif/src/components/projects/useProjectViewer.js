@@ -138,7 +138,22 @@ export function useProjectViewer() {
         return;
       }
       const index = current.list.findIndex((p) => p.slug === slug);
-      if (index >= 0) goTo(index, index > current.index ? 1 : -1);
+      if (index >= 0) {
+        goTo(index, index > current.index ? 1 : -1);
+      } else {
+        // A project outside the list being browsed: switch to its own list.
+        const project = findProject(slug);
+        const list = project.featured ? featuredProjects : projects;
+        setViewer({
+          ...current,
+          list,
+          index: list.indexOf(project),
+          origin: 'link',
+          paired: false,
+          dir: 1,
+          step: current.step + 1,
+        });
+      }
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);

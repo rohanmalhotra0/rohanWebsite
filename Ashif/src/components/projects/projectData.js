@@ -5,7 +5,7 @@ import { projects } from '@/data/portfolioData';
 export const EASE = [0.16, 1, 0.3, 1];
 
 /** Layout transition for the image flying between a featured card and the viewer. */
-export const FLIGHT = { layout: { type: 'spring', visualDuration: 0.5, bounce: 0 } };
+export const FLIGHT = { layout: { type: 'spring', visualDuration: 0.45, bounce: 0 } };
 
 /** Layout changes that happen behind the viewer's scrim must not animate. */
 export const INSTANT = { layout: { type: false, delay: 0 } };

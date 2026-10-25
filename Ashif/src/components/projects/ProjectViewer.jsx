@@ -16,7 +16,6 @@ import { lockScroll, preloadImage } from './viewerDom';
 
 const MotionDiv = motion.div;
 const MotionImg = motion.img;
-const MotionArticle = motion.article;
 
 // Floating panels are the one place the site uses a shadow.
 const PANEL_SHADOW = '0 40px 100px -32px rgb(0 0 0 / 0.32), 0 16px 32px -16px rgb(0 0 0 / 0.16)';
@@ -133,9 +132,7 @@ function Slide({ project, viewer, titleId, reduceMotion }) {
   const links = projectLinks(project);
 
   return (
-    <MotionArticle
-      className="col-start-1 row-start-1 grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8"
-    >
+    <article className="col-start-1 row-start-1 grid gap-6 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:gap-8 sm:p-6 lg:grid-cols-12 lg:p-8">
       {/* Above the details, so the flying image passes over the text. */}
       <div className="relative z-10 lg:col-span-7 xl:col-span-8">
         <ViewerMedia
@@ -190,7 +187,7 @@ function Slide({ project, viewer, titleId, reduceMotion }) {
           ) : null}
         </MotionDiv>
       </div>
-    </MotionArticle>
+    </article>
   );
 }
 
@@ -250,10 +247,20 @@ function ViewerContent({ viewer, titleId, dialogRef, reduceMotion, onNavigate, o
             <div className="ml-auto flex items-center">
               {count > 1 ? (
                 <>
-                  <IconButton label="Previous project" shortcut="ArrowLeft" hint="←" onClick={() => onNavigate(-1)}>
+                  <IconButton
+                    label="Previous project"
+                    shortcut="ArrowLeft"
+                    hint="←"
+                    onClick={() => onNavigate(-1)}
+                  >
                     <ArrowLeft aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
                   </IconButton>
-                  <IconButton label="Next project" shortcut="ArrowRight" hint="→" onClick={() => onNavigate(1)}>
+                  <IconButton
+                    label="Next project"
+                    shortcut="ArrowRight"
+                    hint="→"
+                    onClick={() => onNavigate(1)}
+                  >
                     <ArrowRight aria-hidden="true" className="size-[18px]" strokeWidth={1.75} />
                   </IconButton>
                   <span aria-hidden="true" className="mx-1.5 h-5 w-px bg-line" />

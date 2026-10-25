@@ -132,16 +132,21 @@ export function merge(list) {
   return out;
 }
 
-/** One mesh per material for a rigid link. */
-function assemble(parent, parts, materials) {
-  for (const key of Object.keys(parts)) {
-    if (!parts[key].length) continue;
-    const mesh = new Mesh(merge(parts[key]), materials[key]);
+/** Merge each material's primitives into one geometry. */
+const bake = (parts) =>
+  Object.fromEntries(Object.entries(parts).filter(([, list]) => list.length).map(([key, list]) => [key, merge(list)]));
+
+/** One mesh per material for a rigid link (geometries may be shared). */
+function attach(parent, geometries, materials) {
+  for (const [key, geometry] of Object.entries(geometries)) {
+    const mesh = new Mesh(geometry, materials[key]);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     parent.add(mesh);
   }
 }
+
+const assemble = (parent, parts, materials) => attach(parent, bake(parts), materials);
 
 export function createMaterials() {
   return {
@@ -213,32 +218,43 @@ function buildBody(materials) {
   return body;
 }
 
-function buildLeg(def, materials) {
+// Leg links are symmetric about the leg plane, so all four legs share them.
+function legGeometry() {
+  return {
+    hip: Object.fromEntries(
+      [1, -1].map((end) => [end, bake({ graphite: [place(cyl(0.046, 0.11), [0, 0, -end * 0.02], X90)] })])
+    ),
+    // The thigh's own rounded top is the hip housing; the amber cover wraps
+    // over it like Spot's upper-leg shell.
+    thigh: bake({
+      graphite: [place(taper(0.056, 0.032, DIMS.upper, 0.054), ZERO, X90)],
+      paint: [place(taper(0.05, 0.028, DIMS.upper - 0.06, 0.062), ZERO, X90)],
+      anodized: [place(cyl(0.024, 0.068, 28), ZERO, Z90)],
+    }),
+    knee: bake({
+      graphite: [place(cyl(0.034, 0.064), ZERO, Z90)],
+      dark: [place(taper(0.03, 0.017, DIMS.lower - 0.012, 0.034), ZERO, X90)],
+      anodized: [place(cyl(0.018, 0.068), ZERO, Z90)],
+      rubber: [place(ball(DIMS.foot), [0, -DIMS.lower, 0], ZERO, [1, 0.92, 1.06])],
+    }),
+  };
+}
+
+function buildLeg(def, geometry, materials) {
   const { side, end } = def;
   const root = new Group();
   root.position.set(side * DIMS.hipX, DIMS.hipY, end * DIMS.hipZ);
-  assemble(root, { graphite: [place(cyl(0.046, 0.11), [0, 0, -end * 0.02], X90)] }, materials);
+  attach(root, geometry.hip[end], materials);
 
   const thigh = new Group();
   thigh.position.x = side * DIMS.legOffset;
   root.add(thigh);
-  // The thigh's own rounded top is the hip housing; the amber cover wraps
-  // over it like Spot's upper-leg shell.
-  assemble(thigh, {
-    graphite: [place(taper(0.056, 0.032, DIMS.upper, 0.054), ZERO, X90)],
-    paint: [place(taper(0.05, 0.028, DIMS.upper - 0.06, 0.062), ZERO, X90)],
-    anodized: [place(cyl(0.024, 0.068, 28), ZERO, Z90)],
-  }, materials);
+  attach(thigh, geometry.thigh, materials);
 
   const knee = new Group();
   knee.position.y = -DIMS.upper;
   thigh.add(knee);
-  assemble(knee, {
-    graphite: [place(cyl(0.034, 0.064), ZERO, Z90)],
-    dark: [place(taper(0.03, 0.017, DIMS.lower - 0.012, 0.034), ZERO, X90)],
-    anodized: [place(cyl(0.018, 0.068), ZERO, Z90)],
-    rubber: [place(ball(DIMS.foot), [0, -DIMS.lower, 0], ZERO, [1, 0.92, 1.06])],
-  }, materials);
+  attach(knee, geometry.knee, materials);
 
   return { ...def, root, thigh, knee };
 }
@@ -315,8 +331,9 @@ export function buildRobot(materials) {
   body.position.y = DIMS.height;
   root.add(body);
 
+  const geometry = legGeometry();
   const legs = LEGS.map((def) => {
-    const leg = buildLeg(def, materials);
+    const leg = buildLeg(def, geometry, materials);
     body.add(leg.root);
     return leg;
   });
