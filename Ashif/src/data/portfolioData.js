@@ -171,7 +171,7 @@ export const workExperience = [
     tags: ['PyTorch', 'Data Engineering', 'Analytics'],
   },
   {
-    company: 'Hume Center',
+    company: 'Virginia Tech Hume Center',
     role: 'Aerospace Researcher',
     location: 'Blacksburg, VA',
     date: 'Nov 2024 – May 2025',
@@ -598,8 +598,7 @@ export const education = {
   dates: 'Aug 2024 – May 2027',
   location: 'New York, NY',
   logoUrl: assetUrl('website-photos/Work%20Logos/new_york_university_logo.jpeg'),
-  accelerated:
-    'Completing the degree in three years, with expected graduation in May 2027.',
+  accelerated: 'I’m finishing the degree in three years.',
   graduateCourse: {
     title: 'Mathematical Techniques for CS Applications',
     description: 'Advanced mathematical tools for algorithms, modeling, and computation.',
