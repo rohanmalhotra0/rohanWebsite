@@ -39,7 +39,7 @@
 
     <title>Rohan Malhotra</title>
 
-    <!-- Apply the saved theme (or the OS preference) before first paint. -->
+    <!-- Apply the saved theme before first paint. Light is the default; the toggle saves dark. -->
     <script>
       (function () {
         var theme;
@@ -47,11 +47,10 @@
           theme = localStorage.getItem('rm-theme');
         } catch (e) {}
         if (theme !== 'light' && theme !== 'dark') {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light';
+          theme = 'light';
         }
         document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="color-scheme"]').setAttribute('content', theme);
         document
           .querySelector('meta[name="theme-color"]')
           .setAttribute('content', theme === 'dark' ? '#0e0e0d' : '#f3f2ee');
