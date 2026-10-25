@@ -7,6 +7,9 @@ import { ProjectLinks } from './ProjectLinks';
 import TypeCover from './TypeCover';
 import {
   caseStudyPath,
+  COVER_SIZES,
+  coverSrcSet,
+  dropSrcSetOnError,
   FLIGHT,
   focalPoint,
   imageSize,
@@ -139,10 +142,16 @@ const FeaturedCard = memo(function FeaturedCard({
             {project.imageUrl ? (
               <img
                 src={project.imageUrl}
+                srcSet={coverSrcSet(project)}
+                sizes={wide ? COVER_SIZES.wide : COVER_SIZES.grid}
+                onError={dropSrcSetOnError}
                 alt={project.imageAlt || ''}
                 width={width}
                 height={height}
-                loading="lazy"
+                // The first card is on screen when the page opens, and its
+                // image is the page's largest paint: fetch it right away.
+                loading={index === 0 ? 'eager' : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : 'auto'}
                 decoding="async"
                 draggable="false"
                 className="size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.02]"
