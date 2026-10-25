@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Check, CircleAlert, LoaderCircle } from 'lucide-react';
 import Button from '@/components/primitives/Button';
@@ -6,7 +7,16 @@ import { Kbd } from '@/components/primitives/Tag';
 import { formspreeUrl } from '@/data/portfolioData';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
-import { EMAIL_PATTERN, FIELDS, mailtoWith, validationMessage } from './validation';
+import useFormDraft from './useFormDraft';
+import {
+  EMAIL_PATTERN,
+  FIELD_LABELS,
+  FIELDS,
+  SEND_FAILED,
+  invalidSummary,
+  mailtoWith,
+  validationMessage,
+} from './validation';
 
 const EASE = [0.16, 1, 0.3, 1];
 const MotionDiv = motion.div;
@@ -30,13 +40,14 @@ const inputClass = cn(
 function Field({ id, label, error, children }) {
   const reduceMotion = useReducedMotion();
   return (
-    <div className="pb-2">
+    <div className="pb-4">
       <label htmlFor={id} className="mb-2 block text-sm font-medium text-fg">
         {label}
       </label>
       {children}
-      {/* The slot keeps its height, so a message never pushes the form around. */}
-      <div id={`${id}-error`} className="mt-1.5 min-h-5 text-[13px] leading-5 text-accent-strong">
+      {/* Reserved slot, 4px under its own field and 16px above the next, so a message
+          never pushes the form around and clearly belongs to the field it describes. */}
+      <div id={`${id}-error`} className="mt-1 min-h-5 text-[13px] leading-5 text-accent-strong">
         {error ? (
           <MotionSpan
             key={error}
@@ -94,9 +105,11 @@ export default function ContactForm() {
   const id = useId();
   const reduceMotion = useReducedMotion();
   const showShortcut = useMediaQuery('(hover: hover) and (pointer: fine) and (min-width: 640px)');
-  const [values, setValues] = useState(EMPTY);
+  const [values, setValues, clearDraft] = useFormDraft(EMPTY);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  // Form-level status for screen readers; field errors are also tied to their inputs.
+  const [announcement, setAnnouncement] = useState('');
   const request = useRef(null);
   const focusNameOnMount = useRef(false);
 
@@ -128,7 +141,10 @@ export default function ContactForm() {
   function handleBlur(event) {
     const { name, value } = event.target;
     if (!value) return; // Tabbing through empty fields is not an error yet.
-    setErrors((prev) => ({ ...prev, [name]: validationMessage(event.target) }));
+    const message = validationMessage(event.target);
+    setErrors((prev) => ({ ...prev, [name]: message }));
+    // Focus has already moved on, so say it out loud. (The region only re-speaks on change.)
+    if (message) setAnnouncement(`${FIELD_LABELS[name]}: ${message}`);
   }
 
   async function handleSubmit(event) {
@@ -138,17 +154,24 @@ export default function ContactForm() {
 
     const fields = FIELDS.map((name) => form.elements.namedItem(name));
     const nextErrors = Object.fromEntries(fields.map((f) => [f.name, validationMessage(f)]));
-    setErrors(nextErrors);
-    const firstInvalid = fields.find((f) => nextErrors[f.name]);
-    if (firstInvalid) {
-      firstInvalid.focus();
+    const invalid = FIELDS.filter((name) => nextErrors[name]);
+    if (invalid.length) {
+      // Commit aria-invalid, aria-describedby and the message text before focus lands,
+      // so the screen reader reads the error together with the field.
+      flushSync(() => {
+        setErrors(nextErrors);
+        setAnnouncement(invalidSummary(invalid));
+      });
+      form.elements.namedItem(invalid[0]).focus();
       return;
     }
+    setErrors(nextErrors);
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort('timeout'), TIMEOUT_MS);
     request.current = controller;
     setStatus('sending');
+    setAnnouncement('Sending your message…');
     try {
       const response = await fetch(formspreeUrl, {
         method: 'POST',
@@ -157,10 +180,13 @@ export default function ContactForm() {
         signal: controller.signal,
       });
       if (!response.ok) throw new Error(`Formspree responded ${response.status}`);
-      setValues(EMPTY);
+      clearDraft();
+      setAnnouncement(''); // The confirmation heading takes focus and is read instead.
       setStatus('success');
     } catch {
-      if (controller.signal.reason !== 'unmount') setStatus('error');
+      if (controller.signal.reason === 'unmount') return;
+      setAnnouncement(SEND_FAILED);
+      setStatus('error');
     } finally {
       clearTimeout(timer);
       request.current = null;
@@ -169,6 +195,7 @@ export default function ContactForm() {
 
   function handleReset() {
     setErrors({});
+    setAnnouncement('');
     focusNameOnMount.current = true;
     setStatus('idle');
   }
@@ -189,134 +216,139 @@ export default function ContactForm() {
       };
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      {status === 'success' ? (
-        <MotionDiv key="success" {...swap} transition={{ duration: 0.25, ease: EASE }}>
-          <Success onReset={handleReset} />
-        </MotionDiv>
-      ) : (
-        <MotionDiv key="form" {...swap} transition={{ duration: 0.2, ease: EASE }}>
-          <form
-            action={formspreeUrl}
-            method="POST"
-            noValidate
-            onSubmit={handleSubmit}
-            aria-label="Send a message"
-            aria-busy={sending}
-          >
-            <div className="grid gap-x-5 sm:grid-cols-2 lg:grid-cols-1">
-              <Field id={fieldId('name')} label="Name" error={errors.name}>
-                <input
-                  {...fieldProps('name')}
-                  ref={(node) => {
-                    if (node && focusNameOnMount.current) {
-                      focusNameOnMount.current = false;
-                      node.focus();
-                    }
-                  }}
-                  type="text"
-                  required
-                  maxLength={120}
-                  autoComplete="name"
-                  autoCapitalize="words"
-                  className={cn(inputClass, 'h-12')}
-                />
-              </Field>
-              <Field id={fieldId('email')} label="Email" error={errors.email}>
-                <input
-                  {...fieldProps('email')}
-                  type="email"
-                  required
-                  maxLength={200}
-                  pattern={EMAIL_PATTERN}
-                  autoComplete="email"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  inputMode="email"
-                  className={cn(inputClass, 'h-12')}
-                />
-              </Field>
-            </div>
-
-            <Field id={fieldId('message')} label="Message" error={errors.message}>
-              <textarea
-                {...fieldProps('message')}
-                required
-                rows={5}
-                maxLength={5000}
-                placeholder="What are you working on?"
-                onKeyDown={handleMessageKeyDown}
-                aria-keyshortcuts="Control+Enter Meta+Enter"
-                className={cn(inputClass, 'min-h-36 resize-y py-3 leading-6')}
-              />
-            </Field>
-
-            <input type="hidden" name="_subject" value="New message from rohanm.org" />
-            {/* Honeypot: hidden from people, tempting to bots. Formspree drops anything that fills it. */}
-            <input
-              type="text"
-              name="_gotcha"
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              className="hidden"
-            />
-
-            {status === 'error' ? (
-              <div
-                role="alert"
-                className="mb-5 flex gap-3 rounded-lg border border-line-strong bg-surface px-4 py-3.5 text-[15px] leading-6 text-fg"
-              >
-                <CircleAlert aria-hidden="true" className="mt-1 size-4 shrink-0 text-accent-strong" />
-                <p>
-                  The message didn’t go through. Try again, or{' '}
-                  <a href={mailtoWith(values)} className="link font-medium">
-                    send it by email
-                  </a>
-                  .
-                </p>
+    <>
+      <AnimatePresence mode="wait" initial={false}>
+        {status === 'success' ? (
+          <MotionDiv key="success" {...swap} transition={{ duration: 0.25, ease: EASE }}>
+            <Success onReset={handleReset} />
+          </MotionDiv>
+        ) : (
+          <MotionDiv key="form" {...swap} transition={{ duration: 0.2, ease: EASE }}>
+            <form
+              action={formspreeUrl}
+              method="POST"
+              noValidate
+              onSubmit={handleSubmit}
+              aria-label="Send a message"
+              aria-busy={sending}
+            >
+              {/* Side by side below lg, split on the page's 32px gutter. */}
+              <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-1">
+                <Field id={fieldId('name')} label={FIELD_LABELS.name} error={errors.name}>
+                  <input
+                    {...fieldProps('name')}
+                    ref={(node) => {
+                      if (node && focusNameOnMount.current) {
+                        focusNameOnMount.current = false;
+                        node.focus();
+                      }
+                    }}
+                    type="text"
+                    required
+                    maxLength={120}
+                    autoComplete="name"
+                    autoCapitalize="words"
+                    className={cn(inputClass, 'h-12')}
+                  />
+                </Field>
+                <Field id={fieldId('email')} label={FIELD_LABELS.email} error={errors.email}>
+                  <input
+                    {...fieldProps('email')}
+                    type="email"
+                    required
+                    maxLength={200}
+                    pattern={EMAIL_PATTERN}
+                    autoComplete="email"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    inputMode="email"
+                    className={cn(inputClass, 'h-12')}
+                  />
+                </Field>
               </div>
-            ) : null}
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
-              <Button
-                type="submit"
-                size="lg"
-                aria-disabled={sending || undefined}
-                className="w-full sm:w-auto"
-              >
-                {/* Both labels share one grid cell, so the button keeps its width. */}
-                <span className="grid">
-                  <span className={cn('col-start-1 row-start-1', sending && 'invisible')}>
-                    Send message
-                  </span>
-                  <span
-                    className={cn(
-                      'col-start-1 row-start-1 inline-flex items-center justify-center gap-2',
-                      !sending && 'invisible'
-                    )}
-                  >
-                    <LoaderCircle
-                      aria-hidden="true"
-                      className={cn('size-4', sending && 'animate-spin')}
-                    />
-                    Sending…
-                  </span>
-                </span>
-              </Button>
-              {/* Visual hint only; the textarea exposes the shortcut via aria-keyshortcuts. */}
-              {showShortcut ? (
-                <p aria-hidden="true" className="flex items-center gap-1 text-[13px] text-subtle">
-                  <Kbd>{IS_MAC ? '⌘' : 'Ctrl'}</Kbd>
-                  <Kbd>↵</Kbd>
-                  <span className="ml-1">to send</span>
-                </p>
+              <Field id={fieldId('message')} label={FIELD_LABELS.message} error={errors.message}>
+                <textarea
+                  {...fieldProps('message')}
+                  required
+                  rows={5}
+                  maxLength={5000}
+                  placeholder="What are you working on?"
+                  onKeyDown={handleMessageKeyDown}
+                  aria-keyshortcuts="Control+Enter Meta+Enter"
+                  className={cn(inputClass, 'min-h-36 resize-y py-3 leading-6')}
+                />
+              </Field>
+
+              <input type="hidden" name="_subject" value="New message from rohanm.org" />
+              {/* Honeypot: hidden from people, tempting to bots. Formspree drops anything that fills it. */}
+              <input
+                type="text"
+                name="_gotcha"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="hidden"
+              />
+
+              {/* Visible version of the failure; the status region below announces it. */}
+              {status === 'error' ? (
+                <div className="mb-5 flex gap-3 rounded-lg border border-line-strong bg-surface px-4 py-3.5 text-[15px] leading-6 text-fg">
+                  <CircleAlert aria-hidden="true" className="mt-1 size-4 shrink-0 text-accent-strong" />
+                  <p>
+                    The message didn’t go through. Try again, or{' '}
+                    <a href={mailtoWith(values)} className="link font-medium">
+                      send it by email
+                    </a>
+                    .
+                  </p>
+                </div>
               ) : null}
-            </div>
-          </form>
-        </MotionDiv>
-      )}
-    </AnimatePresence>
+
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+                <Button
+                  type="submit"
+                  size="lg"
+                  aria-disabled={sending || undefined}
+                  className="w-full sm:w-auto"
+                >
+                  {/* Both labels share one grid cell, so the button keeps its width. */}
+                  <span className="grid">
+                    <span className={cn('col-start-1 row-start-1', sending && 'invisible')}>
+                      Send message
+                    </span>
+                    <span
+                      className={cn(
+                        'col-start-1 row-start-1 inline-flex items-center justify-center gap-2',
+                        !sending && 'invisible'
+                      )}
+                    >
+                      <LoaderCircle
+                        aria-hidden="true"
+                        className={cn('size-4', sending && 'animate-spin')}
+                      />
+                      Sending…
+                    </span>
+                  </span>
+                </Button>
+                {/* Visual hint only; the textarea exposes the shortcut via aria-keyshortcuts. */}
+                {showShortcut ? (
+                  <p aria-hidden="true" className="flex items-center gap-1 text-[13px] text-subtle">
+                    <Kbd>{IS_MAC ? '⌘' : 'Ctrl'}</Kbd>
+                    <Kbd>↵</Kbd>
+                    <span className="ml-1">to send</span>
+                  </p>
+                ) : null}
+              </div>
+            </form>
+          </MotionDiv>
+        )}
+      </AnimatePresence>
+      {/* Always mounted (outside the swap) so screen readers pick up every change. */}
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
+    </>
   );
 }

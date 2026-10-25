@@ -1,16 +1,16 @@
 // Everything the ⌘K palette can find, plus the search that ranks it.
 // Items are plain data: `action` describes what Enter does, `verb` is the
 // footer label for it, and the palette component carries it out.
+// `keywords` are facts worth showing when they are why a row matched (a
+// company, a tag, an author); `aliases` are synonyms that are only searched.
 
 import {
-  ArrowUp,
   Copy,
   Download,
   FileText,
   FileUser,
   Folder,
   Github,
-  Hash,
   Linkedin,
   Mail,
   MessageSquare,
@@ -27,61 +27,73 @@ import {
 } from '@/data/portfolioData';
 import { scoreItem } from './fuzzy';
 
-/** Group order when the query is empty. With a query, groups sort by best match. */
-const GROUPS = [
-  { id: 'goto', label: 'Go to' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'research', label: 'Research' },
+// With an empty query: a short, ordered start page of `suggested` items.
+const START_GROUPS = [
+  { id: 'projects', label: 'Featured projects' },
   { id: 'actions', label: 'Actions' },
+  { id: 'research', label: 'Research' },
+  { id: 'goto', label: 'Go to' },
+];
+
+// With a query: everything, groups sorted by their best match.
+const SEARCH_GROUPS = [
+  { id: 'projects', label: 'Projects' },
+  { id: 'actions', label: 'Actions' },
+  { id: 'research', label: 'Research' },
+  { id: 'goto', label: 'Go to' },
 ];
 
 const unique = (list) => [...new Set(list.filter(Boolean))];
 const bareUrl = (url) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+// github.com/<user> is a profile, not a repository.
+const isGitHubProfile = (url) => /^https?:\/\/(www\.)?github\.com\/[^/]+\/?$/i.test(url);
 
-// Extra words people might type for each section.
-const SECTION_KEYWORDS = {
-  experience: ['work', 'jobs', 'internships', ...workExperience.map((job) => job.company)],
-  projects: ['portfolio', 'code', 'apps'],
-  research: ['papers', 'publications'],
-  about: ['bio', 'me', 'photos'],
-  education: ['school', 'university', 'courses', 'gpa', education.school, education.college],
-  rohangpt: ['chat', 'ai', 'ask', 'assistant', 'RohanGPT'],
-  contact: ['email', 'message', 'get in touch'],
+const SECTION_SEARCH = {
+  experience: {
+    keywords: workExperience.map((job) => job.company),
+    aliases: ['work', 'jobs', 'internships'],
+  },
+  projects: { aliases: ['portfolio', 'code', 'apps'] },
+  research: { aliases: ['papers', 'publications'] },
+  about: { aliases: ['bio', 'me', 'photos'] },
+  education: {
+    keywords: [education.school, education.college],
+    aliases: ['school', 'university', 'courses', 'gpa'],
+  },
+  rohangpt: { aliases: ['ask', 'ai', 'assistant'] },
+  contact: { aliases: ['email', 'message', 'get in touch'] },
 };
 
-const goToItems = [
-  {
-    id: 'goto-top',
-    group: 'goto',
-    title: 'Top',
-    keywords: ['home', 'start', 'hero', 'intro'],
-    icon: ArrowUp,
-    verb: 'Go',
-    action: { type: 'section', id: 'top' },
-  },
-  ...sections.map((section) => ({
-    id: `goto-${section.id}`,
-    group: 'goto',
-    title: section.label,
-    keywords: SECTION_KEYWORDS[section.id] ?? [],
-    icon: Hash,
-    verb: 'Go',
-    action: { type: 'section', id: section.id },
-  })),
-];
+// Sections have no icon: the "Go to" heading says what they are.
+const goToItems = sections.map((section) => ({
+  id: `goto-${section.id}`,
+  group: 'goto',
+  title: section.label,
+  keywords: unique(SECTION_SEARCH[section.id]?.keywords ?? []),
+  aliases: SECTION_SEARCH[section.id]?.aliases ?? [],
+  suggested: true,
+  verb: 'Go',
+  action: { type: 'section', id: section.id },
+}));
 
 const projectItems = projects.map((project) => {
-  const href = project.liveUrl || project.repoUrl;
+  const repoUrl = project.repoUrl && !isGitHubProfile(project.repoUrl) ? project.repoUrl : null;
+  const href = project.liveUrl || repoUrl;
   return {
-    id: `project-${project.slug ?? project.title}`,
+    id: `project-${project.slug}`,
     group: 'projects',
     title: project.title,
     meta: [project.category, project.year].filter(Boolean).join(' · '),
     keywords: unique([project.category, ...(project.tags ?? [])]),
+    aliases: [],
     icon: Folder,
+    suggested: Boolean(project.featured),
     external: Boolean(href),
-    verb: project.liveUrl ? 'Open site' : project.repoUrl ? 'View source' : 'Go to projects',
-    action: href ? { type: 'url', href } : { type: 'section', id: 'projects' },
+    verb: project.liveUrl ? 'Open site' : repoUrl ? 'View source' : 'View project',
+    // Without a link of its own, a project opens in the page's project viewer.
+    action: href
+      ? { type: 'url', href }
+      : { type: 'hash', hash: `#project/${project.slug}` },
   };
 });
 
@@ -91,9 +103,16 @@ const researchItems = research
     id: `research-${paper.title}`,
     group: 'research',
     title: paper.title,
-    meta: 'PDF',
-    keywords: unique([paper.venue, paper.authors, 'paper', 'pdf', ...(paper.keywords ?? []), ...(paper.tags ?? [])]),
+    meta: [paper.venue, paper.year].filter(Boolean).join(' · '),
+    keywords: unique([
+      ...(paper.authors ?? '').split(',').map((name) => name.trim()),
+      paper.venue,
+      ...(paper.keywords ?? []),
+      ...(paper.tags ?? []),
+    ]),
+    aliases: ['paper', 'pdf'],
     icon: FileText,
+    suggested: true,
     external: true,
     verb: 'Open PDF',
     action: { type: 'url', href: paper.liveUrl },
@@ -105,8 +124,10 @@ const themeItem = (theme) => {
     id: 'action-theme',
     group: 'actions',
     title: `Switch to ${next} theme`,
-    keywords: ['theme', 'dark mode', 'light mode', 'appearance', 'color scheme'],
+    keywords: [],
+    aliases: ['theme', 'dark mode', 'light mode', 'appearance', 'color scheme'],
     icon: next === 'dark' ? Moon : Sun,
+    suggested: true,
     verb: 'Switch',
     action: { type: 'theme' },
   };
@@ -117,36 +138,42 @@ const actionItems = (theme) => [
     id: 'action-copy-email',
     group: 'actions',
     title: 'Copy email',
-    keywords: ['clipboard', 'mail', 'address', 'contact'],
+    keywords: [],
+    aliases: ['clipboard', 'mail', 'address', 'contact'],
     icon: Copy,
+    suggested: true,
     verb: 'Copy',
     action: { type: 'copy', text: profile.email },
+  },
+  {
+    id: 'action-resume-pdf',
+    group: 'actions',
+    title: 'Download résumé PDF',
+    keywords: [],
+    aliases: ['cv', 'resume', 'pdf', 'save'],
+    icon: Download,
+    suggested: true,
+    verb: 'Download',
+    action: { type: 'download', href: profile.resumeUrl },
   },
   themeItem(theme),
   {
     id: 'action-resume',
     group: 'actions',
     title: 'View résumé',
-    keywords: ['cv', 'resume'],
+    keywords: [],
+    aliases: ['cv', 'resume'],
     icon: FileUser,
     verb: 'Open',
     action: { type: 'hash', hash: '#/resume' },
-  },
-  {
-    id: 'action-resume-pdf',
-    group: 'actions',
-    title: 'Download résumé PDF',
-    keywords: ['cv', 'resume', 'pdf', 'save'],
-    icon: Download,
-    verb: 'Download',
-    action: { type: 'download', href: profile.resumeUrl },
   },
   {
     id: 'action-github',
     group: 'actions',
     title: 'GitHub',
     meta: bareUrl(profile.github),
-    keywords: ['code', 'repos', 'source'],
+    keywords: [],
+    aliases: ['code', 'repos', 'source'],
     icon: Github,
     external: true,
     verb: 'Open',
@@ -157,7 +184,8 @@ const actionItems = (theme) => [
     group: 'actions',
     title: 'LinkedIn',
     meta: bareUrl(profile.linkedin),
-    keywords: ['profile', 'connect'],
+    keywords: [],
+    aliases: ['profile', 'connect'],
     icon: Linkedin,
     external: true,
     verb: 'Open',
@@ -168,7 +196,8 @@ const actionItems = (theme) => [
     group: 'actions',
     title: 'Email',
     meta: profile.email,
-    keywords: ['mail', 'contact', 'message', 'send'],
+    keywords: [],
+    aliases: ['mail', 'contact', 'message', 'send'],
     icon: Mail,
     verb: 'Write',
     action: { type: 'mailto', href: `mailto:${profile.email}` },
@@ -177,10 +206,10 @@ const actionItems = (theme) => [
 
 /** All palette items for the current theme (one title depends on it). */
 export const getPaletteItems = (theme) => [
-  ...goToItems,
   ...projectItems,
-  ...researchItems,
   ...actionItems(theme),
+  ...researchItems,
+  ...goToItems,
 ];
 
 const askItem = (query) => ({
@@ -194,30 +223,47 @@ const askItem = (query) => ({
 });
 
 /**
+ * The meta shown for a match: the keyword it came through, when that keyword
+ * is a fact the row doesn't already show ("Experience · Aress Software"),
+ * otherwise the item's own meta.
+ */
+function metaFor(item, keyword) {
+  if (!keyword || item.meta?.toLowerCase().includes(keyword.toLowerCase())) return item.meta;
+  return keyword;
+}
+
+/**
  * Filter and rank `items` for `query`.
- * Returns `groups` ([{ id, label, results: [{ item, indices, index }] }]), the
- * same results as a `flat` list in display order (`index` is the position in
- * it), and `count`, the number of real matches. A non-empty query always ends
- * with the "Ask about my work" item, in a group without a visible label.
+ * Returns `groups` ([{ id, label, results: [{ item, indices, meta, index }] }]),
+ * the same results as a `flat` list in display order (`index` is the position
+ * in it), and `count`, the number of real matches. A non-empty query always
+ * ends with the "Ask about my work" item, in a group without a visible label.
  */
 export function searchPalette(query, items) {
   const q = query.trim();
   let groups;
 
   if (!q) {
-    groups = GROUPS.map((group) => ({
+    groups = START_GROUPS.map((group) => ({
       ...group,
       results: items
-        .filter((item) => item.group === group.id)
-        .map((item) => ({ item, indices: [] })),
+        .filter((item) => item.group === group.id && item.suggested)
+        .map((item) => ({ item, indices: [], meta: item.meta })),
     }));
   } else {
-    groups = GROUPS.map((group) => {
+    groups = SEARCH_GROUPS.map((group) => {
       const results = [];
       items.forEach((item, order) => {
         if (item.group !== group.id) return;
-        const match = scoreItem(q, item.title, item.keywords);
-        if (match) results.push({ item, ...match, order });
+        const match = scoreItem(q, item.title, item.keywords, item.aliases);
+        if (!match) return;
+        results.push({
+          item,
+          indices: match.indices,
+          meta: metaFor(item, match.keyword),
+          score: match.score,
+          order,
+        });
       });
       results.sort((a, b) => b.score - a.score || a.order - b.order);
       return { ...group, results, best: results[0]?.score ?? -Infinity };
@@ -239,8 +285,8 @@ export function searchPalette(query, items) {
     .filter((group) => group.results.length)
     .map((group) => ({
       ...group,
-      results: group.results.map((result) => {
-        const entry = { item: result.item, indices: result.indices, index: flat.length };
+      results: group.results.map(({ item, indices, meta }) => {
+        const entry = { item, indices, meta, index: flat.length };
         flat.push(entry);
         return entry;
       }),

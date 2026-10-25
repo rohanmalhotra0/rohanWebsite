@@ -2,7 +2,6 @@ import { useId } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Reveal from '@/components/primitives/Reveal';
 import { Container, Section, SectionHeader } from '@/components/primitives/Section';
-import { TechList } from '@/components/primitives/Tag';
 import { research } from '@/data/portfolioData';
 import { dropSrcSetOnError, THUMBNAIL_SIZES, thumbnailSrcSet } from './thumbnail';
 
@@ -12,7 +11,7 @@ export default function Research() {
       <Container>
         <SectionHeader
           title="Research"
-          description="These started as questions I wanted to test: whether sentiment helps explain returns, how prediction contracts can hedge income risk, and how Kelly sizing behaves under drawdowns."
+          description="Two are published on VTechWorks, Virginia Tech’s research repository. The newest came out of my work at Kalshi."
         />
 
         <ul className="mt-12 border-t border-line sm:mt-16">
@@ -29,7 +28,7 @@ function Paper({ paper, index }) {
   const titleId = useId();
 
   return (
-    <Reveal as="li" delay={index * 0.05} className="border-b border-line">
+    <Reveal as="li" delay={index * 0.05} className="border-b border-line last:border-b-0">
       <article
         aria-labelledby={titleId}
         className="grid gap-6 py-10 sm:py-12 md:grid-cols-12 md:gap-8"
@@ -52,10 +51,9 @@ function Paper({ paper, index }) {
           <p className="mt-4 max-w-[62ch] text-pretty text-[15px] leading-7 text-muted sm:text-base">
             {paper.description}
           </p>
-          <TechList items={paper.tags} className="mt-4" />
           {paper.liveUrl || paper.externalUrl ? (
             // 44px tap targets; the negative margin keeps the visual rhythm.
-            <div className="-mb-3 mt-2 flex flex-wrap gap-x-6">
+            <div className="-mb-3 mt-3 flex flex-wrap gap-x-6">
               {paper.liveUrl ? (
                 <PaperLink href={paper.liveUrl} title={paper.title}>
                   Read paper (PDF)
@@ -63,7 +61,7 @@ function Paper({ paper, index }) {
               ) : null}
               {paper.externalUrl ? (
                 <PaperLink href={paper.externalUrl} title={paper.title}>
-                  Published record
+                  VTechWorks
                 </PaperLink>
               ) : null}
             </div>

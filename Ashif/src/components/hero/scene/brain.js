@@ -1,11 +1,14 @@
 import { Vector3 } from 'three';
 import { DIMS } from './model';
 import { TOY_REST, toyAxis } from './toy';
+import { BEAT } from './robot';
 import { damp, easeInOut, random } from './math';
 
 /** Body centre to toy when grasping: the arm reaches just past the face. */
 const REACH = 0.57;
 const DOWN = new Vector3(0, -1, 0);
+/** Celebration after a pickup: four beats, then a short settle. */
+const DANCE = BEAT * 4.4;
 
 /** Word shown in the camera HUD for each state. */
 export const STATUS = {
@@ -14,6 +17,7 @@ export const STATUS = {
   approach: 'fetching',
   reach: 'grasping',
   lift: 'grasping',
+  dance: 'dancing',
   return: 'returning',
   present: 'returning',
   trick: 'waving',
@@ -21,6 +25,7 @@ export const STATUS = {
 
 const MESSAGES = {
   track: 'Toy thrown. The robot spotted it and is going to fetch it.',
+  place: 'Toy moved. The robot is going to fetch it.',
   lift: 'The robot picked up the toy.',
   drop: 'The robot brought the toy back.',
   trick: 'The robot waved.',
@@ -28,10 +33,11 @@ const MESSAGES = {
 
 /**
  * Fetch behaviour as a small state machine on top of the controller:
- * idle → track (toy in the air) → approach → reach → lift → return →
- * present → idle, plus a wave trick. New throws retarget at any point.
+ * idle → track (toy in the air or being dragged) → approach → reach →
+ * dance (or lift, with reduced motion) → return → present → idle, plus a
+ * wave trick. New throws and drags retarget at any point.
  */
-export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
+export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange, canDance = () => true }) {
   const s = ctl.state;
   const arm = ctl.arm;
   const gaze = ctl.gaze;
@@ -91,6 +97,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
 
     let crouch = 0;
     let sit = 0;
+    let dance = 0;
     arm.mode = 'gaze';
     arm.rate = 7;
     arm.neck = 0;
@@ -124,7 +131,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
         gaze.target.copy(toy.mesh.position);
         gaze.omega = 11;
         ctl.stop();
-        if (toy.landed && time > 0.3) go('approach');
+        if (toy.landed && toy.state !== 'dragged' && time > 0.3) go('approach');
         break;
 
       case 'approach': {
@@ -164,10 +171,28 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
           toy.mesh.layers.set(1);
           toy.state = 'held';
           holding = true;
-          go('lift', MESSAGES.lift);
+          go(canDance() ? 'dance' : 'lift', MESSAGES.lift);
         }
         break;
       }
+
+      case 'dance':
+        // A little celebration with the toy before bringing it back.
+        ctl.stop();
+        s.look = 0.5;
+        gaze.target.copy(viewer());
+        arm.grip = 0;
+        arm.clock = time;
+        if (time < DANCE) {
+          dance = 1;
+          arm.mode = 'dance';
+          arm.rate = 11;
+        } else {
+          arm.mode = 'carry';
+          arm.rate = 6;
+        }
+        if (time > DANCE + 0.3) go('return');
+        break;
 
       case 'lift':
         ctl.stop();
@@ -195,7 +220,7 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
         ctl.stop();
         const fx = Math.sin(s.yaw);
         const fz = Math.cos(s.yaw);
-        goal.set(s.x + fx * 0.66, 0.62, s.z + fz * 0.66);
+        goal.set(s.x + fx * 0.46, 0.6, s.z + fz * 0.46);
         dir.set(fx * 0.94, -0.34, fz * 0.94);
         if (time < 1.45) {
           const k = easeInOut(time / 0.8);
@@ -234,6 +259,16 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
 
     s.crouch = damp(s.crouch, crouch, 5, dt);
     s.sit = damp(s.sit, sit, 4.5, dt);
+    s.danceTarget = dance;
+  }
+
+  function takeToy() {
+    if (toy) {
+      letGo();
+      toy.fadeOut();
+    }
+    toy = toy === toys[0] ? toys[1] : toys[0];
+    return toy;
   }
 
   return {
@@ -250,23 +285,40 @@ export function createBrain({ ctl, rig, toys, scene, home, viewer, onChange }) {
       if (point) pointer.at.copy(point);
     },
 
-    /** Lob a toy from the viewer's side onto `point` (on the floor). */
-    throwTo(point) {
-      if (toy) {
-        letGo();
-        toy.fadeOut();
-      }
-      toy = toy === toys[0] ? toys[1] : toys[0];
-      // Lob it from the viewer's side, landing a little short so the bounce
-      // carries it onto the spot that was clicked.
-      const v = viewer();
-      const len = Math.hypot(v.x - point.x, v.z - point.z) || 1;
-      const ux = (v.x - point.x) / len;
-      const uz = (v.z - point.z) / len;
-      start.set(point.x + ux * 1.2, 1.25, point.z + uz * 1.2);
-      goal.set(point.x + ux * 0.22, TOY_REST, point.z + uz * 0.22);
-      toy.throwTo(start, goal, 0.72);
+    /** Lob a toy from `from` (the viewer's side, out of frame) onto `point` on the floor. */
+    throwTo(point, from, duration) {
+      takeToy();
+      // Land a little short, so the bounce carries it onto the clicked spot.
+      const len = Math.hypot(from.x - point.x, from.z - point.z) || 1;
+      goal.set(point.x + ((from.x - point.x) / len) * 0.2, TOY_REST, point.z + ((from.z - point.z) / len) * 0.2);
+      toy.throwTo(from, goal, duration);
       go('track', MESSAGES.track);
+    },
+
+    /** Put a toy down at rest (the one lying on the floor at first). */
+    place(at, heading) {
+      takeToy().rest(at, heading);
+    },
+
+    /** The active toy, if it can be picked up by the pointer right now. */
+    get draggable() {
+      return toy && toy.onFloor ? toy : null;
+    },
+
+    /** Pointer picked up the toy: watch it until it is dropped. */
+    grab() {
+      if (!toy?.onFloor) return false;
+      toy.grab();
+      go('track');
+      return true;
+    },
+
+    /** Pointer let go: it falls, then the fetch runs as after a throw. */
+    drop() {
+      if (toy?.state !== 'dragged') return;
+      toy.drop();
+      time = 0;
+      onChange(state, MESSAGES.place);
     },
 
     /** Clicked the robot: wave, when it's not busy. */

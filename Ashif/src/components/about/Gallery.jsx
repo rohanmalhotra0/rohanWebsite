@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { photos } from '@/data/portfolioData';
 import { cn } from '@/lib/utils';
 import { srcSetFor, thumbnailSizes } from './images';
@@ -7,21 +7,35 @@ import { srcSetFor, thumbnailSizes } from './images';
 const gallery = photos.slice(1);
 const totalAspect = gallery.reduce((total, photo) => total + photo.width / photo.height, 0);
 
-// The viewer loads on first hover or focus of a thumbnail, so the first open is
-// instant. If it can't load (offline), thumbnails do nothing rather than break the page.
-const loadLightbox = () => import('./Lightbox');
-const Lightbox = lazy(() => loadLightbox().catch(() => ({ default: () => null })));
-const preloadLightbox = () => {
-  loadLightbox().catch(() => {});
-};
+// The viewer is not in the main bundle. It is mounted (closed) once the photos
+// come within half a screen, or on first hover/focus of a thumbnail, rather than
+// on click: a lazy component suspends on its first render and React holds back
+// the reveal, so mounting early is what makes the first open instant (touch
+// included, where hover only fires with the tap). If it can't load, thumbnails do nothing.
+const Lightbox = lazy(() => import('./Lightbox').catch(() => ({ default: () => null })));
 
 export default function Gallery({ className }) {
   const [view, setView] = useState(null);
-  const [viewerMounted, setViewerMounted] = useState(false);
+  const [viewerWanted, setViewerWanted] = useState(false);
+  const list = useRef(null);
   const buttons = useRef([]);
 
+  const wantViewer = () => setViewerWanted(true);
+
+  useEffect(() => {
+    if (viewerWanted || !list.current || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setViewerWanted(true);
+      },
+      { rootMargin: '0px 0px 50% 0px' }
+    );
+    observer.observe(list.current);
+    return () => observer.disconnect();
+  }, [viewerWanted]);
+
   const open = (index) => {
-    setViewerMounted(true);
+    setViewerWanted(true);
     setView({ index, direction: 0 });
   };
 
@@ -43,6 +57,7 @@ export default function Gallery({ className }) {
   return (
     <>
       <ul
+        ref={list}
         aria-label="Photos"
         className={cn(
           // Phones and tablets: a strip that runs to the screen edges, the next photo peeking in.
@@ -67,8 +82,8 @@ export default function Gallery({ className }) {
                 type="button"
                 aria-haspopup="dialog"
                 onClick={() => open(index)}
-                onPointerEnter={preloadLightbox}
-                onFocus={preloadLightbox}
+                onPointerEnter={wantViewer}
+                onFocus={wantViewer}
                 className="group block w-full cursor-zoom-in overflow-hidden rounded-lg bg-surface-2"
               >
                 <img
@@ -94,7 +109,7 @@ export default function Gallery({ className }) {
         ))}
       </ul>
 
-      {viewerMounted ? (
+      {viewerWanted ? (
         <Suspense fallback={null}>
           <Lightbox photos={gallery} view={view} onNavigate={navigate} onClose={close} />
         </Suspense>

@@ -139,36 +139,90 @@ export function fuzzyMatch(query, text) {
   return { score: total, indices };
 }
 
-const goodEnough = (match, token) =>
-  Boolean(match) && match.score >= token.length * MIN_SCORE_PER_CHAR;
+/**
+ * Whether a match reads as something a person meant: one contiguous run
+ * anywhere ("board" in Dashboard), or runs that each start a word ("epmw" in
+ * EPM Wizard). The one allowance is a typo: a single later run of two or more
+ * letters inside the word the previous run reached ("gavndle" in Gavindle).
+ * Letters picked out of the middle of words ("ai" in Autism, "home" in
+ * "Hedging … Income") are not.
+ */
+function isPlausible(indices, text) {
+  const runs = [];
+  indices.forEach((index, i) => {
+    if (i > 0 && index === indices[i - 1] + 1) runs[runs.length - 1].end = index;
+    else runs.push({ start: index, end: index });
+  });
+  if (runs.length === 1) return true;
+  if (!isWordStart(text, runs[0].start)) return false;
+
+  let typos = 0;
+  for (let r = 1; r < runs.length; r += 1) {
+    const { start, end } = runs[r];
+    if (isWordStart(text, start)) continue;
+    typos += 1;
+    if (typos > 1 || end === start) return false;
+    let wordStart = start;
+    while (!isWordStart(text, wordStart)) wordStart -= 1;
+    if (runs[r - 1].end < wordStart) return false;
+  }
+  return true;
+}
+
+const goodEnough = (match, token, text) =>
+  Boolean(match) &&
+  match.score >= token.length * MIN_SCORE_PER_CHAR &&
+  isPlausible(match.indices, text);
+
+// Hidden synonyms can't explain a match, so they must be typed as the start
+// of one of their words.
+const isWordPrefix = (match, text) =>
+  Boolean(match) &&
+  isWordStart(text, match.indices[0]) &&
+  match.indices.every((index, i) => index === match.indices[0] + i);
 
 /**
  * Score a palette item against a (possibly multi-word) query. Every word must
- * match the title or one of the keywords. Returns { score, indices } where
- * `indices` are title characters to highlight, or null for no match.
+ * match the title, a keyword (fuzzy), or an alias (word prefix). Returns
+ * { score, indices, keyword } where `indices` are title characters to
+ * highlight and `keyword` is the keyword behind the first word the title
+ * couldn't match (so the row can say why it is there), or null for no match.
  */
-export function scoreItem(query, title, keywords = []) {
+export function scoreItem(query, title, keywords = [], aliases = []) {
   const phrase = query.trim().replace(/\s+/g, ' ');
-  if (!phrase) return { score: 0, indices: [] };
+  if (!phrase) return { score: 0, indices: [], keyword: null };
 
   let total = 0;
+  let keyword = null;
   const highlight = new Set();
 
   for (const token of phrase.split(' ')) {
     const onTitle = fuzzyMatch(token, title);
-    const titleHit = goodEnough(onTitle, token);
+    const titleHit = goodEnough(onTitle, token, title);
     let best = titleHit ? onTitle.score : -Infinity;
+    // A keyword that beats the title explains this word better than a weak
+    // highlight would ("py" in Physics Calculator comes from Python).
+    let via = null;
 
-    for (const keyword of keywords) {
-      const onKeyword = fuzzyMatch(token, keyword);
-      if (goodEnough(onKeyword, token)) {
-        best = Math.max(best, onKeyword.score * KEYWORD_WEIGHT);
+    for (const candidate of keywords) {
+      const onKeyword = fuzzyMatch(token, candidate);
+      if (goodEnough(onKeyword, token, candidate) && onKeyword.score * KEYWORD_WEIGHT > best) {
+        best = onKeyword.score * KEYWORD_WEIGHT;
+        via = candidate;
+      }
+    }
+    for (const alias of aliases) {
+      const onAlias = fuzzyMatch(token, alias);
+      if (isWordPrefix(onAlias, alias) && onAlias.score * KEYWORD_WEIGHT > best) {
+        best = onAlias.score * KEYWORD_WEIGHT;
+        via = null;
       }
     }
 
     if (best === -Infinity) return null;
     total += best;
-    if (titleHit) onTitle.indices.forEach((i) => highlight.add(i));
+    if (via) keyword ??= via;
+    else if (titleHit) onTitle.indices.forEach((i) => highlight.add(i));
   }
 
   // The whole query typed as the start of a word in the title ("hedg",
@@ -182,5 +236,5 @@ export function scoreItem(query, title, keywords = []) {
     }
   }
 
-  return { score: total, indices: [...highlight].sort((a, b) => a - b) };
+  return { score: total, indices: [...highlight].sort((a, b) => a - b), keyword };
 }

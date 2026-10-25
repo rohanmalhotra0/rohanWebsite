@@ -6,3 +6,10 @@ export const ICON_BUTTON =
 
 /** The bar's inner row; the mobile menu repeats it so opening it feels in place. */
 export const BAR_ROW = 'container-page flex h-14 items-center justify-between gap-4 lg:h-16';
+
+/**
+ * Desktop bar text links (sections and Résumé). Tighter between 1024 and
+ * 1280 so the centered links clear both sides; 44px tall on touch screens.
+ */
+export const NAV_LINK =
+  'flex h-9 items-center rounded-md px-2 text-[13px] font-medium transition-colors duration-150 pointer-coarse:h-11 xl:px-3 xl:text-[13.5px]';

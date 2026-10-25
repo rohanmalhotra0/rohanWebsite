@@ -7,6 +7,8 @@ export const TOY_REST = 0.019;
 
 const GRAVITY = 9.8;
 const STEP = 1 / 120;
+/** Height a dragged toy is carried at, so it reads as picked up. */
+export const DRAG_LIFT = 0.06;
 const UP = new Vector3(0, 1, 0);
 const LONG_AXIS = new Vector3(1, 0, 0);
 const _dq = new Quaternion();
@@ -34,10 +36,11 @@ export function createToy(geometry, material) {
     mesh,
     vel: new Vector3(),
     spin: new Vector3(),
-    // hidden | flying | rolling | resting | held | fading
+    // hidden | flying | rolling | resting | held | dragged | fading
     state: 'hidden',
     landed: false,
     fade: 1,
+    goal: new Vector3(),
 
     get onFloor() {
       return toy.state === 'rolling' || toy.state === 'resting';
@@ -67,11 +70,50 @@ export function createToy(geometry, material) {
       if (toy.state !== 'hidden') toy.state = 'fading';
     },
 
+    /** Lie still on the floor at `at`, long axis along `heading`. */
+    rest(at, heading) {
+      mesh.position.set(at.x, TOY_REST, at.z);
+      mesh.quaternion.setFromAxisAngle(UP, heading);
+      mesh.scale.setScalar(1);
+      mesh.visible = true;
+      toy.vel.set(0, 0, 0);
+      toy.spin.set(0, 0, 0);
+      toy.fade = 1;
+      toy.landed = true;
+      toy.state = 'resting';
+    },
+
+    /** Picked up by the pointer: follows `goal` (set by the caller) a little above the floor. */
+    grab() {
+      toy.goal.copy(mesh.position).setY(TOY_REST);
+      toy.vel.set(0, 0, 0);
+      toy.spin.set(0, 0, 0);
+      toy.landed = false;
+      toy.state = 'dragged';
+    },
+
+    /** Let go of a drag: it drops onto the floor, keeping a little of the hand's speed. */
+    drop() {
+      const speed = Math.hypot(toy.vel.x, toy.vel.z);
+      if (speed > 1.2) toy.vel.multiplyScalar(1.2 / speed);
+      toy.vel.y = 0;
+      toy.release();
+    },
+
     update(dt, bounds) {
       if (toy.state === 'flying' || toy.state === 'rolling') {
         let n = Math.ceil(dt / STEP);
         const h = dt / Math.max(n, 1);
         while (n-- > 0) step(h, bounds);
+      } else if (toy.state === 'dragged') {
+        // Critically damped follow, so a fast drag still looks carried.
+        const p = mesh.position;
+        const k = 1 - Math.exp(-22 * dt);
+        const x = p.x + (toy.goal.x - p.x) * k;
+        const z = p.z + (toy.goal.z - p.z) * k;
+        const y = p.y + (TOY_REST + DRAG_LIFT - p.y) * (1 - Math.exp(-16 * dt));
+        if (dt > 0) toy.vel.set((x - p.x) / dt, 0, (z - p.z) / dt);
+        p.set(x, y, z);
       } else if (toy.state === 'held') {
         // Ease into the centre of the jaws after the grasp.
         mesh.position.multiplyScalar(Math.exp(-14 * dt));

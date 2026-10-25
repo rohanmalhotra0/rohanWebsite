@@ -3,8 +3,18 @@
 
 export const EASE = [0.16, 1, 0.3, 1];
 
-/** Highlights shown before "Show more". The most recent role shows all of them. */
-export const VISIBLE_HIGHLIGHTS = 2;
+// The latest role shows every highlight and the next two show a couple. Older
+// roles lead with their summary and keep highlights behind "Show N more".
+const RECENT_ROLES = 3;
+const PREVIEW = 2;
+
+/** How many of a role's highlights show before "Show N more". */
+export function visibleHighlights(index, count) {
+  if (index === 0) return count;
+  if (index >= RECENT_ROLES) return 0;
+  // Hiding a single bullet would save nothing.
+  return count - PREVIEW > 1 ? PREVIEW : count;
+}
 
 /**
  * Groups consecutive roles at the same company, keeping each role's position
@@ -21,38 +31,8 @@ export function groupByCompany(roles) {
   }, []);
 }
 
-/** Some entries reuse their date text as the location ("Earlier experience"). */
-export const roleLocation = (role) =>
-  role.location && role.location !== role.date ? role.location : null;
-
 /** The location every role in a group shares, or null. */
 export function sharedLocation(roles) {
-  const location = roleLocation(roles[0]);
-  return roles.every((role) => roleLocation(role) === location) ? location : null;
-}
-
-// Standalone figures: 898, 500,000, 36.7%, 99.4%, 10+.
-const FIGURE = /\d+(?:,\d{3})*(?:\.\d+)?%?\+?/g;
-// Figures glued to a word stay plain: YOLO11, Qwen-Coder-32B, mAP@50, 13-day.
-const GLUED_BEFORE = /[\w@.-]/;
-const GLUED_AFTER = /[\w%-]/;
-
-/**
- * Splits text into [{ text, figure }] parts so standalone figures can be
- * emphasized. Joining the parts' text gives back the original string.
- * (No regex lookbehind: older Safari can't parse it.)
- */
-export function splitFigures(text) {
-  const parts = [];
-  let last = 0;
-  for (const match of text.matchAll(FIGURE)) {
-    const start = match.index;
-    const end = start + match[0].length;
-    if (GLUED_BEFORE.test(text[start - 1] ?? '') || GLUED_AFTER.test(text[end] ?? '')) continue;
-    if (start > last) parts.push({ text: text.slice(last, start) });
-    parts.push({ text: match[0], figure: true });
-    last = end;
-  }
-  if (last < text.length) parts.push({ text: text.slice(last) });
-  return parts;
+  const [{ location }] = roles;
+  return roles.every((role) => role.location === location) ? location : null;
 }

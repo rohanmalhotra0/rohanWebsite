@@ -150,7 +150,8 @@ function Sheet({
         </div>
       </div>
 
-      <nav aria-label="Mobile" className="container-page shrink-0 pt-5">
+      {/* Same name as the bar's nav: only one of the two is ever exposed. */}
+      <nav aria-label="Primary" className="container-page shrink-0 pt-5">
         <ul className="border-t border-line">
           {sections.map((section, i) => {
             const isActive = active === section.id;

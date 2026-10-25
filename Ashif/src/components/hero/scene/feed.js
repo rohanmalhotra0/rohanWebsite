@@ -22,6 +22,7 @@ uniform vec3 uDark;
 uniform vec3 uLight;
 uniform vec2 uSize;
 uniform float uRadius;
+uniform float uFade;
 varying vec2 vUv;
 void main() {
   vec4 raw = texture2D(map, vUv);
@@ -32,7 +33,7 @@ void main() {
   l *= 1.0 - dot(v, v) * 0.55;
   vec2 p = abs((vUv - 0.5) * uSize) - (uSize * 0.5 - uRadius);
   float d = length(max(p, 0.0)) - uRadius;
-  gl_FragColor = vec4(mix(uDark, uLight, l), 1.0 - smoothstep(-0.75, 0.75, d));
+  gl_FragColor = vec4(mix(uDark, uLight, l), (1.0 - smoothstep(-0.75, 0.75, d)) * uFade);
   #include <colorspace_fragment>
 }`;
 
@@ -61,6 +62,7 @@ export function createFeed(renderer) {
     uLight: { value: new Color() },
     uSize: { value: new Vector2(256, 144) },
     uRadius: { value: 8 },
+    uFade: { value: 1 },
   };
   const quad = new Mesh(
     new PlaneGeometry(2, 2),
@@ -114,9 +116,15 @@ export function createFeed(renderer) {
       renderer.setRenderTarget(null);
     },
 
+    /** Compile the inset's shader ahead of its first use. */
+    warm() {
+      return renderer.compileAsync(quadScene, quadCamera);
+    },
+
     /** Composite the last capture into the inset (after the main view). */
-    draw(width, height) {
+    draw(width, height, fade = 1) {
       if (!rect.w) return;
+      uniforms.uFade.value = fade;
       const y = height - rect.y - rect.h;
       renderer.autoClear = false;
       renderer.setScissorTest(true);
@@ -156,7 +164,9 @@ export function createFeed(renderer) {
       out.y = Math.max(minY - 2, 0);
       out.w = Math.min(maxX + 2, rect.w) - out.x;
       out.h = Math.min(maxY + 2, rect.h) - out.y;
-      return out.w > 3 && out.h > 3 ? out : null;
+      // Like a detector, drop slivers and objects mostly out of frame.
+      const inside = (out.w * out.h) / ((maxX - minX + 4) * (maxY - minY + 4));
+      return out.w > 6 && out.h > 6 && inside > 0.35 ? out : null;
     },
 
     dispose() {

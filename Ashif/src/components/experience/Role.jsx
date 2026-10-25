@@ -2,6 +2,7 @@ import { TechList } from '@/components/primitives/Tag';
 import { cn } from '@/lib/utils';
 import CompanyLogo from './CompanyLogo';
 import Highlights from './Highlights';
+import { visibleHighlights } from './timeline';
 
 /**
  * Dates and location: one line on phones, two lines from md up, where the
@@ -11,7 +12,7 @@ export function RoleMeta({ date, location, className }) {
   if (!date && !location) return null;
 
   return (
-    <p className={cn('text-sm leading-5 text-subtle tabular-nums', className)}>
+    <p className={cn('text-sm leading-5 text-subtle', className)}>
       {date ? <span className="md:block">{date}</span> : null}
       {date && location ? (
         <>
@@ -27,11 +28,20 @@ export function RoleMeta({ date, location, className }) {
   );
 }
 
+/** The company, spoken with a role heading that doesn't already name it. */
+export function SrCompany({ company }) {
+  return <span className="sr-only">, {company}</span>;
+}
+
 /**
  * Logo tile beside a two-line title block. The tile is positioned out of flow
  * so the block's first baseline is the title's, which the meta column aligns to.
+ * When the second line is the company, screen readers get it inside the heading
+ * ("Quantitative Developer, Kalshi") instead of hearing it twice.
  */
 export function RoleHeader({ company, imageUrl, title, subtitle, className }) {
+  const companyLine = subtitle === company;
+
   return (
     <header
       className={cn(
@@ -49,14 +59,19 @@ export function RoleHeader({ company, imageUrl, title, subtitle, className }) {
       ) : null}
       <h3 className="type-heading text-balance text-xl leading-[1.625rem] text-fg sm:text-[1.375rem]">
         {title}
+        {companyLine ? <SrCompany company={company} /> : null}
       </h3>
-      {subtitle ? <p className="text-[15px] leading-6 text-muted">{subtitle}</p> : null}
+      {subtitle ? (
+        <p aria-hidden={companyLine || undefined} className="text-[15px] leading-6 text-muted">
+          {subtitle}
+        </p>
+      ) : null}
     </header>
   );
 }
 
 /** Summary, highlights, and tools for one role. */
-export function RoleBody({ role, expanded, className }) {
+export function RoleBody({ role, className }) {
   return (
     <div className={className}>
       {role.summary ? (
@@ -64,7 +79,12 @@ export function RoleBody({ role, expanded, className }) {
           {role.summary}
         </p>
       ) : null}
-      <Highlights items={role.highlights} expanded={expanded} className="mt-4" />
+      <Highlights
+        items={role.highlights}
+        visible={visibleHighlights(role.index, role.highlights?.length ?? 0)}
+        label={`${role.role} at ${role.company}`}
+        className="mt-4"
+      />
       <TechList items={role.tags} className="mt-5" />
     </div>
   );

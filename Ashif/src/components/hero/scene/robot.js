@@ -20,6 +20,10 @@ const JOINTS = ['sh', 'el', 'wr'];
 // Arm folded flat along the back, the gripper over the nose looking down at
 // the floor ahead (so its camera sees the floor at rest).
 const STOW = { yaw: 0, sh: Math.PI + 0.06, el: -(Math.PI - 0.24), wr: -0.75 };
+// Dance: one beat every half second. Each beat the body dips and sways to
+// one side while the opposite front foot taps; the arm waves the toy.
+export const BEAT = 0.5;
+const TAP_BEATS = 4;
 
 /** Drives the rig: locomotion, gait, body pose, leg IK and the arm. */
 export function createController({ root, body, legs, arm }) {
@@ -37,6 +41,7 @@ export function createController({ root, body, legs, arm }) {
     phase: 0, walking: false, gaitMix: 0,
     crouch: 0, sit: 0, look: 1,
     twist: 0, nod: 0,
+    dance: 0, danceTarget: 0, danceClock: 0,
     time: 0,
   };
 
@@ -48,6 +53,7 @@ export function createController({ root, body, legs, arm }) {
     to: new Vector3(),
     swing: false,
     lift: 0,
+    tap: 0,
   }));
 
   const gaze = { target: new Vector3(), pos: new Vector3(), vel: new Vector3(), omega: 5 };
@@ -141,6 +147,21 @@ export function createController({ root, body, legs, arm }) {
     if (!moving && !feet.some((f) => f.swing) && footError() < 0.02) s.walking = false;
   }
 
+  // Front-foot taps on the beat, scaled by the dance weight. They only ever
+  // lift a planted foot straight up and put it back on the same spot.
+  function updateDance(dt) {
+    s.dance = damp(s.dance, s.danceTarget, s.danceTarget > s.dance ? 5 : 7, dt);
+    s.danceClock = s.dance > 0.002 ? s.danceClock + dt : 0;
+    const beat = Math.floor(s.danceClock / BEAT);
+    const u = (s.danceClock % BEAT) / BEAT;
+    // Sway goes to +x on even beats, so the -x front foot is the free one.
+    const side = beat % 2 === 0 ? -1 : 1;
+    for (const f of feet) {
+      const tapping = !s.walking && beat >= 1 && beat <= TAP_BEATS && u < 0.55 && f.leg.end > 0 && f.leg.side === side;
+      f.tap = tapping ? 0.055 * Math.sin((Math.PI * u) / 0.55) * s.dance : 0;
+    }
+  }
+
   function updateBody(dt) {
     const speed = Math.hypot(s.vf, s.vl) + Math.abs(s.w) * 0.25;
     s.gaitMix = damp(s.gaitMix, s.walking ? clamp(speed / 0.35, 0.25, 1) : 0, 5, dt);
@@ -157,28 +178,35 @@ export function createController({ root, body, legs, arm }) {
 
     const swayX = (0.011 * Math.sin(t * 0.47) + 0.005 * Math.sin(t * 1.21 + 1.3)) * still;
     const swayZ = 0.006 * Math.sin(t * 0.63 + 0.4) * still;
+    // Dance groove: half a sway per beat, a dip on every beat.
+    const d = s.dance;
+    const beat = (s.danceClock / BEAT) * Math.PI;
+    const groove = Math.sin(beat) * d;
+    const dip = Math.sin(beat) ** 2 * d;
     body.position.set(
-      swayX,
+      swayX + 0.04 * groove,
       DIMS.height -
         0.07 * s.crouch -
-        0.055 * s.sit +
+        0.055 * s.sit -
+        0.045 * dip +
         0.006 * s.gaitMix * Math.cos(2 * ph - SWING * Math.PI * 2) +
         0.0035 * Math.sin(t * 1.6) * still,
       swayZ - 0.05 * s.sit
     );
     body.rotation.set(
-      0.1 * s.crouch - 0.25 * s.sit - clamp(0.035 * s.accel, -0.04, 0.04) + s.nod,
-      s.twist,
+      0.1 * s.crouch - 0.25 * s.sit - clamp(0.035 * s.accel, -0.04, 0.04) + s.nod + 0.05 * Math.sin(2 * beat) * d,
+      s.twist + 0.16 * Math.sin(beat - Math.PI / 2) * d,
       -clamp(0.09 * s.vf * s.w, -0.06, 0.06) +
         0.012 * s.gaitMix * Math.sin(ph - SWING * Math.PI) -
         swayX * 0.5 -
-        s.twist * 0.25
+        s.twist * 0.25 -
+        0.12 * groove
     );
   }
 
   function solveLegs() {
     for (const f of feet) {
-      v.copy(f.pos).applyMatrix4(inv).sub(f.leg.root.position);
+      v.set(f.pos.x, f.pos.y + f.tap, f.pos.z).applyMatrix4(inv).sub(f.leg.root.position);
       solveLeg(v.x, v.y, v.z, f.leg.side, DIMS.legOffset, DIMS.upper, DIMS.lower, sol);
       f.leg.root.rotation.z = sol.roll;
       f.leg.thigh.rotation.x = -sol.pitch;
@@ -229,7 +257,13 @@ export function createController({ root, body, legs, arm }) {
     else if (armCtl.mode === 'gaze') aimGaze(qt);
     else if (armCtl.mode === 'reach') aimWrist(qt);
     else if (armCtl.mode === 'carry') pose(qt, 0, 0.24, 0.12, -0.74);
-    else {
+    else if (armCtl.mode === 'dance') {
+      // Toy held up at head height, swung side to side on the beat and
+      // wiggled twice as fast.
+      const b = (armCtl.clock / BEAT) * Math.PI;
+      pose(qt, 0.55 * Math.sin(b), 0.3, 0.26 + 0.06 * Math.sin(2 * b), 0.25 + 0.3 * Math.sin(2 * b + 0.8));
+      qt.roll = 0.6 * Math.sin(2 * b + 0.3);
+    } else {
       // Wave: arm up toward the gaze target, gripper swinging and snapping.
       const k = armCtl.clock;
       v.copy(gaze.pos).applyMatrix4(inv);
@@ -355,6 +389,7 @@ export function createController({ root, body, legs, arm }) {
       springTo(gaze.pos, gaze.vel, gaze.target, gaze.omega, dt);
       updateLocomotion(dt);
       updateGait(dt);
+      updateDance(dt);
       updateBody(dt);
       apply(dt);
     },

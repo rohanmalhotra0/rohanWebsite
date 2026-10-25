@@ -17,20 +17,27 @@ import {
 import { buildRobot, createMaterials } from './model';
 import { createController } from './robot';
 import { createBrain, STATUS } from './brain';
-import { boneGeometry, createToy, TOY_REST } from './toy';
+import { boneGeometry, createToy, DRAG_LIFT, TOY_REST } from './toy';
 import { createStage } from './stage';
 import { createFeed } from './feed';
-import { clamp, damp, smooth } from './math';
+import { approach, clamp, damp, lerp, smooth } from './math';
 import { readPalette } from '../palette';
 
 const HOME = { x: 0, z: 0, yaw: -0.62 };
-const TARGET = new Vector3(0, 0.17, 0.02);
-// Camera framing: a 3/4 view that "contains" the robot at a reference aspect,
-// matching how the poster image is fitted with object-fit: contain.
-export const VIEW = { az: 0.08, el: 0.32, dist: 3.85, fov: 27, aspect: 1 };
-const BOUNDS = { minX: -1.7, maxX: 1.7, minZ: -1.25, maxZ: 1.4 };
-// Where the gripper camera looks on frame one (and in the poster).
+// The taped play field (metres): toys land, roll and are dragged inside it.
+// Deep rather than wide, so all of it fits the frame with the robot large.
+const FIELD = { minX: -0.9, maxX: 0.9, minZ: -1.5, maxZ: 0.75 };
+const MARGIN = 0.1;
+const TARGET = new Vector3(0, 0.14, 0.05);
+// Camera framing: a 3/4 view of a square reference frame (the poster) that
+// holds the whole field. Wide stages crop its top and bottom by up to
+// `crop`, narrow ones fit its width; the poster is sized in CSS with the
+// same rule (see RobotStage).
+export const VIEW = { az: 0.03, el: 0.33, dist: 6.6, fov: 20, crop: 0.72 };
+// Where the gripper camera looks on frame one (and in the poster), and the
+// toy lying on the floor before anyone throws one.
 const FIRST_LOOK = new Vector3(-0.95, 0.1, 1.15);
+const FIRST_TOY = { x: -0.5, z: 0.5, heading: 0.45 };
 const ROBOT_BOX = new Box3(new Vector3(-0.26, 0, -0.52), new Vector3(0.26, 0.9, 0.66));
 const UP = new Vector3(0, 1, 0);
 
@@ -42,6 +49,13 @@ const QUALITY = [
   { ratio: 0.5, min: 0.75, shadow: 512, feed: 1 / 12 },
 ];
 
+// The camera inset shows only while there is something to watch: from a
+// throw or drag until a moment after the toy is back on the floor. It sits
+// out the dance, when the camera points at the sky.
+const WATCH = new Set(['track', 'approach', 'reach', 'lift', 'return', 'present']);
+const LINGER = 2.2;
+const FEED_FADE = 0.3; // seconds; matches the frame's CSS opacity transition
+
 const yieldToPage = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 /**
@@ -49,9 +63,10 @@ const yieldToPage = () => new Promise((resolve) => setTimeout(resolve, 0));
  * stays responsive. Returns null when a WebGL 2 renderer can't be created.
  *
  * `overlay` holds React refs to the DOM over the canvas (camera inset frame,
- * detection box, HUD line, controls). `onSlow` fires when the
- * device can't keep up even at the lowest quality (unless `forced`). In
- * poster mode it renders one still frame and exposes `capture()`.
+ * detection box, HUD line, controls); the scene sets the frame's opacity.
+ * Slow frames step quality down; a second or so of frames over 100 ms stops
+ * the loop and calls `onSlow` (unless `forced`). In poster mode it renders
+ * one still frame and exposes `capture()`.
  */
 export function createRobotScene({
   host,
@@ -61,7 +76,6 @@ export function createRobotScene({
   poster = false,
   forced = false,
   onReady,
-  onStatus,
   onAnnounce,
   onInteract,
   onLost,
@@ -100,6 +114,7 @@ export function createRobotScene({
   const toys = [createToy(toyGeometry, toyMaterial), createToy(toyGeometry, toyMaterial)];
   for (const t of toys) scene.add(t.mesh);
   const feed = poster ? null : createFeed(renderer);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   // Built during boot.
   let rig = null;
@@ -116,6 +131,7 @@ export function createRobotScene({
   let disposed = false;
   let first = true;
   let manual = false;
+  let gaveUp = false;
   let lastEvent = 0;
   let raf = 0;
   let last = 0;
@@ -136,6 +152,35 @@ export function createRobotScene({
     camera.updateMatrixWorld();
   }
 
+  // Auto-framing: `zoom` is the fraction of the reference frame's height in
+  // view. It sits at the stage's default and widens just enough to keep the
+  // raised arm and the body's ends inside the frame, then eases back.
+  const TAN = Math.tan((VIEW.fov * Math.PI) / 360);
+  const corner = new Vector3();
+  let baseZoom = 1;
+  let zoom = 1;
+
+  function frameRobot(dt) {
+    let need = baseZoom;
+    const s = ctl.state;
+    const fit = (p, pad) => {
+      p.applyMatrix4(camera.matrixWorldInverse);
+      if (p.z > -0.1) return;
+      need = Math.max(
+        need,
+        (p.y / -p.z / TAN + pad) / 0.88,
+        (Math.abs(p.x / -p.z) / TAN + pad) / (0.94 * camera.aspect)
+      );
+    };
+    for (const o of [rig.arm.elbow, rig.arm.wrist, rig.arm.grasp]) fit(o.getWorldPosition(corner), 0.06);
+    for (const end of [0.5, -0.5]) {
+      fit(corner.set(s.x + Math.sin(s.yaw) * end, 0.5, s.z + Math.cos(s.yaw) * end), 0.04);
+    }
+    zoom = dt > 0 ? damp(zoom, need, need > zoom ? 5 : 1.2, dt) : need;
+    camera.fov = (Math.atan(TAN * zoom) * 360) / Math.PI;
+    camera.updateProjectionMatrix();
+  }
+
   const baseRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
   let quality = 0;
   let pixelRatio = baseRatio;
@@ -151,13 +196,14 @@ export function createRobotScene({
     height = h;
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(w, h, false);
-    const aspect = w / h;
-    camera.aspect = aspect;
-    camera.fov =
-      aspect >= VIEW.aspect
-        ? VIEW.fov
-        : (Math.atan(Math.tan((VIEW.fov * Math.PI) / 360) * (VIEW.aspect / aspect)) * 360) / Math.PI;
-    camera.updateProjectionMatrix();
+    camera.aspect = w / h;
+    baseZoom = Math.max(1 / camera.aspect, VIEW.crop);
+    if (ctl) frameRobot(0);
+    else {
+      zoom = baseZoom;
+      camera.fov = (Math.atan(TAN * zoom) * 360) / Math.PI;
+      camera.updateProjectionMatrix();
+    }
     const inset = el('frame');
     if (feed && inset) {
       const f = inset.getBoundingClientRect();
@@ -196,22 +242,22 @@ export function createRobotScene({
   const hoverGoal = new Vector3();
   let hoverAlpha = 0;
 
-  const inBounds = (p) => p.x > BOUNDS.minX && p.x < BOUNDS.maxX && p.z > BOUNDS.minZ && p.z < BOUNDS.maxZ;
+  const inField = (p, m = MARGIN) =>
+    p.x > FIELD.minX + m && p.x < FIELD.maxX - m && p.z > FIELD.minZ + m && p.z < FIELD.maxZ - m;
 
-  // A throw target must keep the robot readable: not too close to the
-  // camera, inside the canvas margins, above the overlays and (on desktop)
-  // clear of the name.
+  // A throw target must be on the field, inside the canvas, clear of the
+  // overlays and (on desktop) clear of the name.
   function onScreen(p) {
-    if (p.z > HOME.z + 0.95) return false;
+    if (!inField(p)) return false;
     probe.copy(p).project(camera);
     const x = (probe.x * 0.5 + 0.5) * width;
     const y = (0.5 - probe.y * 0.5) * height;
-    const left = window.innerWidth >= 1024 ? 0.24 : 0.08;
-    if (x < width * left || x > width * 0.92 || y < height * 0.14 || y > height * 0.76) return false;
+    const left = window.innerWidth >= 1024 ? 0.14 : 0.03;
+    if (x < width * left || x > width * 0.97 || y < height * 0.05 || y > height * 0.95) return false;
     const c = canvas.getBoundingClientRect();
     for (const key of ['frame', 'controls']) {
       const r = el(key)?.getBoundingClientRect();
-      if (r && x > r.left - c.left - 48 && x < r.right - c.left + 48 && y > r.top - c.top - 56 && y < r.bottom - c.top + 48) {
+      if (r?.width && x > r.left - c.left - 48 && x < r.right - c.left + 48 && y > r.top - c.top - 56 && y < r.bottom - c.top + 48) {
         return false;
       }
     }
@@ -226,9 +272,10 @@ export function createRobotScene({
 
   const hitsRobot = () => nearRobot(raycaster.ray) && raycaster.intersectObject(rig.root, true).length > 0;
 
-  /** Keep a throw on the visible floor and off the robot's footprint. */
-  function clampTarget(p) {
-    p.set(clamp(p.x, BOUNDS.minX + 0.12, BOUNDS.maxX - 0.12), 0, clamp(p.z, BOUNDS.minZ + 0.12, BOUNDS.maxZ - 0.12));
+  /** Keep a spot on the field and off the robot's footprint. */
+  function clampToField(p) {
+    const m = MARGIN + 0.02;
+    p.set(clamp(p.x, FIELD.minX + m, FIELD.maxX - m), 0, clamp(p.z, FIELD.minZ + m, FIELD.maxZ - m));
     const s = ctl.state;
     const c = Math.cos(s.yaw);
     const sn = Math.sin(s.yaw);
@@ -241,13 +288,34 @@ export function createRobotScene({
       else lz = Math.sign(lz || 1) * 0.72;
       p.set(s.x + lx * c + lz * sn, 0, s.z - lx * sn + lz * c);
     }
+    return p;
+  }
+
+  /** A throw also has to stay readable: pull it toward home until it is. */
+  function clampTarget(p) {
+    clampToField(p);
     for (let i = 0; i < 14 && !onScreen(p); i++) p.lerp(homeVec, 0.15);
     return p;
   }
 
+  // Throws come from the viewer's side and out of frame, so the toy flies in.
+  const launch = new Vector3();
+  function launchFrom(p) {
+    for (let k = 0.3; k < 0.95; k += 0.05) {
+      launch.lerpVectors(p, camera.position, k);
+      launch.y = 0.25 + k * 0.6;
+      probe.copy(launch).project(camera);
+      if (probe.y < -1.1 || Math.abs(probe.x) > 1.1) break;
+    }
+    return launch;
+  }
+
   function throwTo(p) {
     if (!ready) return;
-    brain.throwTo(clampTarget(p));
+    endDrag(false);
+    clampTarget(p);
+    const from = launchFrom(p);
+    brain.throwTo(p, from, clamp(0.45 + from.distanceTo(p) * 0.12, 0.7, 1.1));
     onInteract?.();
     if (!running && !lost) frame(0);
   }
@@ -256,13 +324,81 @@ export function createRobotScene({
     if (!ready) return;
     const s = ctl.state;
     const p = new Vector3();
-    for (let i = 0; i < 30; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const r = 0.7 + Math.random() * 0.8;
-      p.set(HOME.x + Math.sin(a) * r * 1.3, 0, HOME.z + Math.cos(a) * r);
-      if (inBounds(p) && onScreen(p) && Math.hypot(p.x - s.x, p.z - s.z) > 0.85) break;
+    for (let i = 0; i < 40; i++) {
+      p.set(lerp(FIELD.minX, FIELD.maxX, Math.random()), 0, lerp(FIELD.minZ, FIELD.maxZ, Math.random()));
+      if (onScreen(p) && Math.hypot(p.x - s.x, p.z - s.z) > 0.85) break;
     }
     throwTo(p);
+  }
+
+  // Dragging the toy ---------------------------------------------------------
+  // A small handle element follows the toy on screen. It alone has
+  // touch-action: none, so a finger that lands on the toy drags it while a
+  // swipe anywhere else still scrolls the page.
+
+  const dragPlane = new Plane(UP, -(TOY_REST + DRAG_LIFT));
+  let dragId = null;
+  let handleShown = false;
+  let handleX = -1;
+  let handleY = -1;
+
+  function onHandleDown(e) {
+    if (e.button !== 0 || !ready || dragId !== null || !brain.grab()) return;
+    const handle = e.currentTarget;
+    handle.setPointerCapture(e.pointerId);
+    handle.style.cursor = 'grabbing';
+    dragId = e.pointerId;
+    onInteract?.();
+    if (!running && !lost) frame(0);
+  }
+
+  function onHandleMove(e) {
+    if (e.pointerId !== dragId) return;
+    const toy = brain.toy;
+    if (toy?.state !== 'dragged') {
+      endDrag(false);
+      return;
+    }
+    setNdc(e.clientX, e.clientY);
+    if (raycaster.ray.intersectPlane(dragPlane, hit)) toy.goal.copy(clampToField(hit));
+  }
+
+  function onHandleUp(e) {
+    if (e.pointerId === dragId) endDrag(true);
+  }
+
+  function endDrag(drop) {
+    if (dragId === null) return;
+    const handle = el('handle');
+    if (handle) {
+      if (handle.hasPointerCapture?.(dragId)) handle.releasePointerCapture(dragId);
+      handle.style.cursor = '';
+    }
+    dragId = null;
+    if (drop) brain.drop();
+  }
+
+  /** Keep the handle over the toy while it can be picked up. */
+  function updateHandle() {
+    const handle = el('handle');
+    if (!handle) return;
+    const toy = dragId !== null ? brain.toy : brain.draggable;
+    let show = false;
+    if (toy?.mesh.visible) {
+      probe.copy(toy.mesh.position).project(camera);
+      const x = (probe.x * 0.5 + 0.5) * width;
+      const y = (0.5 - probe.y * 0.5) * height;
+      show = x > 0 && x < width && y > 0 && y < height;
+      if (show && (Math.abs(x - handleX) > 0.25 || Math.abs(y - handleY) > 0.25)) {
+        handleX = x;
+        handleY = y;
+        handle.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%)`;
+      }
+    }
+    if (show !== handleShown) {
+      handleShown = show;
+      handle.style.display = show ? 'block' : 'none';
+    }
   }
 
   // Input ------------------------------------------------------------------
@@ -340,8 +476,9 @@ export function createRobotScene({
   /** Pointer-driven gaze, parallax and the floor reticle (once per frame). */
   function updatePointer(dt) {
     const active = input.mouse && performance.now() - input.moved < 6000;
-    orbit.goalPx = active ? clamp((input.x / window.innerWidth) * 2 - 1, -1, 1) : 0;
-    orbit.goalPy = active ? clamp((input.y / window.innerHeight) * 2 - 1, -1, 1) : 0;
+    const parallax = active && !reducedMotion.matches;
+    orbit.goalPx = parallax ? clamp((input.x / window.innerWidth) * 2 - 1, -1, 1) : 0;
+    orbit.goalPy = parallax ? clamp((input.y / window.innerHeight) * 2 - 1, -1, 1) : 0;
     // A few seconds after a drag, drift back to the composed view.
     if (!input.dragging && input.released && performance.now() - input.released > 5000) {
       orbit.goalAz = damp(orbit.goalAz, 0, 0.8, dt);
@@ -366,9 +503,9 @@ export function createRobotScene({
       brain.setPointer(look);
 
       const inside = Math.abs(ndc.x) <= 1 && Math.abs(ndc.y) <= 1;
-      if (inside && !input.dragging) {
+      if (inside && !input.dragging && dragId === null) {
         const overRobot = nearRobot(ray);
-        floorHover = !overRobot && ray.intersectPlane(floorPlane, hit) !== null && inBounds(hit) && onScreen(hit);
+        floorHover = !overRobot && ray.intersectPlane(floorPlane, hit) !== null && onScreen(hit);
         if (floorHover) hoverGoal.copy(hit);
         canvas.style.cursor = overRobot || floorHover ? 'pointer' : '';
       }
@@ -386,12 +523,29 @@ export function createRobotScene({
   let feedClock = Infinity;
   let hudText = '';
   let boxShown = false;
+  let clock = 0;
+  let watchUntil = -1;
+  let feedFade = 0;
+  let feedShown = false;
+
+  /** Fade the inset in for a fetch and out a moment after (WebGL quad and DOM frame together). */
+  function updateInset(dt) {
+    clock += dt;
+    if (WATCH.has(brain.state)) watchUntil = clock + (brain.state === 'present' ? LINGER : 0);
+    const want = Boolean(feed?.rect.w) && clock < watchUntil;
+    feedFade = approach(feedFade, want ? 1 : 0, dt / FEED_FADE);
+    if (want === feedShown) return;
+    feedShown = want;
+    if (want) feedClock = Infinity;
+    const frameEl = el('frame');
+    if (frameEl) frameEl.style.opacity = want ? '1' : '0';
+  }
 
   function step(dt) {
     if (!poster) updatePointer(dt);
     brain.update(dt);
     ctl.update(dt);
-    for (const t of toys) t.update(dt, BOUNDS);
+    for (const t of toys) t.update(dt, FIELD);
     placeCamera();
 
     const toy = brain.toy;
@@ -402,6 +556,9 @@ export function createRobotScene({
     }
     stage.update(ctl, toyWorld, strength, hover);
     scene.updateMatrixWorld();
+    frameRobot(dt);
+    if (feed) updateInset(dt);
+    if (!poster) updateHandle();
   }
 
   // The "detection" is the toy's real projected bounds in the robot camera;
@@ -433,7 +590,8 @@ export function createRobotScene({
 
   function draw(dt) {
     renderer.shadowMap.needsUpdate = true;
-    if (feed) {
+    const inset = feed && feedFade > 0;
+    if (inset) {
       feedClock += dt;
       if (feedClock >= feedInterval) {
         feedClock = feedClock === Infinity ? 0 : feedClock % feedInterval;
@@ -444,7 +602,7 @@ export function createRobotScene({
     }
     stage.setView(width * pixelRatio, height * pixelRatio, true);
     renderer.render(scene, camera);
-    feed?.draw(width, height);
+    if (inset) feed.draw(width, height, feedFade);
   }
 
   function frame(dt) {
@@ -458,14 +616,29 @@ export function createRobotScene({
 
   // Loop, visibility and adaptive quality ----------------------------------
 
-  const perf = { skip: 8, samples: [] };
+  const perf = { skip: 3, samples: [], slow: 0, slowMs: 0 };
 
-  // Median frame interval over 30 frames: step quality down above ~30 fps
-  // budget, and give up (poster + "Run demo") if it is hopeless.
+  // Frames over 100 ms several times in a row (about a second of real jank,
+  // where one long task elsewhere counts once) mean no usable GPU: stop now
+  // and hand back to the poster + "Run demo". Otherwise the median of 30
+  // frames steps quality down above a ~30 fps budget.
   function measure(ms) {
     if (perf.skip > 0) {
       perf.skip--;
       return;
+    }
+    if (ms > 100) {
+      perf.slow += 1;
+      perf.slowMs += Math.min(ms, 400);
+      if (!forced && perf.slow >= 4 && perf.slowMs >= 1000) {
+        gaveUp = true;
+        sync();
+        onSlow?.();
+        return;
+      }
+    } else {
+      perf.slow = 0;
+      perf.slowMs = 0;
     }
     perf.samples.push(ms);
     if (perf.samples.length < 30) return;
@@ -473,8 +646,7 @@ export function createRobotScene({
     const median = perf.samples[15];
     perf.samples.length = 0;
     perf.skip = 6;
-    if (median > 100 && !forced) onSlow?.();
-    else if (median > 34 && quality < QUALITY.length - 1) setQuality(quality + 1);
+    if (median > 34 && quality < QUALITY.length - 1) setQuality(quality + 1);
   }
 
   function tick(now) {
@@ -492,7 +664,13 @@ export function createRobotScene({
 
   function sync() {
     const should =
-      ready && visible && !document.hidden && !lost && !disposed && !(import.meta.env.DEV && manual);
+      ready &&
+      visible &&
+      !document.hidden &&
+      !lost &&
+      !disposed &&
+      !gaveUp &&
+      !(import.meta.env.DEV && manual);
     if (should && !running) {
       running = true;
       last = 0;
@@ -519,12 +697,14 @@ export function createRobotScene({
    * screen and for the camera's offscreen target, yielding in between.
    */
   async function warmUp() {
+    const target = feed?.rect.w ? feed.target : null;
     if (renderer.extensions.has('KHR_parallel_shader_compile')) {
       const jobs = [renderer.compileAsync(scene, camera)];
-      if (feed) {
-        renderer.setRenderTarget(feed.target);
+      if (target) {
+        renderer.setRenderTarget(target);
         jobs.push(renderer.compileAsync(scene, camera));
         renderer.setRenderTarget(null);
+        jobs.push(feed.warm());
       }
       await Promise.all(jobs).catch(() => {});
       return;
@@ -537,14 +717,15 @@ export function createRobotScene({
     });
     const meshes = [...groups.values()].flat();
     const shown = new Map(meshes.map((m) => [m, m.visible]));
+    const placed = toys.map((t) => t.mesh.position.clone());
     for (const t of toys) t.mesh.position.set(HOME.x, TOY_REST, HOME.z + 0.8);
     for (const list of groups.values()) {
       for (const m of meshes) m.visible = false;
       for (const m of list) m.visible = true;
       renderer.shadowMap.needsUpdate = true;
       renderer.render(scene, camera);
-      if (feed) {
-        renderer.setRenderTarget(feed.target);
+      if (target) {
+        renderer.setRenderTarget(target);
         renderer.render(scene, camera);
         renderer.setRenderTarget(null);
       }
@@ -552,7 +733,8 @@ export function createRobotScene({
       if (disposed) return;
     }
     for (const [m, v] of shown) m.visible = v;
-    feed?.draw(width, height);
+    toys.forEach((t, i) => t.mesh.position.copy(placed[i]));
+    if (target) feed.draw(width, height, 0);
   }
 
   async function boot() {
@@ -575,23 +757,27 @@ export function createRobotScene({
       scene,
       home: HOME,
       viewer: () => camera.position,
+      canDance: () => !reducedMotion.matches,
       onChange(state, message) {
         lastEvent = performance.now();
         status = STATUS[state];
-        onStatus?.(status);
         if (message) onAnnounce?.(message);
       },
     });
     ctl.reset(HOME.x, HOME.z, HOME.yaw, FIRST_LOOK);
+    brain.place(FIRST_TOY, FIRST_TOY.heading);
 
     await yieldToPage();
     if (disposed) return;
-    stage = createStage(renderer, scene, { mobile, home: HOME });
-    stage.setShadowSize(mobile ? 1024 : 2048);
+    stage = createStage(renderer, scene, { mobile, home: HOME, field: FIELD });
     applyPalette(palette);
-    resize();
     placeCamera();
     scene.updateMatrixWorld();
+    resize();
+    // The reflection bake compiles and renders on its own; give it a task.
+    await yieldToPage();
+    if (disposed) return;
+    stage.bakeEnvironment();
 
     if (poster) {
       frame(0);
@@ -611,6 +797,14 @@ export function createRobotScene({
     window.addEventListener('pointercancel', onPointerCancel);
     document.documentElement.addEventListener('pointerleave', onPointerLeave);
     document.addEventListener('visibilitychange', sync);
+    const handle = el('handle');
+    if (handle) {
+      handle.addEventListener('pointerdown', onHandleDown);
+      handle.addEventListener('pointermove', onHandleMove);
+      handle.addEventListener('pointerup', onHandleUp);
+      handle.addEventListener('pointercancel', onHandleUp);
+      handle.addEventListener('lostpointercapture', onHandleUp);
+    }
 
     // Test hook for the Playwright checks (deterministic stepping); stripped
     // from production builds.
@@ -694,6 +888,18 @@ export function createRobotScene({
       window.removeEventListener('pointercancel', onPointerCancel);
       document.documentElement.removeEventListener('pointerleave', onPointerLeave);
       document.removeEventListener('visibilitychange', sync);
+      const frameEl = el('frame');
+      if (frameEl) frameEl.style.opacity = '';
+      const handle = el('handle');
+      if (handle) {
+        handle.removeEventListener('pointerdown', onHandleDown);
+        handle.removeEventListener('pointermove', onHandleMove);
+        handle.removeEventListener('pointerup', onHandleUp);
+        handle.removeEventListener('pointercancel', onHandleUp);
+        handle.removeEventListener('lostpointercapture', onHandleUp);
+        handle.style.display = '';
+        handle.style.cursor = '';
+      }
       scene.traverse((o) => o.geometry?.dispose());
       for (const m of Object.values(materials)) m.dispose();
       toyMaterial.dispose();

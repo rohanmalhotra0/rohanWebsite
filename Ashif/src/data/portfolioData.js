@@ -10,6 +10,8 @@ export const profile = {
   website: 'https://rohanm.org',
   github: 'https://github.com/rohanmalhotra0',
   linkedin: 'https://www.linkedin.com/in/rohanamal',
+  /** This site's source (public). */
+  siteRepo: 'https://github.com/rohanmalhotra0/rohanWebsite',
   resumeUrl: assetUrl('Rohan_Malhotra_Resume.pdf'),
   headline: 'Applied AI, quantitative systems, and robotics.',
   /** Hero line: leads with the IBM robotics and Kalshi work, in past tense. */
@@ -17,16 +19,8 @@ export const profile = {
     'I’m a math and computer science double major at NYU Courant. At IBM I trained the vision system for a Boston Dynamics Spot demo, and at Kalshi I turned research on income risk into a prediction-market hedging tool.',
   school: 'NYU Courant',
   graduation: 'May 2027',
-  summary:
-    'I’m a math and computer science double major at NYU Courant. Lately I’ve been building Oracle finance tools, computer-vision systems for Boston Dynamics Spot, and quantitative research software.',
 };
 
-export const heroStats = [
-  { value: 99.5, decimals: 1, suffix: '%', label: 'mAP@50 on the Spot vision model' },
-  { value: 95.0, decimals: 1, suffix: '%', label: 'EPM task accuracy after fine-tuning, up from 36.7%' },
-  { value: 26, label: 'projects on this site' },
-  { value: 3, label: 'years to finish the NYU degree' },
-];
 
 export const photos = [
   {
@@ -171,7 +165,7 @@ export const workExperience = [
     tags: ['PyTorch', 'Data Engineering', 'Analytics'],
   },
   {
-    company: 'Hume Center',
+    company: 'Virginia Tech Hume Center',
     role: 'Aerospace Researcher',
     location: 'Blacksburg, VA',
     date: 'Nov 2024 – May 2025',
@@ -579,7 +573,7 @@ export const sections = [
   { id: 'research', label: 'Research' },
   { id: 'about', label: 'About' },
   { id: 'education', label: 'Education' },
-  { id: 'rohangpt', label: 'Ask me' },
+  { id: 'rohangpt', label: 'Chat' },
   { id: 'contact', label: 'Contact' },
 ];
 
@@ -598,11 +592,9 @@ export const education = {
   dates: 'Aug 2024 – May 2027',
   location: 'New York, NY',
   logoUrl: assetUrl('website-photos/Work%20Logos/new_york_university_logo.jpeg'),
-  accelerated:
-    'Completing the degree in three years, with expected graduation in May 2027.',
+  accelerated: 'I’m finishing the degree in three years.',
   graduateCourse: {
     title: 'Mathematical Techniques for CS Applications',
-    description: 'Advanced mathematical tools for algorithms, modeling, and computation.',
   },
   coursework: [
     'Algorithms',

@@ -29,6 +29,7 @@ uniform vec3 uTape;
 uniform vec3 uAccent;
 uniform vec4 uAlpha;   // grid, tape, shade, main view (edge fade + reticle)
 uniform vec4 uHome;    // x, z, cos(yaw), sin(yaw)
+uniform vec4 uField;   // centre x, z, half extents x, z
 uniform vec4 uBody;    // x, z, yaw, strength
 uniform vec4 uFeet[4]; // x, z, contact, -
 uniform vec4 uToy;     // x, z, strength, radius
@@ -64,9 +65,10 @@ vec4 over(vec4 dst, vec3 color, float a) {
 void main() {
   // Robot camera (main view off): solid floor, wider extent, bolder marks.
   float feed = 1.0 - uAlpha.w;
-  vec2 rel = vXZ - uHome.xy;
-  float r = length(rel);
-  float fade = 1.0 - smoothstep(mix(1.0, 2.2, feed), mix(2.6, 5.0, feed), r);
+  float field = box(vXZ, uField.xy, uField.zw);
+  // Main view: the grid fills the taped field and fades out just past it.
+  // Robot camera: a wider fade around home, so it always sees floor.
+  float fade = mix(1.0 - smoothstep(0.0, 0.9, field), 1.0 - smoothstep(2.2, 5.0, length(vXZ - uHome.xy)), feed);
   if (uAlpha.w > 0.5) {
     vec2 uv = gl_FragCoord.xy / uView;
     vec2 edge = min(uv, 1.0 - uv) * uView / min(uView.x, uView.y);
@@ -75,9 +77,8 @@ void main() {
 
   float lines = max(grid(vXZ, 0.25, 0.0012) * 0.55, grid(vXZ, 1.0, 0.002));
 
-  // A thin taped rectangle marking the robot's home spot.
-  vec2 q = mat2(uHome.z, -uHome.w, uHome.w, uHome.z) * rel;
-  float tape = fill(abs(box(q, vec2(0.0), vec2(0.33, 0.6))) - 0.006);
+  // Thin tape around the play field.
+  float tape = fill(abs(field) - 0.007);
 
   // Soft contact shadow: body footprint, feet and toy.
   float c = cos(uBody.z);
@@ -112,14 +113,8 @@ const LIGHTING = {
   dark: { hemi: 0.75, key: 2.6, rim: 2.2, env: 0.5, shadow: 0.55, grid: 0.55, tape: 0.2, shade: 0.55, feed: 0.2 },
 };
 
-export function createStage(renderer, scene, { mobile, home }) {
-  // Soft studio reflections, baked once.
-  const pmrem = new PMREMGenerator(renderer);
-  const room = new RoomEnvironment();
-  const envTarget = pmrem.fromScene(room, 0.04);
-  scene.environment = envTarget.texture;
-  room.dispose();
-  pmrem.dispose();
+export function createStage(renderer, scene, { mobile, home, field }) {
+  let envTarget = null;
 
   const hemi = new HemisphereLight(0xffffff, 0x808080, 1);
   const key = new DirectionalLight(0xfffaf2, 2.6);
@@ -136,7 +131,7 @@ export function createStage(renderer, scene, { mobile, home }) {
   rim.position.set(2.6, 2.4, -3.2);
   scene.add(hemi, key, key.target, rim);
 
-  const plane = new PlaneGeometry(9, 9);
+  const plane = new PlaneGeometry(12, 12);
   plane.rotateX(-Math.PI / 2);
 
   const catcher = new Mesh(plane, new ShadowMaterial({ depthWrite: false }));
@@ -149,6 +144,14 @@ export function createStage(renderer, scene, { mobile, home }) {
     uAccent: { value: new Color() },
     uAlpha: { value: new Vector4(0.6, 0.5, 0.25, 1) },
     uHome: { value: new Vector4(home.x, home.z, Math.cos(home.yaw), Math.sin(home.yaw)) },
+    uField: {
+      value: new Vector4(
+        (field.minX + field.maxX) / 2,
+        (field.minZ + field.maxZ) / 2,
+        (field.maxX - field.minX) / 2,
+        (field.maxZ - field.minZ) / 2
+      ),
+    },
     uBody: { value: new Vector4() },
     uFeet: { value: [new Vector4(), new Vector4(), new Vector4(), new Vector4()] },
     uToy: { value: new Vector4() },
@@ -172,6 +175,17 @@ export function createStage(renderer, scene, { mobile, home }) {
 
   return {
     uniforms,
+
+    /** Soft studio reflections, baked once (a separate boot step: it compiles and renders). */
+    bakeEnvironment() {
+      if (envTarget) return;
+      const pmrem = new PMREMGenerator(renderer);
+      const room = new RoomEnvironment();
+      envTarget = pmrem.fromScene(room, 0.04);
+      scene.environment = envTarget.texture;
+      room.dispose();
+      pmrem.dispose();
+    },
 
     /** Smaller shadow maps for slower devices (no shader recompiles). */
     setShadowSize(px) {
@@ -213,7 +227,7 @@ export function createStage(renderer, scene, { mobile, home }) {
     },
 
     dispose() {
-      envTarget.dispose();
+      envTarget?.dispose();
       plane.dispose();
       floor.material.dispose();
       catcher.material.dispose();
