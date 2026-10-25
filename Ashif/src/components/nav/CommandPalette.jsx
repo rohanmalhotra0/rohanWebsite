@@ -374,7 +374,7 @@ function Option({ id, entry, active, copied, onHover, onSelect }) {
       onClick={onSelect}
       className={cn(
         'flex h-11 cursor-pointer select-none items-center gap-3 rounded-md px-2.5 text-sm sm:h-10 pointer-coarse:h-11',
-        active && 'bg-surface-2'
+        active && 'bg-fg/[0.06] dark:bg-fg/[0.08]'
       )}
     >
       <Icon

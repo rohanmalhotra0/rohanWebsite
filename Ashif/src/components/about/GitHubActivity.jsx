@@ -53,7 +53,11 @@ function Activity({ activity, fadeIn }) {
       <p className="text-[13px] leading-5 text-subtle">On GitHub</p>
       <p className="mt-1 text-pretty break-words text-muted">
         Last pushed to <RepoLink repo={repo}>{repo}</RepoLink>{' '}
-        <time dateTime={new Date(pushedAt).toISOString()} title={exactTime.format(pushedAt)}>
+        <time
+          dateTime={new Date(pushedAt).toISOString()}
+          title={exactTime.format(pushedAt)}
+          className="whitespace-nowrap"
+        >
           {timeAgo(pushedAt, now)}
         </time>
         .{others.length ? <> Also active in {otherLinks}.</> : null}

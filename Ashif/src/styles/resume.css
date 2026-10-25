@@ -136,10 +136,6 @@
   text-align: right;
 }
 
-.rv-contact-sep {
-  color: var(--paper-meta);
-}
-
 /* ---------- Sections: a hanging title column and a body column ---------- */
 
 .rv-section {
@@ -189,61 +185,47 @@
   white-space: nowrap;
 }
 
-.rv-org {
-  color: var(--paper-ink);
-  font-size: 13px;
-  font-weight: 650;
-  line-height: 17px;
-  letter-spacing: -0.005em;
-}
-
-.rv-org-note {
-  color: var(--paper-meta);
-  font-weight: 400;
-}
-
-.rv-role {
-  color: var(--paper-ink);
-  font-weight: 520;
-}
-
-.rv-role-note {
-  color: var(--paper-text);
-  font-weight: 400;
-}
-
-.rv-job + .rv-job {
-  margin-top: 7px;
-}
-
-.rv-title-line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 10px;
-}
-
-.rv-title {
+.rv-heading {
   color: var(--paper-ink);
   font-size: 12.5px;
-  font-weight: 620;
-  line-height: 18px;
+  line-height: 17px;
+}
+
+.rv-strong {
+  color: var(--paper-ink);
+  font-weight: 650;
+}
+
+.rv-inline {
+  display: inline;
+}
+
+.rv-note,
+.rv-sep {
+  color: var(--paper-meta);
+  font-weight: 400;
 }
 
 .rv-url {
-  color: var(--paper-meta);
   font-size: 11.5px;
+}
+
+/* The degree line under the school. */
+.rv-sub {
+  color: var(--paper-ink);
+  font-weight: 480;
+}
+
+.rv-sub .rv-sep {
+  font-weight: 400;
 }
 
 .rv-text {
-  margin-top: 1px;
   text-wrap: pretty;
 }
 
-.rv-stack {
-  margin-top: 2px;
-  color: var(--paper-meta);
-  font-size: 11.5px;
+.rv-gap {
+  margin-top: 4px;
 }
 
 .rv-key {
@@ -251,11 +233,13 @@
   font-weight: 520;
 }
 
-.rv-gap {
-  margin-top: 4px;
+.rv-stack {
+  margin-top: 1px;
+  color: var(--paper-meta);
+  font-size: 11px;
 }
 
-/* Bullets hang in the gutter so the text lines up with the role title. */
+/* Bullets hang in the gutter so the text lines up with the heading. */
 .rv-bullets {
   margin-top: 2px;
 }
@@ -273,16 +257,12 @@
   content: "";
   position: absolute;
   top: 0.75em;
-  left: -13px;
+  left: -12px;
   width: 6px;
   border-top: 1px solid var(--paper-meta);
 }
 
-/* Key and value lines: education facts and skills. */
-.rv-facts {
-  margin-top: 5px;
-}
-
+/* Skills: label and list. */
 .rv-facts > div {
   display: grid;
   grid-template-columns: 112px minmax(0, 1fr);
@@ -302,7 +282,7 @@
 
 @media (max-width: 879px) {
   .rv-paper {
-    padding: 40px 40px 44px;
+    padding: 40px 36px 44px;
   }
 }
 
@@ -346,7 +326,7 @@
     text-align: left;
   }
 
-  .rv-head > .rv-headline + .rv-contact {
+  .rv-headline + .rv-contact {
     margin-top: 10px;
   }
 
@@ -356,7 +336,7 @@
     min-height: 36px;
   }
 
-  .rv-contact-sep {
+  .rv-contact .rv-sep {
     display: none;
   }
 
@@ -380,22 +360,17 @@
     margin-top: 20px;
   }
 
-  .rv-org {
-    font-size: 16px;
-    line-height: 1.4;
+  .rv-heading {
+    font-size: 15px;
+    line-height: 1.45;
   }
 
-  .rv-org-note {
+  .rv-college {
     display: block;
   }
 
-  .rv-org-sep {
+  .rv-college-comma {
     display: none;
-  }
-
-  .rv-title {
-    font-size: 15px;
-    line-height: 1.4;
   }
 
   .rv-row {
@@ -403,8 +378,8 @@
   }
 
   .rv-meta {
-    margin-left: 0;
     flex-basis: 100%;
+    margin-left: 0;
     font-size: 13px;
     white-space: normal;
   }
@@ -414,8 +389,8 @@
     font-size: 13px;
   }
 
-  .rv-job + .rv-job {
-    margin-top: 14px;
+  .rv-gap {
+    margin-top: 8px;
   }
 
   .rv-bullets {
@@ -504,7 +479,6 @@
     text-decoration: none !important;
   }
 
-  .rv-job,
   .rv-entry,
   .rv-facts > div,
   .rv-bullets li {

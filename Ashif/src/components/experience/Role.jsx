@@ -4,8 +4,8 @@ import CompanyLogo from './CompanyLogo';
 import Highlights from './Highlights';
 
 /**
- * Dates and location. One line above the role on phones; a two-line column
- * from md up, baseline-aligned with the role title beside it.
+ * Dates and location: one line on phones, two lines from md up, where the
+ * first is baseline-aligned with the role title beside it.
  */
 export function RoleMeta({ date, location, className }) {
   return (
@@ -13,6 +13,7 @@ export function RoleMeta({ date, location, className }) {
       <span className="md:block">{date}</span>
       {location ? (
         <>
+          <span className="sr-only">, </span>
           <span aria-hidden="true" className="md:hidden">
             {' · '}
           </span>
@@ -28,9 +29,11 @@ export function RoleMeta({ date, location, className }) {
  * Logo tile beside a two-line title block. The tile is positioned out of flow
  * so the block's first baseline is the title's, which the meta column aligns to.
  */
-export function RoleHeader({ company, imageUrl, title, subtitle }) {
+export function RoleHeader({ company, imageUrl, title, subtitle, className }) {
   return (
-    <header className="relative flex min-h-10 flex-col justify-center pl-[3.25rem]">
+    <header
+      className={cn('relative flex min-h-10 flex-col justify-center pl-[3.25rem]', className)}
+    >
       <CompanyLogo
         company={company}
         src={imageUrl}
@@ -45,14 +48,14 @@ export function RoleHeader({ company, imageUrl, title, subtitle }) {
 }
 
 /** Summary, highlights, and tools for one role. */
-export function RoleBody({ role, expanded }) {
+export function RoleBody({ role, expanded, className }) {
   return (
-    <>
+    <div className={className}>
       <p className="mt-5 max-w-[38rem] text-pretty text-base leading-[1.625rem] text-muted">
         {role.summary}
       </p>
       <Highlights items={role.highlights} expanded={expanded} className="mt-4" />
       <TechList items={role.tags} className="mt-5" />
-    </>
+    </div>
   );
 }

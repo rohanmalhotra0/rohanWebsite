@@ -77,7 +77,7 @@ export default function Footer() {
         </div>
 
         {/* Same columns as above: "Back to top" lines up with the Elsewhere links. */}
-        <div className="grid grid-cols-2 items-baseline gap-x-8 border-t border-line pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 text-[13px] leading-5 text-subtle md:grid-cols-12 md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="grid grid-cols-2 items-baseline gap-x-8 border-t border-line pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3 text-[13px] leading-5 text-subtle md:grid-cols-12 md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <p className="text-muted md:col-span-7">
             © {year} {profile.name}
           </p>

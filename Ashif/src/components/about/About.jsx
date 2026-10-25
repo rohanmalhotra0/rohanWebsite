@@ -22,7 +22,7 @@ export default function About() {
 
           <Reveal
             as="p"
-            className="text-pretty text-[1.375rem] font-[450] leading-[1.42] tracking-[-0.012em] text-fg sm:text-2xl md:col-span-11 md:row-start-2 lg:col-span-6 xl:text-[1.625rem]"
+            className="text-pretty text-[1.375rem] font-[450] leading-[1.42] tracking-[-0.012em] text-fg sm:text-2xl md:col-span-11 md:row-start-2 lg:col-span-6 xl:text-[1.75rem] xl:leading-[1.38]"
           >
             I learn by building. If I get curious about prediction markets, I make a hedging
             model. If I want to understand computer vision, I train a robot to find a toy. This

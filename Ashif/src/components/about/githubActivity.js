@@ -116,8 +116,14 @@ const UNITS = [
 /** "3 hours ago", "yesterday", "last week". Never less than a minute or in the future. */
 export function timeAgo(time, now) {
   const elapsed = Math.max(now - time, MINUTE);
-  const [unit, size] = UNITS.find(([, length]) => elapsed >= length);
-  return relativeTime.format(-Math.floor(elapsed / size), unit);
+  const index = UNITS.findIndex(([, size]) => elapsed >= size);
+  const [unit, size] = UNITS[index];
+  const value = Math.round(elapsed / size);
+  // Rounding up into the next unit: 23.6 hours reads as "yesterday", not "24 hours ago".
+  if (index > 0 && value * size >= UNITS[index - 1][1]) {
+    return relativeTime.format(-1, UNITS[index - 1][0]);
+  }
+  return relativeTime.format(-value, unit);
 }
 
 export const repoUrl = (repo) => `https://github.com/${repo}`;
