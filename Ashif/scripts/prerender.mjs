@@ -157,7 +157,9 @@ try {
     try {
       const { links, markup } = splitHoisted(await render(route.path ?? '/404/'));
       const app = route.id === 'home' ? themePoster(markup) : markup;
-      const preloads = [...(route.id === 'home' ? [] : links), ...pageAssets(manifest, route, template)];
+      // The home page's code is in the main chunk, which the template already
+      // loads (see src/main.jsx), and index.html's script preloads its poster.
+      const preloads = route.id === 'home' ? [] : [...links, ...pageAssets(manifest, route, template)];
       const html = head
         .replace('</head>', () => `${preloads.map((tag) => `    ${tag}\n`).join('')}  </head>`)
         .replace(

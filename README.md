@@ -47,8 +47,10 @@ npm run build     # outputs Ashif/dist
   plain `<a href="/projects/">` links into in-place page changes with a short
   crossfade, remembers scroll positions for Back, and moves focus to the new
   page's heading. Each page's code is its own chunk, fetched on hover and
-  when the browser is idle. Old one-page links (`/#projects`, `/#/resume`,
-  `/#project/<slug>`) are redirected by `index.html`.
+  when the browser is idle; the home page's ships in the main bundle, so the
+  page most visits start on hydrates without another request. Old one-page
+  links (`/#projects`, `/#/resume`, `/#project/<slug>`) are redirected by
+  `index.html`.
 - `npm run build` also renders every page on the server
   (`Ashif/src/entry-server.jsx`) and writes each one to its own HTML file with
   its own title and description (`Ashif/scripts/prerender.mjs`), plus

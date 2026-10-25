@@ -3,7 +3,12 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import '@fontsource-variable/mona-sans/wght.css';
 import './index.css';
 import App from './App.jsx';
-import { findRoute, loadRoute, notFoundRoute } from './routes';
+import HomePage from './pages/HomePage';
+import { definePage, findRoute, loadRoute, notFoundRoute } from './routes';
+
+// Most visits start on the home page, so its code is in this chunk instead
+// of its own: the page hydrates without waiting on another request.
+definePage('home', HomePage);
 
 // After a redeploy, an open tab still points at the old hashed chunks, which
 // are gone. Reload once to pick up the new build; the timestamp stops a reload

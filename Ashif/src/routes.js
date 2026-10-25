@@ -1,10 +1,14 @@
 // The site's pages. Each has its own URL and is prerendered into its own HTML
 // file at build time (scripts/prerender.mjs). Each page's code is a separate
-// chunk that loads when a visitor is about to need it (see lib/router.jsx).
+// chunk that loads when a visitor is about to need it (see lib/router.js),
+// except the home page's, which is in the main chunk (see main.jsx).
 import { projects } from '@/data/portfolioData';
 
-// One lazy loader per file in ./pages, keyed by './pages/<Name>.jsx'.
-const pageModules = import.meta.glob('./pages/*.jsx');
+// One lazy loader per file in ./pages, keyed by './pages/<Name>.jsx'. Not the
+// home page: main.jsx and entry-server.jsx import it and hand it over with
+// definePage. Importing it here would be a cycle, and its sections call
+// routeById as they load.
+const pageModules = import.meta.glob(['./pages/*.jsx', '!./pages/HomePage.jsx']);
 
 /**
  * `page` names the component file in ./pages. `label` puts a route in the
@@ -171,6 +175,11 @@ export function loadRoute(route) {
     loading.set(route.id, promise);
   }
   return promise;
+}
+
+/** Hand over a page component an entry imported directly (the home page). */
+export function definePage(id, component) {
+  loaded.set(id, component);
 }
 
 /** The route's page component if it has loaded, else null. */
