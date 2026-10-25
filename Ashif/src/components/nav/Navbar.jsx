@@ -37,7 +37,7 @@ export default function Navbar() {
     loadPalette().then(
       (module) => setPaletteComponent(() => module.default),
       // Offline, or the chunk is gone after a redeploy: drop the queued open
-      // so the next ⌘K starts fresh and retries the load.
+      // instead of leaving it pending. The rest of the page is unaffected.
       () => setPaletteOpen(false)
     );
   }, []);

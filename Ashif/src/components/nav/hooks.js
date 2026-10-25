@@ -266,7 +266,13 @@ export function useModalFocus(open, { initialRef, containerRef, returnRef }) {
 
   useLayoutEffect(() => {
     if (open) {
-      returnTo.current = returnRef?.current ?? document.activeElement;
+      const current = document.activeElement;
+      // A re-run while already open (StrictMode, or a modal that mounts open,
+      // like the lazily loaded palette) must not take the modal's own field
+      // as the place to return to.
+      if (!containerRef.current?.contains(current)) {
+        returnTo.current = returnRef?.current ?? current;
+      }
       restore.current = true;
       initialRef.current?.focus({ preventScroll: true });
       return;

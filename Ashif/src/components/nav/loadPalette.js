@@ -5,7 +5,11 @@
 
 let pending = null;
 
-/** Import the palette chunk once. A failed load is forgotten, so the next call retries. */
+/**
+ * Import the palette chunk once. A failed load isn't kept, so a later call
+ * can try again where the browser allows it (Chromium remembers a failed
+ * module fetch until the page reloads).
+ */
 export function loadPalette() {
   pending ??= import('./CommandPalette').catch((error) => {
     pending = null;
