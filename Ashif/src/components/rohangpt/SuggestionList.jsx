@@ -20,7 +20,7 @@ export default function SuggestionList({ onAsk, labelledBy, compact = false, cla
             <ArrowRight
               aria-hidden="true"
               strokeWidth={1.75}
-              className="size-4 shrink-0 -translate-x-1 text-subtle opacity-0 transition-[opacity,translate,color] duration-200 ease-out group-hover:translate-x-0 group-hover:text-accent-strong group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 [@media(hover:none)]:translate-x-0 [@media(hover:none)]:opacity-100"
+              className="size-4 shrink-0 -translate-x-1 text-subtle opacity-0 transition-[opacity,translate,color] duration-200 ease-out group-hover:translate-x-0 group-hover:text-accent-strong group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
             />
           </button>
         </li>

@@ -52,20 +52,9 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
         {TYPEWRITER_CSS}
       </style>
 
-      <div className="flex h-12 shrink-0 items-center justify-between gap-4 border-b border-line pl-4 pr-1 sm:pl-5">
-        <h3 id={TITLE_ID} className="text-[13px] text-subtle">
-          Conversation
-        </h3>
-        {hasMessages ? (
-          <button
-            type="button"
-            onClick={clear}
-            className="h-11 rounded-md px-3 text-[13px] text-subtle transition-colors duration-150 hover:text-fg"
-          >
-            Clear
-          </button>
-        ) : null}
-      </div>
+      <h3 id={TITLE_ID} className="sr-only">
+        Conversation
+      </h3>
 
       <div
         ref={scrollRef}
@@ -83,7 +72,7 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
             role="log"
             aria-live="polite"
             aria-label="Messages"
-            className="mt-6 flex flex-col gap-6 empty:mt-0"
+            className="mt-7 flex flex-col empty:mt-0"
           >
             {messages.map((message) =>
               message.role === 'user' ? (
@@ -103,6 +92,7 @@ export default function ChatPanel({ chat, inputRef, panelRef, onAsk, finePointer
         onSend={sendMessage}
         error={error}
         onRetry={retry}
+        onClear={hasMessages ? clear : null}
       />
     </div>
   );

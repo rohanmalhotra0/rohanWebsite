@@ -10,7 +10,7 @@ const MAX_INPUT_HEIGHT = 160;
  * The question box. Enter sends, Shift+Enter adds a line. While a reply is
  * pending it is read-only (not disabled) so it keeps focus.
  */
-export default function Composer({ inputRef, busy, onSend, error, onRetry }) {
+export default function Composer({ inputRef, busy, onSend, error, onRetry, onClear }) {
   const [draft, setDraft] = useState('');
   const canSend = draft.trim().length > 0 && !busy;
 
@@ -68,18 +68,33 @@ export default function Composer({ inputRef, busy, onSend, error, onRetry }) {
           aria-disabled={!canSend}
           // Keep focus (and the phone keyboard) in the textarea when tapped.
           onPointerDown={(event) => event.preventDefault()}
-          className="grid size-11 shrink-0 place-items-center rounded-md bg-fg text-bg transition-[background-color,color,scale] duration-150 active:scale-95 aria-disabled:cursor-default aria-disabled:bg-fg/10 aria-disabled:text-subtle aria-disabled:active:scale-100 pointer-fine:size-9"
+          className="grid size-11 shrink-0 place-items-center rounded-md text-fg transition-[background-color,color,scale] duration-150 hover:bg-surface-2 active:scale-95 aria-disabled:cursor-default aria-disabled:text-subtle aria-disabled:hover:bg-transparent aria-disabled:active:scale-100 pointer-fine:size-9"
         >
           <ArrowUp aria-hidden="true" className="size-[18px]" strokeWidth={2} />
         </button>
       </div>
-      {error ? (
-        <p id={ERROR_ID} role="alert" className="mt-2 px-1 text-[13px] leading-5 text-accent-strong">
-          {error}{' '}
-          <button type="button" onClick={onRetry} className="link font-medium text-fg">
-            Try again
-          </button>
-        </p>
+      {error || onClear ? (
+        <div className="mt-2 flex items-start justify-between gap-4 px-1 text-[13px] leading-5">
+          {error ? (
+            <p id={ERROR_ID} role="alert" className="text-accent-strong">
+              {error}{' '}
+              <button type="button" onClick={onRetry} className="link font-medium text-fg">
+                Try again
+              </button>
+            </p>
+          ) : (
+            <span />
+          )}
+          {onClear ? (
+            <button
+              type="button"
+              onClick={onClear}
+              className="-my-3 shrink-0 px-1 py-3 text-subtle transition-colors duration-150 hover:text-fg"
+            >
+              Clear
+            </button>
+          ) : null}
+        </div>
       ) : null}
     </form>
   );
