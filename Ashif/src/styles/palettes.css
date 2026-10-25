@@ -412,7 +412,7 @@
 }
 
 [data-palette="spot"][data-theme="light"] .hero-lab {
-  @apply block-b mesh grain;
+  @apply block-b;
 }
 
 [data-palette="terminal"][data-theme="light"] {
@@ -420,7 +420,7 @@
 }
 
 [data-palette="terminal"][data-theme="light"] .hero-lab {
-  @apply block-a mesh grain;
+  @apply block-a;
 }
 
 [data-palette="courant"][data-theme="light"] {
@@ -428,7 +428,7 @@
 }
 
 [data-palette="courant"][data-theme="light"] .hero-lab {
-  @apply block-c mesh grain;
+  @apply block-c;
 }
 
 [data-palette="market"][data-theme="light"] {
@@ -436,7 +436,23 @@
 }
 
 [data-palette="market"][data-theme="light"] .hero-lab {
-  @apply block-c mesh grain;
+  @apply block-c;
+}
+
+/* The panel's glow lies over the stage (screen blend, under the stage's
+   button and camera inset), not behind it: the posters in a lab are opaque
+   on the panel color (much smaller than transparent ones), and the live
+   scene and the posters get the same light. No grain, which would show
+   behind the live scene only. */
+:root[data-theme="light"]:not([data-palette="paper"]) .hero-lab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  @apply mesh;
 }
 
 /* The home hero's main button (an ink button, Hero.jsx) is in the palette's
